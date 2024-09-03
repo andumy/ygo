@@ -20,6 +20,7 @@ use function strtoupper;
  * @property string card_set_code
  * @property string rarity_verbose
  * @property string rarity_code
+ * @property string rarity
  */
 class CardInstance extends Model
 {

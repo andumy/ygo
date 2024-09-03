@@ -2,12 +2,11 @@
 
 namespace App\Livewire;
 
-use App\Models\CardInstance;
-use App\Models\OwnedCard;
+use App\Enums\AddCardStatuses;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;
 use App\Repositories\OwnedCardRepository;
-use Illuminate\Support\Collection;
+use App\Services\CardService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,49 +15,53 @@ class Cards extends Component
     use WithPagination;
 
     public string $code = '';
+    public string $rarity = '';
+    public array $rarities = [];
     public string $search = '';
     public string $message = '';
     private CardRepository $cardRepository;
     private CardInstanceRepository $cardInstanceRepository;
     private OwnedCardRepository $ownedCardRepository;
+    private CardService $cardService;
 
     public function boot(
         CardRepository $cardRepository,
         CardInstanceRepository $cardInstanceRepository,
-        OwnedCardRepository $ownedCardRepository
+        OwnedCardRepository $ownedCardRepository,
+        CardService $cardService
     )
     {
         $this->cardRepository = $cardRepository;
         $this->cardInstanceRepository = $cardInstanceRepository;
         $this->ownedCardRepository = $ownedCardRepository;
+        $this->cardService = $cardService;
     }
 
     public function addCard()
     {
+
         $this->message = '';
         if($this->code === '') return;
 
-        /** @var Collection<CardInstance> $cardInstance */
-        $cardInstance = $this->cardInstanceRepository->findBySetCode($this->code);
-        /** @var OwnedCard $ownCard */
-        $ownCard = $cardInstance->first()->ownedCard;
+        $response = $this->cardService->addCard($this->code, $this->rarity);
 
-        if($ownCard) {
-            $ownCard->amount += 1;
-            $ownCard->save();
-            $this->message =
-                $ownCard->cardInstance->card->name . ' variant ' .
-                $ownCard->cardInstance->card_set_code . ' incremented to ' .
-                $ownCard->amount;
-            return;
+        switch ($response->status) {
+            case AddCardStatuses::MULTIPLE_OPTIONS:
+                $this->message = 'Select the rarity';
+                $this->rarities = $response->rarities;
+                break;
+            case AddCardStatuses::NEW_CARD:
+                $this->message = 'New card added: ' . $response->cardName;
+                $this->rarities = [];
+                $this->rarity = '';
+                break;
+            case AddCardStatuses::INCREMENT:
+                $this->message =  $response->cardName . ' incremented';
+                $this->rarities = [];
+                $this->rarity = '';
+                break;
         }
-        $ownCard = $this->ownedCardRepository->create([
-            'card_instance_id' => $cardInstance->first()->id,
-            'amount' => 1,
-        ]);
-        $this->message =
-            $ownCard->cardInstance->card->name . ' variant ' .
-            $ownCard->cardInstance->card_set_code . ' was added ';
+
     }
 
     public function fetchCards()

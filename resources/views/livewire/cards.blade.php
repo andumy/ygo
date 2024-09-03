@@ -5,7 +5,7 @@
         </h1>
     </div>
     <div class="">
-        <p class="bg-green-300 text-white">
+        <p class="bg-green-300 text-stone-700">
             {{$message}}
         </p>
     </div>
@@ -16,6 +16,11 @@
                 type="text"
                 wire:model="code"
             >
+            <select wire:model="rarity">
+                @foreach($rarities as $r)
+                    <option value="{{$r}}">{{$r}}</option>
+                @endforeach
+            </select>
             <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="addCard">
                 Add Card
             </button>
