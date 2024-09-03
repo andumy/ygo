@@ -35,9 +35,9 @@
                 placeholder="Search"
             >
         </div>
-
     </div>
-    <div class="grid gap-6 grid-cols-10 grid-rows-1">
+    {{$cards->links()}}
+    <div class="grid gap-6 grid-cols-10 grid-rows-1 py-5">
         @foreach($cards as $card)
             <div class="flex flex-col text-stone-400">
                 <img @if(!$card->isOwned)
