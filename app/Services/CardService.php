@@ -23,6 +23,12 @@ class CardService
         /** @var Collection<CardInstance> $cardInstances */
         $cardInstances = $this->cardInstanceRepository->findBySetCode($code);
 
+        if($cardInstances->isEmpty()){
+            return new AddCardResponse(
+                status: AddCardStatuses::NOT_FOUND,
+            );
+        }
+
         if($cardInstances->count() > 1 && !$rarity){
             return new AddCardResponse(
                 status: AddCardStatuses::MULTIPLE_OPTIONS,

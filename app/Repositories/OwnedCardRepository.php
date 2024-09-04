@@ -9,4 +9,9 @@ class OwnedCardRepository
     public function create(array $data): OwnedCard{
         return OwnedCard::create($data);
     }
+
+    public function countAmountOfCards(): int {
+        return OwnedCard::sum('amount');
+    }
+
 }

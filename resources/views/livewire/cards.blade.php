@@ -1,20 +1,38 @@
 <div class="w-screen p-10 text-stone-700">
-    <div class="pb-10 text-xl font-bold">
-        <h1>
+    <div class="pb-10">
+        <h1 class="text-2xl font-bold">
             YU-GI-OH! Library
         </h1>
+        <div class="flex pt-2 justify-between">
+            <div class="flex">
+                <h3 class="text-lg font-bold text-cyan-400">
+                    {{$owned}} Owned
+                </h3>
+                <p class="px-5 text-lg">/</p>
+                <h3 class="text-lg font-bold">
+                    {{$total}} Total
+                </h3>
+                <h3 class="text-lg font-bold ps-10 text-stone-300">
+                    ({{round($owned/$total*100,2)}} %)
+                </h3>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-cyan-700">
+                    {{$amountOfCards}} Physical Cards
+                </h3>
+            </div>
+        </div>
     </div>
-    <div class="">
-        <p class="bg-green-300 text-stone-700">
-            {{$message}}
-        </p>
-    </div>
+    <p class="bg-green-300 text-stone-700">
+        {{$message}}
+    </p>
     <div class="py-10 flex justify-between">
         <div class="flex">
             <input
                 class="appearance-none border rounded text-black"
                 type="text"
                 wire:model="code"
+                placeholder="Card Code"
             >
             <select wire:model="rarity">
                 @foreach($rarities as $r)
@@ -26,7 +44,17 @@
             </button>
         </div>
 
+
         <div class="flex">
+            <select wire:model="set" wire:change="fetchCards" class="mx-4">
+                <option value="">All sets</option>
+                @foreach($sets as $s)
+                    <option value="{{$s->name}}">
+                        {{$s->name}}
+                        ({{$fillBySet[$s->name]['owned']}} / {{$fillBySet[$s->name]['total']}})
+                    </option>
+                @endforeach
+            </select>
             <input
                 class="appearance-none border rounded text-black"
                 type="text"

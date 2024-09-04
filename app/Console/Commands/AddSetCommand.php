@@ -16,7 +16,7 @@ class AddSetCommand extends Command
     protected $signature = 'add:set
                                     {code : the set code}
                                     {start : the starting number}
-                                    {end : the last number}';
+                                    {end? : the last number}';
 
     /**
      * The console command description.
@@ -32,7 +32,7 @@ class AddSetCommand extends Command
     {
         $code = $this->argument('code');
         $start = $this->argument('start');
-        $end = $this->argument('end');
+        $end = $this->argument('end') ?? $start;
 
         $range = $this->generateRangeWithLeadingZeros($start, $end);
 
@@ -57,6 +57,9 @@ class AddSetCommand extends Command
                     break;
                 case AddCardStatuses::INCREMENT:
                     $this->info($response->cardName . ' incremented');
+                    break;
+                case AddCardStatuses::NOT_FOUND:
+                    $this->error('Not found');
                     break;
                 default:
                     throw new \Exception('To be implemented');
