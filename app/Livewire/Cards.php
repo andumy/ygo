@@ -11,7 +11,6 @@ use App\Services\CardService;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
-use function var_dump;
 
 class Cards extends Component
 {
