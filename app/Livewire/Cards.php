@@ -93,11 +93,15 @@ class Cards extends Component
 
     public function render()
     {
+        $owned = $this->cardRepository->countOwned($this->search, $this->set);
+        $total = $this->cardRepository->count($this->search, $this->set);
+
         return view('livewire.cards', [
             'cards' => $this->cardRepository->paginate($this->search, $this->set, 50),
-            'total' => $this->cardRepository->count($this->search, $this->set),
-            'owned' => $this->cardRepository->countOwned($this->search, $this->set),
+            'total' => $total,
+            'owned' => $owned,
             'amountOfCards' => $this->ownedCardRepository->countAmountOfCards(),
+            'percentage' => $total != 0 ? round($owned/$total*100,2) : 0
         ]);
     }
 }

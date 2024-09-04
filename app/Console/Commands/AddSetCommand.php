@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Enums\AddCardStatuses;
 use App\Services\CardService;
 use Illuminate\Console\Command;
+use function count;
+use function explode;
 
 class AddSetCommand extends Command
 {
@@ -14,16 +16,20 @@ class AddSetCommand extends Command
      * @var string
      */
     protected $signature = 'add:set
-                                    {code : the set code}
-                                    {start : the starting number}
-                                    {end? : the last number}';
+                                    {code : the set base code}
+                                    {cards : the cards as structural syntax}';
+
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '
+        Fast add multiple cards:
+        Syntax:
+        001x4,002:029,003x2
+    ';
 
     /**
      * Execute the console command.
@@ -31,12 +37,31 @@ class AddSetCommand extends Command
     public function handle(CardService $cardService)
     {
         $code = $this->argument('code');
-        $start = $this->argument('start');
-        $end = $this->argument('end') ?? $start;
+        $cards = $this->argument('cards');
+        $entries = [];
 
-        $range = $this->generateRangeWithLeadingZeros($start, $end);
+        $rules = explode(',', $cards);
+        foreach ($rules as $rule){
+            $entry = explode(':', $rule);
+            if (count($entry) == 2) {
+                $entries = [
+                    ...$entries,
+                    ...$this->generateRangeWithLeadingZeros($entry[0], $entry[1])
+                ];
+                continue;
+            }
 
-        foreach ($range as $i) {
+            $entry = explode('x', $rule);
+            if (count($entry) == 2) {
+                for ($i= 0; $i < $entry[1]; $i++) {
+                    $entries []= $entry[0];
+                }
+                continue;
+            }
+            $entries []= $rule;
+        }
+
+        foreach ($entries as $i) {
             $rarity = null;
             do {
                 $response = $cardService->addCard($code . $i, $rarity);

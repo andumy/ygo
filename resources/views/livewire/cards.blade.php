@@ -13,7 +13,7 @@
                     {{$total}} Total
                 </h3>
                 <h3 class="text-lg font-bold ps-10 text-stone-300">
-                    ({{round($owned/$total*100,2)}} %)
+                    ({{$percentage}} %)
                 </h3>
             </div>
             <div>
