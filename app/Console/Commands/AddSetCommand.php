@@ -68,7 +68,7 @@ class AddSetCommand extends Command
 
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {
                     $rarity = $this->choice(
-                        "Select rarity for: " . $code . $i,
+                        "Select rarity for: " . $response->cardName . '( ' . $code . $i . ' )',
                         $response->rarities,
                         0
                     );
@@ -84,7 +84,7 @@ class AddSetCommand extends Command
                     $this->info($response->cardName . ' incremented');
                     break;
                 case AddCardStatuses::NOT_FOUND:
-                    $this->error('Not found');
+                    $this->error($response->cardName. ' not found');
                     break;
                 default:
                     throw new \Exception('To be implemented');

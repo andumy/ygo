@@ -26,13 +26,15 @@ class CardService
         if($cardInstances->isEmpty()){
             return new AddCardResponse(
                 status: AddCardStatuses::NOT_FOUND,
+                cardName: $code
             );
         }
 
         if($cardInstances->count() > 1 && !$rarity){
             return new AddCardResponse(
                 status: AddCardStatuses::MULTIPLE_OPTIONS,
-                rarities: $cardInstances->pluck('rarity_verbose')->toArray()
+                rarities: $cardInstances->pluck('rarity_verbose')->toArray(),
+                cardName: $cardInstances->first()->card->name
             );
         }
         $cardInstance = $cardInstances->first();
