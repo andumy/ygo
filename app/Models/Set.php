@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,6 +12,9 @@ use Illuminate\Support\Collection;
 /**
  * @property int id
  * @property string name
+ * @property string code
+ * @property int card_amount
+ * @property Carbon date
  * @property Collection<CardInstance> cardInstances
  * @property Collection<Card> cards
  */
@@ -21,6 +25,9 @@ class Set extends Model
     public $timestamps = false;
     protected $guarded = [];
 
+    public $casts = [
+        'date' => 'date'
+    ];
     public function cardInstances(): HasMany
     {
         return $this->hasMany(CardInstance::class);

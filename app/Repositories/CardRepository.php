@@ -21,6 +21,11 @@ class CardRepository
         Card::chunk(100, $callback);
     }
 
+    public function findByYgoId(string $id): ?Card
+    {
+        return Card::where('ygo_id', $id)->first();
+    }
+
     public function count(string $search = '', string $set = ''): int {
         return $this->searchQuery($search , $set)->count();
     }
