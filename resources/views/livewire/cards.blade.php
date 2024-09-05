@@ -34,11 +34,14 @@
                 wire:model="code"
                 placeholder="Card Code"
             >
-            <select wire:model="rarity">
-                @foreach($rarities as $r)
-                    <option value="{{$r}}">{{$r}}</option>
-                @endforeach
-            </select>
+           @if(count($rarities) > 0)
+                <select wire:model="rarity" class="px-4">
+                    <option value="" selected disabled>Select Rarity</option>
+                    @foreach($rarities as $r)
+                        <option value="{{$r}}">{{$r}}</option>
+                    @endforeach
+                </select>
+           @endif
             <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="addCard">
                 Add Card
             </button>
