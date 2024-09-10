@@ -25,7 +25,7 @@ class CardRepository
     public function getForOrder(int $orderId): Collection
     {
         return Card::whereHas('cardInstances', function ($query) use ($orderId) {
-            $query->whereHas('ownedCard', function ($query) use ($orderId) {
+            $query->whereHas('orderedCards', function ($query) use ($orderId) {
                 $query->where('order_id', $orderId);
             });
         })->get();
