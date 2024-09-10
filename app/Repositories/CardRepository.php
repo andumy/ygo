@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Card;
+use Illuminate\Support\Collection;
 
 class CardRepository
 {
@@ -14,6 +15,15 @@ class CardRepository
     public function paginate(string $search, string $set, bool $hideOwned, int $pagination)
     {
         return $this->searchQuery($search, $set, $hideOwned)->paginate($pagination);
+    }
+
+    public function getForOrder(int $orderId): Collection
+    {
+        return Card::whereHas('cardInstances', function ($query) use ($orderId) {
+            $query->whereHas('ownedCard', function ($query) use ($orderId) {
+                $query->where('order_id', $orderId);
+            });
+        })->get();
     }
 
     public function chunk(callable $callback): void

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int id
@@ -21,5 +22,10 @@ class Order extends Model
     public function ownedCards(): HasMany
     {
         return $this->hasMany(OwnedCard::class);
+    }
+
+    public function cards(): HasManyThrough
+    {
+        return $this->hasManyThrough(Card::class, OwnedCard::class);
     }
 }

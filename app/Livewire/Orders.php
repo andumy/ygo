@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Repositories\CardRepository;
 use App\Repositories\OrderRepository;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -9,6 +10,7 @@ use Livewire\Component;
 class Orders extends Component
 {
     private OrderRepository $orderRepository;
+    private CardRepository $cardRepository;
 
     public string $message = '';
     public string $orderName;
@@ -16,10 +18,12 @@ class Orders extends Component
     public Collection $orders;
 
     public function boot(
-        OrderRepository $orderRepository
+        OrderRepository $orderRepository,
+        CardRepository $cardRepository
     )
     {
         $this->orderRepository = $orderRepository;
+        $this->cardRepository = $cardRepository;
     }
 
 
@@ -45,9 +49,15 @@ class Orders extends Component
     public function render()
     {
         $this->orders = $this->orderRepository->all();
+        $cards = [];
+
+        if($this->order) {
+            $order = $this->orderRepository->findById($this->order);
+            $cards = $this->cardRepository->getForOrder($order->id);
+        }
+
         return view('livewire.orders', [
-            'cards' => $this->order ?
-                $this->orderRepository->findById($this->order)->ownedCards()->paginate(50) : []
+            'cards' => $cards
         ]);
     }
 }
