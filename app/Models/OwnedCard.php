@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int id
  * @property CardInstance cardInstance
  * @property int amount
+ * @property int order_amount
  */
 class OwnedCard extends Model
 {
@@ -22,5 +23,10 @@ class OwnedCard extends Model
     public function cardInstance(): BelongsTo
     {
         return $this->belongsTo(CardInstance::class);
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 }

@@ -18,7 +18,7 @@ class CardService
     {
     }
 
-    public function addCard(string $code, ?string $rarity = null): AddCardResponse
+    public function addCard(string $code, ?string $rarity = null, int $orderId = null): AddCardResponse
     {
         /** @var Collection<CardInstance> $cardInstances */
         $cardInstances = $this->cardInstanceRepository->findBySetCode($code);
@@ -46,7 +46,26 @@ class CardService
         $ownCard = $cardInstance->ownedCard;
 
         if($ownCard) {
-            $ownCard->amount += 1;
+            if(!$orderId){
+                //add to owned
+                $ownCard->amount += 1;
+                $ownCard->save();
+                return new AddCardResponse(
+                    status: AddCardStatuses::INCREMENT,
+                    cardName: $cardInstance->card->name
+                );
+            }
+
+            if($ownCard->order_id && $ownCard->order_id !== $orderId){
+                return new AddCardResponse(
+                    status: AddCardStatuses::PART_OF_ANOTHER_ORDER,
+                    cardName: $cardInstance->card->name
+                );
+            }
+
+            //add to order
+            $ownCard->order_amount += 1;
+            $ownCard->order_id = $orderId;
             $ownCard->save();
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
@@ -54,9 +73,24 @@ class CardService
             );
         }
 
-         $this->ownedCardRepository->create([
+        // create own
+        if(!$orderId) {
+            $this->ownedCardRepository->create([
+                'card_instance_id' => $cardInstance->id,
+                'amount' => 1,
+            ]);
+            return new AddCardResponse(
+                status: AddCardStatuses::NEW_CARD,
+                cardName: $cardInstance->card->name
+            );
+        }
+
+        // create order
+        $this->ownedCardRepository->create([
             'card_instance_id' => $cardInstance->id,
-            'amount' => 1,
+            'order_amount' => 1,
+            'amount' => 0,
+            'order_id' => $orderId,
         ]);
         return new AddCardResponse(
             status: AddCardStatuses::NEW_CARD,

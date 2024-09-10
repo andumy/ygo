@@ -5,12 +5,14 @@ namespace App\Livewire;
 use App\Enums\AddCardStatuses;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;
+use App\Repositories\OrderRepository;
 use App\Repositories\OwnedCardRepository;
 use App\Repositories\SetRepository;
 use App\Services\CardService;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
+use function array_key_exists;
 
 class Cards extends Component
 {
@@ -24,7 +26,14 @@ class Cards extends Component
     public Collection $sets;
     public string $search = '';
     public string $message = '';
+
+    public Collection $orders;
+    public array $ownedCards = [];
+    public array $orderedCards = [];
+    public array $orderId = [];
+
     private CardRepository $cardRepository;
+    private OrderRepository $orderRepository;
     private CardInstanceRepository $cardInstanceRepository;
     private OwnedCardRepository $ownedCardRepository;
     private CardService $cardService;
@@ -36,6 +45,7 @@ class Cards extends Component
         OwnedCardRepository $ownedCardRepository,
         CardService $cardService,
         SetRepository $setRepository,
+        OrderRepository $orderRepository,
     )
     {
         $this->cardRepository = $cardRepository;
@@ -43,6 +53,35 @@ class Cards extends Component
         $this->ownedCardRepository = $ownedCardRepository;
         $this->cardService = $cardService;
         $this->setRepository = $setRepository;
+        $this->orderRepository = $orderRepository;
+    }
+
+    public function updateStock(int $instanceId){
+        $instance = $this->cardInstanceRepository->findById($instanceId);
+        if($ownedCard = $instance->ownedCard){
+            $ownedCard->amout += array_key_exists($instanceId,$this->ownedCards) ?
+                (int)$this->ownedCards[$instanceId] : 0;
+            $ownedCard->order_amount += array_key_exists($instanceId,$this->orderedCards) ?
+                (int)$this->orderedCards[$instanceId] : 0;
+            $ownedCard->order_id = array_key_exists($instanceId,$this->orderId) ?
+                (int)$this->orderId[$instanceId] : null;
+            $ownedCard->save();
+
+            $this->message = 'Amount updated';
+            return;
+        }
+
+        $this->ownedCardRepository->firstOrCreate(
+            $instanceId,
+            array_key_exists($instanceId,$this->ownedCards) ?
+                (int)$this->ownedCards[$instanceId] : 0,
+            array_key_exists($instanceId,$this->orderedCards) ?
+                (int)$this->orderedCards[$instanceId] : 0,
+            array_key_exists($instanceId,$this->orderId) ?
+                (int)$this->orderId[$instanceId] : null
+        );
+
+        $this->message = 'Amount updated';
     }
 
     public function mount() {
@@ -94,7 +133,7 @@ class Cards extends Component
     {
         $owned = $this->cardRepository->countOwned($this->search, $this->set);
         $total = $this->cardRepository->count($this->search, $this->set);
-
+        $this->orders = $this->orderRepository->all();
         return view('livewire.cards', [
             'cards' => $this->cardRepository->paginate($this->search, $this->set, 50),
             'total' => $total,

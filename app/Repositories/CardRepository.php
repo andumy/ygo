@@ -38,28 +38,20 @@ class CardRepository
     }
 
     private function searchQuery(string $search = '', string $set = '') {
-        if ($search) {
-            return Card::when($search !== '', function($q) use ($search){
-                return $q->where(function ($qq) use ($search) {
-                    $qq
-                        ->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('ygo_id', 'like', '%' . $search . '%')
-                        ->orWhereHas('cardInstances', function ($query) use ($search) {
-                            $query->where('card_set_code', 'like', '%' . $search . '%');
-                        });
-                });
-            })
-                ->when($set !== '', function($q) use ($set) {
-                    return $q->whereHas('sets', function ($qq) use ($set) {
-                        $qq->where('name', $set);
+        return Card::when($search !== '', function($q) use ($search){
+            return $q->where(function ($qq) use ($search) {
+                $qq
+                    ->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('ygo_id', 'like', '%' . $search . '%')
+                    ->orWhereHas('cardInstances', function ($query) use ($search) {
+                        $query->where('card_set_code', 'like', '%' . $search . '%');
                     });
-                });
-        }
-
-        return Card::when($set !== '', function($q) use ($set) {
-            return $q->whereHas('sets', function ($query) use ($set) {
-                $query->where('name', $set);
             });
-        });
+        })
+            ->when($set !== '', function($q) use ($set) {
+                return $q->whereHas('sets', function ($qq) use ($set) {
+                    $qq->where('name', $set);
+                });
+            });
     }
 }

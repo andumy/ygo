@@ -16,6 +16,8 @@ use Illuminate\Support\Collection;
  * @property string type
  * @property Collection<CardInstance> instances
  * @property Collection<Set> sets
+ * @property boolean isOwned
+ * @property boolean isOrdered
  */
 class Card extends Model
 {
@@ -42,7 +44,13 @@ class Card extends Model
     public function getIsOwnedAttribute(): bool
     {
         return $this->cardInstances->filter(function (CardInstance $instance) {
-            return $instance->ownedCard !== null;
+            return $instance->ownedCard?->amount > 0;
         })->isNotEmpty();
+    }
+    public function getIsOrderedAttribute(): bool
+    {
+        return $this->cardInstances->filter(function (CardInstance $instance) {
+            return $instance->ownedCard?->order_id !== null;
+        })->isNotEmpty() && !$this->isOwned;
     }
 }

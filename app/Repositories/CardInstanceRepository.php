@@ -22,6 +22,10 @@ class CardInstanceRepository
         return CardInstance::where('rarity_code','')->get();
     }
 
+    public function findById(int $id): ?CardInstance{
+        return CardInstance::find($id);
+    }
+
     public function rarities(): Collection{
         return CardInstance::select('rarity_verbose','rarity_code')
             ->groupBy('rarity_verbose','rarity_code')

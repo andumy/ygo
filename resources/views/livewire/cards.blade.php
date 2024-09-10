@@ -70,25 +70,7 @@
     {{$cards->links()}}
     <div class="grid gap-6 grid-cols-10 grid-rows-1 py-5">
         @foreach($cards as $card)
-            <div class="flex flex-col text-stone-400">
-                <img @if(!$card->isOwned)
-                         class="grayscale opacity-80"
-                     @endif src="{{asset('storage/'. $card->ygo_id . '.jpg')}}">
-                <h2 class="text-center font-bold text-stone-800">{{ $card->name }}</h2>
-                @foreach($card->cardInstances as $instance)
-                    <div class="flex flex-row justify-center @if($instance->ownedCard)
-                         text-cyan-500 font-bold
-                    @endif">
-                        @if($instance->ownedCard)
-                        <p class="text-xs">{{$instance->ownedCard->amount}}</p>
-                        <p class="text-xs px-2">x</p>
-
-                        @endif
-                        <p class="text-xs"> {{$instance->card_set_code}}</p>
-                        <p class="text-xs"> {{$instance->rarity}}</p>
-                    </div>
-                @endforeach
-            </div>
+            @include('components.card', ['card' => $card])
         @endforeach
     </div>
     {{$cards->links()}}
