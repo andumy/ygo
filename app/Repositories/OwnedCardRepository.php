@@ -11,16 +11,24 @@ class OwnedCardRepository
     }
 
     public function countAmountOfCards(): int {
-        return OwnedCard::sum('amount')+OwnedCard::sum('order_amount');
+        return OwnedCard::sum('amount');
     }
 
-    public function firstOrCreate(int $cardInstanceId, int $amount, int $orderAmount, ?int $orderId): OwnedCard {
+    public function firstOrCreate(int $cardInstanceId, int $amount): OwnedCard {
         return OwnedCard::firstOrCreate([
             'card_instance_id' => $cardInstanceId,
             'amount' => $amount,
-            'order_amount' => $orderAmount,
-            'order_id' => $orderId
         ]);
+    }
+
+    public function updateAmount(OwnedCard $ownedCard, int $amount): void {
+        $ownedCard->amount = $amount;
+        $ownedCard->save();
+    }
+
+    public function delete(int $cardInstanceId): void {
+        OwnedCard::where('card_instance_id', $cardInstanceId)
+            ->delete();
     }
 
 }

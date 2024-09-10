@@ -50,7 +50,7 @@ class Card extends Model
     public function getIsOrderedAttribute(): bool
     {
         return $this->cardInstances->filter(function (CardInstance $instance) {
-            return $instance->ownedCard?->order_id !== null;
+            return $instance->orderedCards->count() > 0;
         })->isNotEmpty() && !$this->isOwned;
     }
 }

@@ -1,7 +1,12 @@
 {
     "manifest_version": 3,
-    "name": "YGO Tracker",
-    "description": "Base Level Extension",
+    "name": "YGO Cardmarket integrator",
+    "description": "Integrator for YGO Cardmarket to YGO Library",
+    "author": {
+        "email": "andrei_dumitrescu_96@yahoo.com",
+        "name": "Andrei Dumitrescu",
+        "url": "https://github.com/andumy"
+    },
     "version": "1.0",
     "permissions": [
         "activeTab",
@@ -17,5 +22,8 @@
     "host_permissions": [
         "https://*.cardmarket.com/*",
         "http://localhost/*"
-    ]
+    ],
+    "icons": {
+        "128": "ygo.png"
+    }
 }

@@ -1,4 +1,4 @@
-const showBoxes = (card,code,order,el) => {
+const showBoxes = (card,code,order,el,addToCart) => {
     if(card === undefined || code === undefined || order === undefined){
         return;
     }
@@ -15,14 +15,11 @@ const showBoxes = (card,code,order,el) => {
                 case 'Card not found':
                     div.innerHTML = '<p style="pointer-events: none; margin:0;border:0;padding:0;color:black;">?</p>';
                     break;
-                case 'Card owned':
-                    div.innerHTML = '<p style="pointer-events: none; margin:0;border:0;padding:0;color:red;">X</p>';
-                    break;
                 case 'Card needed':
                     div.innerHTML = '<p style="pointer-events: none; margin:0;border:0;padding:0;color:green;">✓</p>';
+                    el.appendChild(div);
                     break;
             }
-            el.appendChild(div);
         })
         .catch((error) => {
             console.error('Error fetching data:', error);
@@ -48,6 +45,9 @@ const showBoxes = (card,code,order,el) => {
                         break;
                     case 'Added':
                         div.innerHTML = '<p style="pointer-events: none; margin:0;border:0;padding:0;color:green;">Added</p>';
+                        if(addToCart !== false){
+                            addToCart.click();
+                        }
                         break;
                 }
             })
@@ -65,7 +65,8 @@ const handleProductPage = () => {
     document.querySelectorAll('.col-seller').forEach((el) => {
         const card = el.querySelector('a')?.innerText;
         const code = el.parentNode.querySelector('.col-product')?.querySelector('a')?.innerText;
-        showBoxes(card,code,order,el)
+        const cart = el.parentNode.parentNode.parentNode.querySelector('button');
+        showBoxes(card,code,order,el, cart)
     });
 }
 
@@ -83,12 +84,12 @@ const handleShoppingCart = () => {
         const card = element.card;
         const code = element.code;
 
-        showBoxes(card,code,order,el)
+        showBoxes(card,code,order,el, false)
     })
 }
 
 
-if(document.querySelector('h1').innerText === "Shopping Cart"){
+if(document.querySelector('h1')?.innerText === "Shopping Cart"){
     handleShoppingCart();
 } else {
     handleProductPage();

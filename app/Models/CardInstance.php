@@ -17,6 +17,8 @@ use function strtoupper;
  * @property string name
  * @property Card card
  * @property Set set
+ * @property OwnedCard ownedCard
+ * @property Collection<OrderedCard> orderedCards
  * @property string card_set_code
  * @property string rarity_verbose
  * @property string rarity_code
@@ -42,6 +44,11 @@ class CardInstance extends Model
     public function ownedCard(): HasOne
     {
         return $this->hasOne(OwnedCard::class);
+    }
+
+    public function orderedCards(): HasMany
+    {
+        return $this->hasMany(OrderedCard::class);
     }
 
     public function getRarityAttribute(): string

@@ -64,7 +64,10 @@ class AddSetCommand extends Command
         foreach ($entries as $i) {
             $rarity = null;
             do {
-                $response = $cardService->addCard($code . $i, $rarity);
+                $response = $cardService->updateCardStock(
+                    code: $code . $i,
+                    rarity: $rarity,
+                );
 
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {
                     $rarity = $this->choice(

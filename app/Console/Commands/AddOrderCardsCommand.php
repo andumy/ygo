@@ -41,7 +41,11 @@ class AddOrderCardsCommand extends Command
         foreach ($cards as $card) {
             $rarity = null;
             do {
-                $response = $cardService->addCard($card, $rarity, $order->id);
+                $response = $cardService->updateCardStock(
+                    code: $card,
+                    rarity: $rarity,
+                    orderId: $order->id,
+                );
 
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {
                     $rarity = $this->choice(

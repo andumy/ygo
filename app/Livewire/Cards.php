@@ -3,8 +3,10 @@
 namespace App\Livewire;
 
 use App\Enums\AddCardStatuses;
+use App\Models\CardInstance;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;
+use App\Repositories\OrderedCardRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OwnedCardRepository;
 use App\Repositories\SetRepository;
@@ -38,6 +40,7 @@ class Cards extends Component
     private OrderRepository $orderRepository;
     private CardInstanceRepository $cardInstanceRepository;
     private OwnedCardRepository $ownedCardRepository;
+    private OrderedCardRepository $orderedCardRepository;
     private CardService $cardService;
     private SetRepository $setRepository;
 
@@ -48,6 +51,7 @@ class Cards extends Component
         CardService $cardService,
         SetRepository $setRepository,
         OrderRepository $orderRepository,
+        OrderedCardRepository $orderedCardRepository,
     )
     {
         $this->cardRepository = $cardRepository;
@@ -56,37 +60,37 @@ class Cards extends Component
         $this->cardService = $cardService;
         $this->setRepository = $setRepository;
         $this->orderRepository = $orderRepository;
+        $this->orderedCardRepository = $orderedCardRepository;
     }
 
-    public function updateStock(int $instanceId){
+    public function updateStock(int $instanceId): void
+    {
         $instance = $this->cardInstanceRepository->findById($instanceId);
-        if($ownedCard = $instance->ownedCard){
-            $ownedCard->amout += array_key_exists($instanceId,$this->ownedCards) ?
-                (int)$this->ownedCards[$instanceId] : 0;
-            $ownedCard->order_amount += array_key_exists($instanceId,$this->orderedCards) ?
-                (int)$this->orderedCards[$instanceId] : 0;
-            $ownedCard->order_id = array_key_exists($instanceId,$this->orderId) ?
-                (int)$this->orderId[$instanceId] : null;
-            $ownedCard->save();
 
-            $this->message = 'Amount updated';
-            return;
+        $ownAmount = array_key_exists($instanceId,$this->ownedCards) ?
+            (int)$this->ownedCards[$instanceId] : 0;
+        $orderAmount = array_key_exists($instanceId,$this->orderedCards) ?
+            (int)$this->orderedCards[$instanceId] : 0;
+        $orderId = array_key_exists($instanceId,$this->orderId) ?
+            (int)$this->orderId[$instanceId] : null;
+
+        if($orderId){
+            $this->cardService->updateCardStockFromInstance(
+                cardInstance: $instance,
+                orderId: $orderId,
+                orderAmount: $orderAmount,
+            );
         }
 
-        $this->ownedCardRepository->firstOrCreate(
-            $instanceId,
-            array_key_exists($instanceId,$this->ownedCards) ?
-                (int)$this->ownedCards[$instanceId] : 0,
-            array_key_exists($instanceId,$this->orderedCards) ?
-                (int)$this->orderedCards[$instanceId] : 0,
-            array_key_exists($instanceId,$this->orderId) ?
-                (int)$this->orderId[$instanceId] : null
+        $this->cardService->updateCardStockFromInstance(
+            cardInstance: $instance,
+            ownAmount: $ownAmount
         );
 
-        $this->message = 'Amount updated';
     }
 
-    public function mount() {
+    public function mount(): void
+    {
         $this->sets = $this->setRepository->all();
         foreach ($this->sets as $set) {
             $this->fillBySet[$set->name] = [
@@ -96,12 +100,15 @@ class Cards extends Component
         }
     }
 
-    public function addCard()
+    public function addCard(): void
     {
         $this->message = '';
         if($this->code === '') return;
 
-        $response = $this->cardService->addCard($this->code, $this->rarity);
+        $response = $this->cardService->updateCardStock(
+            code: $this->code,
+            rarity: $this->rarity
+        );
 
         switch ($response->status) {
             case AddCardStatuses::MULTIPLE_OPTIONS:
@@ -140,7 +147,8 @@ class Cards extends Component
             'cards' => $this->cardRepository->paginate($this->search, $this->set, $this->hideOwned, 50),
             'total' => $total,
             'owned' => $owned,
-            'amountOfCards' => $this->ownedCardRepository->countAmountOfCards(),
+            'amountOfCards' =>
+                $this->ownedCardRepository->countAmountOfCards() + $this->orderedCardRepository->countAmountOfCards(),
             'percentage' => $total != 0 ? round($owned / $total * 100,2) : 0
         ]);
     }

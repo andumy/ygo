@@ -9,21 +9,22 @@
     <h2 id="card-{{$card->id}}" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500" onclick="copyName({{$card->id}})">{{ $card->name }}</h2>
     @foreach($card->cardInstances as $instance)
         <div class="flex flex-row justify-center relative has-tooltip
-            @if($instance->ownedCard)
+            @if($instance->ownedCard || $instance->orderedCards->count() > 0)
                  font-bold
-                 @if($instance->ownedCard->order_id !== null)
-                     text-yellow-500
+                 @if($instance->ownedCard)
+                     text-cyan-500
                  @else
-                    text-cyan-500
+                    text-yellow-500
                  @endif
             @endif">
-            @if($instance->ownedCard)
-                @if($instance->ownedCard->order_amount > 0)
-                    <p class="text-xs pe-1">({{$instance->ownedCard->order_amount}}) </p>
-                @endif
-                <p class="text-xs"> {{$instance->ownedCard->amount}}</p>
-                <p class="text-xs px-1">x</p>
 
+            @if($instance->orderedCards->count() > 0)
+                <p class="text-xs text-yellow-500">({{ $instance->orderedCards->reduce(fn($c, $oc) => $c + $oc->amount,0) }})</p>
+            @endif
+
+            @if($instance->ownedCard)
+                <p class="text-xs text-cyan-500"> {{$instance->ownedCard->amount}}</p>
+                <p class="text-xs px-1 text-cyan-500">x</p>
             @endif
             <div data-tooltip-target="{{$instance->id}}" class="flex cursor-pointer">
                 <p class="text-xs pointer-events-none"> {{$instance->card_set_code}}</p>

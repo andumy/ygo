@@ -6,6 +6,7 @@ use App\Dtos\AddCardResponse;
 use App\Enums\AddCardStatuses;
 use App\Models\CardInstance;
 use App\Repositories\CardInstanceRepository;
+use App\Repositories\OrderedCardRepository;
 use App\Repositories\OwnedCardRepository;
 use Illuminate\Support\Collection;
 
@@ -13,12 +14,19 @@ class CardService
 {
     public function __construct(
         private readonly OwnedCardRepository    $ownedCardRepository,
+        private readonly OrderedCardRepository    $orderedCardRepository,
         private readonly CardInstanceRepository $cardInstanceRepository,
     )
     {
     }
 
-    public function addCard(string $code, ?string $rarity = null, int $orderId = null): AddCardResponse
+    public function updateCardStock(
+        string $code,
+        ?string $rarity = null,
+        int $orderId = null,
+        int $orderAmount = 1,
+        int $ownAmount = 1
+    ): AddCardResponse
     {
         /** @var Collection<CardInstance> $cardInstances */
         $cardInstances = $this->cardInstanceRepository->findBySetCode($code);
@@ -43,55 +51,89 @@ class CardService
             $cardInstance = $cardInstances->where('rarity_verbose', $rarity)->first();
         }
 
-        $ownCard = $cardInstance->ownedCard;
+        return $this->updateCardStockFromInstance(
+            $cardInstance,
+            $orderId,
+            $orderAmount,
+            $ownAmount
+        );
+    }
 
-        if($ownCard) {
-            if(!$orderId){
-                //add to owned
-                $ownCard->amount += 1;
-                $ownCard->save();
-                return new AddCardResponse(
-                    status: AddCardStatuses::INCREMENT,
-                    cardName: $cardInstance->card->name
-                );
-            }
+    public function updateCardStockFromInstance(
+        CardInstance $cardInstance,
+        int $orderId = null,
+        int $orderAmount = 1,
+        int $ownAmount = 1
+    ): AddCardResponse
+    {
+        if($orderId){
+            return $this->handleOrderedCards($cardInstance, $orderId, $orderAmount);
+        }
+        return $this->handleOwnedCards($cardInstance, $ownAmount);
+    }
 
-            if($ownCard->order_id && $ownCard->order_id !== $orderId){
-                return new AddCardResponse(
-                    status: AddCardStatuses::PART_OF_ANOTHER_ORDER,
-                    cardName: $cardInstance->card->name
-                );
-            }
+    private function handleOwnedCards(
+        CardInstance $cardInstance,
+        int $ownAmount
+    ): AddCardResponse
+    {
+        //delete owned
+        if($ownAmount === 0) {
+            $this->ownedCardRepository->delete($cardInstance->id);
+            return new AddCardResponse(
+                status: AddCardStatuses::DELETE,
+                cardName: $cardInstance->card->name
+            );
+        }
 
-            //add to order
-            $ownCard->order_amount += 1;
-            $ownCard->order_id = $orderId;
-            $ownCard->save();
+        //update owned
+        if($cardInstance->ownedCard){
+            $this->ownedCardRepository
+                ->updateAmount($cardInstance->ownedCard, $cardInstance->ownedCard->amount + $ownAmount);
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
                 cardName: $cardInstance->card->name
             );
         }
 
-        // create own
-        if(!$orderId) {
-            $this->ownedCardRepository->create([
-                'card_instance_id' => $cardInstance->id,
-                'amount' => 1,
-            ]);
+        //create owned
+        $this->ownedCardRepository->firstOrCreate(
+            $cardInstance->id,
+            $ownAmount,
+        );
+
+        return new AddCardResponse(
+            status: AddCardStatuses::NEW_CARD,
+            cardName: $cardInstance->card->name
+        );
+    }
+
+    private function handleOrderedCards(
+        CardInstance $cardInstance,
+        int $orderId,
+        int $orderAmount,
+    ): AddCardResponse
+    {
+        //delete order
+        if($orderAmount === 0) {
+            $this->orderedCardRepository->delete($cardInstance->id, $orderId);
             return new AddCardResponse(
-                status: AddCardStatuses::NEW_CARD,
+                status: AddCardStatuses::DELETE,
                 cardName: $cardInstance->card->name
             );
         }
 
-        // create order
-        $this->ownedCardRepository->create([
-            'card_instance_id' => $cardInstance->id,
-            'order_amount' => 1,
-            'amount' => 0,
-            'order_id' => $orderId,
-        ]);
+        //update order
+        if($orderedCard = $this->orderedCardRepository->findByInstanceAndOrder($cardInstance->id, $orderId)){
+            $this->orderedCardRepository->updateAmount($orderedCard, $orderedCard->amount + $orderAmount);
+            return new AddCardResponse(
+                status: AddCardStatuses::INCREMENT,
+                cardName: $cardInstance->card->name
+            );
+        }
+
+        //create order
+        $this->orderedCardRepository->firstOrCreate($cardInstance->id, $orderAmount, $orderId);
         return new AddCardResponse(
             status: AddCardStatuses::NEW_CARD,
             cardName: $cardInstance->card->name

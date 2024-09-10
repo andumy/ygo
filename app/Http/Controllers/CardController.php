@@ -57,9 +57,9 @@ class CardController extends Controller
             return response()->json(['message' => 'Not Found']);
         }
 
-        $response = $cardService->addCard(
+        $response = $cardService->updateCardStock(
             code: $cardInstances->first()->card_set_code,
-            orderId: $order->id
+            orderId: $order->id,
         );
 
         if(
