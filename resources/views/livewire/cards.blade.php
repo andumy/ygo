@@ -46,10 +46,12 @@
                 Add Card
             </button>
         </div>
-
-
         <div class="flex">
-            <select wire:model="set" wire:change="fetchCards" class="mx-4">
+            <div class="flex">
+                <label for="hideOwned"><p>Hide owned?</p></label>
+                <input type="checkbox" wire:model="hideOwned" wire:change="refresh" id="hideOwned" name="hideOwned">
+            </div>
+            <select wire:model="set" wire:change="refresh" class="mx-4">
                 <option value="">All sets</option>
                 @foreach($sets as $s)
                     <option value="{{$s->name}}">
@@ -62,7 +64,7 @@
                 class="appearance-none border rounded text-black"
                 type="text"
                 wire:model="search"
-                wire:keyup="fetchCards"
+                wire:keyup="refresh"
                 placeholder="Search"
             >
         </div>

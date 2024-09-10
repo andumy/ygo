@@ -18,6 +18,8 @@ class Cards extends Component
 {
     use WithPagination;
 
+    public bool $hideOwned = false;
+
     public string $code = '';
     public string $set = '';
     public string $rarity = '';
@@ -125,21 +127,21 @@ class Cards extends Component
 
     }
 
-    public function fetchCards()
+    public function refresh()
     {
     }
 
     public function render()
     {
-        $owned = $this->cardRepository->countOwned($this->search, $this->set);
-        $total = $this->cardRepository->count($this->search, $this->set);
+        $owned = $this->cardRepository->countOwned($this->search, $this->set, $this->hideOwned);
+        $total = $this->cardRepository->count($this->search, $this->set, $this->hideOwned);
         $this->orders = $this->orderRepository->all();
         return view('livewire.cards', [
-            'cards' => $this->cardRepository->paginate($this->search, $this->set, 50),
+            'cards' => $this->cardRepository->paginate($this->search, $this->set, $this->hideOwned, 50),
             'total' => $total,
             'owned' => $owned,
             'amountOfCards' => $this->ownedCardRepository->countAmountOfCards(),
-            'percentage' => $total != 0 ? round($owned/$total*100,2) : 0
+            'percentage' => $total != 0 ? round($owned / $total * 100,2) : 0
         ]);
     }
 }

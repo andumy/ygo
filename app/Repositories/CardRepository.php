@@ -11,9 +11,9 @@ class CardRepository
         return Card::firstOrCreate($find, $data);
     }
 
-    public function paginate(string $search, string $set, int $pagination)
+    public function paginate(string $search, string $set, bool $hideOwned, int $pagination)
     {
-        return $this->searchQuery($search , $set)->paginate($pagination);
+        return $this->searchQuery($search, $set, $hideOwned)->paginate($pagination);
     }
 
     public function chunk(callable $callback): void
@@ -26,18 +26,18 @@ class CardRepository
         return Card::where('ygo_id', $id)->first();
     }
 
-    public function count(string $search = '', string $set = ''): int {
-        return $this->searchQuery($search , $set)->count();
+    public function count(string $search = '', string $set = '', bool $hideOwned = false): int {
+        return $this->searchQuery($search, $set, $hideOwned)->count();
     }
 
-    public function countOwned(string $search = '', string $set = ''): int {
-        return $this->searchQuery($search , $set)
+    public function countOwned(string $search = '', string $set = '', bool $hideOwned = false): int {
+        return $this->searchQuery($search , $set, $hideOwned)
             ->whereHas('cardInstances', function ($query) use ($search) {
                 $query->whereHas('ownedCard');
             })->count();
     }
 
-    private function searchQuery(string $search = '', string $set = '') {
+    private function searchQuery(string $search = '', string $set = '', bool $hideOwned = false) {
         return Card::when($search !== '', function($q) use ($search){
             return $q->where(function ($qq) use ($search) {
                 $qq
@@ -51,6 +51,11 @@ class CardRepository
             ->when($set !== '', function($q) use ($set) {
                 return $q->whereHas('sets', function ($qq) use ($set) {
                     $qq->where('name', $set);
+                });
+            })
+            ->when($hideOwned, function($q) {
+                return $q->whereDoesntHave('cardInstances', function ($qq) {
+                    $qq->whereHas('ownedCard');
                 });
             });
     }
