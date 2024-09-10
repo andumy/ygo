@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "YGO Tracker",
+    "description": "Base Level Extension",
+    "version": "1.0",
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["https://*.cardmarket.com/*"],
+            "js": ["contentScript.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "host_permissions": [
+        "https://*.cardmarket.com/*",
+        "http://localhost/*"
+    ]
+}

@@ -12,6 +12,11 @@ class CardRepository
         return Card::firstOrCreate($find, $data);
     }
 
+    public function findByName(string $name): ?Card
+    {
+        return Card::where('name', $name)->first();
+    }
+
     public function paginate(string $search, string $set, bool $hideOwned, int $pagination)
     {
         return $this->searchQuery($search, $set, $hideOwned)->paginate($pagination);
