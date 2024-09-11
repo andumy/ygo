@@ -45,10 +45,11 @@ class CardRepository
         return $this->searchQuery($search, $set, $hideOwned)->count();
     }
 
-    public function countOwned(string $search = '', string $set = '', bool $hideOwned = false): int {
+    public function countOwnedAndOrdered(string $search = '', string $set = '', bool $hideOwned = false): int {
         return $this->searchQuery($search , $set, $hideOwned)
             ->whereHas('cardInstances', function ($query) use ($search) {
-                $query->whereHas('ownedCard');
+                $query->whereHas('ownedCard')
+                    ->orWhereHas('orderedCards');
             })->count();
     }
 
@@ -70,7 +71,8 @@ class CardRepository
             })
             ->when($hideOwned, function($q) {
                 return $q->whereDoesntHave('cardInstances', function ($qq) {
-                    $qq->whereHas('ownedCard');
+                    $qq->whereHas('ownedCard')
+                        ->orWhereHas('orderedCards');
                 });
             });
     }

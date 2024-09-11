@@ -2,12 +2,13 @@ const showBoxes = (card,code,order,el,addToCart) => {
     if(card === undefined || code === undefined || order === undefined){
         return;
     }
-    const realCard = card.split('(')[0]?.trim();
+    const realCard = card.split(' (')[0]?.trim();
+    let rarity = card.split(' (')[1]?.split(')')[0]?.split(' - ')[1].trim();
     const div = document.createElement('div');
     div.style = 'position:absolute; top:0; left:-10px; background-color:white; padding:2px;margin:2px;border-radius:4px; z-index:1000;display:flex;justify-content:center;align-items:center;font-size:10px;';
 
     // Fix fetch to use HTTP if your local server isn't using HTTPS
-    fetch(`http://localhost/card-info?card=${encodeURIComponent(realCard)}&code=${encodeURIComponent(code)}`)
+    fetch(`http://localhost/card-info?card=${encodeURIComponent(realCard)}`)
         .then((response) => response.json())
         .then((data) => {
             // Safely update the div content with the received data
@@ -26,7 +27,7 @@ const showBoxes = (card,code,order,el,addToCart) => {
         });
 
     div.addEventListener('click', () => {
-        fetch(`http://localhost/order-card?card=${encodeURIComponent(realCard)}&code=${encodeURIComponent(code)}&order=${encodeURIComponent(order)}`)
+        fetch(`http://localhost/order-card?card=${encodeURIComponent(realCard)}&code=${encodeURIComponent(code)}&order=${encodeURIComponent(order)}&rarity=${encodeURIComponent(rarity)}`)
             .then((response) => response.json())
             .then((data) => {
                 // Safely update the div content with the received data

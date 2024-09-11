@@ -40,12 +40,18 @@ class CardController extends Controller
         $cardName = $request->get('card');
         $orderName = $request->get('order');
         $code = $request->get('code');
+        $rarity = $request->get('rarity');
+
+        if($rarity === 'undefined'){
+            $rarity = null;
+        }
 
         $order = $orderRepository->firstOrCreate($orderName);
         $card = $cardRepository->findByName($cardName);
         /** @var Collection<CardInstance> $cardInstance */
-        $cardInstances = $card->cardInstances->filter(function ($instance) use ($code) {
-            return str_contains($instance->card_set_code,$code);
+        $cardInstances = $card->cardInstances->filter(function (CardInstance $instance) use ($code, $rarity) {
+            return str_contains($instance->card_set_code , $code) &&
+                ($rarity === null || $instance->rarity_verbose === $rarity);
         });
 
 
@@ -59,7 +65,8 @@ class CardController extends Controller
 
         $response = $cardService->updateCardStock(
             code: $cardInstances->first()->card_set_code,
-            orderId: $order->id,
+            rarity: $rarity,
+            orderId: $order->id
         );
 
         if(

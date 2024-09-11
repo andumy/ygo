@@ -24,6 +24,6 @@ class SetRepository
 
     public function all(): Collection
     {
-        return Set::orderBy('name')->get();
+        return Set::orderBy('code')->get();
     }
 }

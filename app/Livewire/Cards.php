@@ -95,7 +95,7 @@ class Cards extends Component
         foreach ($this->sets as $set) {
             $this->fillBySet[$set->name] = [
                 'total' => $this->cardRepository->count('', $set->name),
-                'owned' => $this->cardRepository->countOwned('', $set->name)
+                'owned' => $this->cardRepository->countOwnedAndOrdered('', $set->name)
             ];
         }
     }
@@ -140,7 +140,7 @@ class Cards extends Component
 
     public function render()
     {
-        $owned = $this->cardRepository->countOwned($this->search, $this->set, $this->hideOwned);
+        $owned = $this->cardRepository->countOwnedAndOrdered($this->search, $this->set, $this->hideOwned);
         $total = $this->cardRepository->count($this->search, $this->set, $this->hideOwned);
         $this->orders = $this->orderRepository->all();
         return view('livewire.cards', [
