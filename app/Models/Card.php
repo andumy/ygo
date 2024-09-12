@@ -14,7 +14,7 @@ use Illuminate\Support\Collection;
  * @property int ygo_id
  * @property string name
  * @property string type
- * @property Collection<CardInstance> instances
+ * @property Collection<CardInstance> cardInstances
  * @property Collection<Set> sets
  * @property boolean isOwned
  * @property boolean isOrdered

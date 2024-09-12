@@ -28,4 +28,8 @@ class OrderRepository
     {
         return Order::where('name',$name)->first();
     }
+
+    public function delete(int $id): void{
+        Order::where('id',$id)->delete();
+    }
 }

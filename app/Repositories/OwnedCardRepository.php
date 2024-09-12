@@ -30,5 +30,4 @@ class OwnedCardRepository
         OwnedCard::where('card_instance_id', $cardInstanceId)
             ->delete();
     }
-
 }

@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Card;
-use App\Models\CardInstance;
 use App\Models\Set;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;

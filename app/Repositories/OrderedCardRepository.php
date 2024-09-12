@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\OrderedCard;
+use Illuminate\Support\Collection;
 
 class OrderedCardRepository
 {
@@ -34,5 +35,11 @@ class OrderedCardRepository
         return OrderedCard::where('card_instance_id', $cardInstanceId)
             ->where('order_id', $orderId)
             ->first();
+    }
+
+    /** @return Collection<OrderedCard> */
+    public function getByOrderId(int $orderId): Collection
+    {
+        return OrderedCard::where('order_id',$orderId)->get();
     }
 }

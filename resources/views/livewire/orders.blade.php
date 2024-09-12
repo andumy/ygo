@@ -29,7 +29,7 @@
     </h2>
     <div class="py-10 flex justify-between">
         <div class="flex">
-            <select wire:model="order" wire:change="orderSelected" class="px-4">
+            <select wire:model="orderId" wire:change="refresh" class="px-4">
                 <option value="" selected>Select Order</option>
                 @foreach($orders as $o)
                     <option value="{{$o->id}}">{{$o->name}}</option>
