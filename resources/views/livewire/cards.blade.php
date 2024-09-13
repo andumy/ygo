@@ -26,7 +26,7 @@
     <p class="bg-green-300 text-stone-700">
         {{$message}}
     </p>
-    <div class="py-10 flex justify-between">
+    <div class="py-10 flex flex-col xl:flex-row justify-center xl:justify-between">
         <div class="flex">
             <input
                 class="appearance-none border rounded text-black"
@@ -46,12 +46,12 @@
                 Add Card
             </button>
         </div>
-        <div class="flex">
+        <div class="flex flex-col xl:flex-row justify-center my-4 xl:my-0">
             <div class="flex">
-                <label for="hideOwned"><p>Hide owned?</p></label>
                 <input type="checkbox" wire:model="hideOwned" wire:change="refresh" id="hideOwned" name="hideOwned">
+                <label for="hideOwned" class="flex justify-center items-center ps-2">Hide owned?</label>
             </div>
-            <select wire:model="set" wire:change="refresh" class="mx-4">
+            <select wire:model="set" wire:change="refresh" class="my-4 xl:mx-4 xl:my-0">
                 <option value="">All sets</option>
                 @foreach($sets as $s)
                     <option value="{{$s->name}}">
@@ -70,7 +70,7 @@
         </div>
     </div>
     {{$cards->links()}}
-    <div class="grid gap-6 grid-cols-10 grid-rows-1 py-5">
+    <div class="grid gap-6 grid-cols-1 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 grid-rows-1 py-5">
         @foreach($cards as $card)
             @include('components.card', ['card' => $card])
         @endforeach
