@@ -17,18 +17,22 @@
                     text-yellow-500
                  @endif
             @endif">
+            <div data-tooltip-target="{{$instance->id}}" class="flex flex-col cursor-pointer justify-center align-center">
+                <div class="flex justify-center">
+                    @if($instance->orderedCards->count() > 0)
+                        <p class="text-xs text-yellow-500">({{ $instance->orderedCards->reduce(fn($c, $oc) => $c + $oc->amount,0) }})</p>
+                    @endif
 
-            @if($instance->orderedCards->count() > 0)
-                <p class="text-xs text-yellow-500">({{ $instance->orderedCards->reduce(fn($c, $oc) => $c + $oc->amount,0) }})</p>
-            @endif
-
-            @if($instance->ownedCard)
-                <p class="text-xs text-cyan-500"> {{$instance->ownedCard->amount}}</p>
-                <p class="text-xs px-1 text-cyan-500">x</p>
-            @endif
-            <div data-tooltip-target="{{$instance->id}}" class="flex cursor-pointer">
-                <p class="text-xs pointer-events-none"> {{$instance->card_set_code}}</p>
-                <p class="text-xs pointer-events-none"> {{$instance->rarity}}</p>
+                    @if($instance->ownedCard)
+                        <p class="text-xs text-cyan-500"> {{$instance->ownedCard->amount}}</p>
+                        <p class="text-xs px-1 text-cyan-500">x</p>
+                    @endif
+                    <p class="text-xs pointer-events-none m-0"> {{$instance->card_set_code}}</p>
+                    <p class="text-xs pointer-events-none m-0"> {{$instance->rarity}}</p>
+                </div>
+                <p class="text-xs pointer-events-none pb-2 m-0 text-center">
+                    {{$instance->price?->low ?? '-'}} € / {{$instance->price?->avg ?? '-'}} € / {{$instance->price?->high ?? '-'}} €
+                </p>
             </div>
             <div id="tooltip-{{$instance->id}}" class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
                 <div class="flex flex-col">

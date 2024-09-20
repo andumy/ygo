@@ -16,10 +16,16 @@
                     ({{$percentage}} %)
                 </h3>
             </div>
-            <div>
+            <div class="flex flex-col">
                 <h3 class="text-lg font-bold text-cyan-700">
                     {{$amountOfCards}} Physical Cards
                 </h3>
+                <div class="pt-2">
+                    <p class="text-lg font-bold text-cyan-700">Estimated value:</p>
+                    <p class="text-lg font-bold text-cyan-600">Low: {{$price['low']}} €</p>
+                    <p class="text-lg font-bold text-cyan-500">Avg: {{$price['avg']}} €</p>
+                    <p class="text-lg font-bold text-cyan-400">High: {{$price['high']}} €</p>
+                </div>
             </div>
         </div>
     </div>

@@ -170,11 +170,13 @@ class Cards extends Component
         }
         $owned = $this->cardRepository->countOwnedAndOrdered($this->search, $this->set, $this->hideOwned);
         $total = $this->cardRepository->count($this->search, $this->set, $this->hideOwned);
+        $price = $this->cardInstanceRepository->priceForOwnOrOrder();
         $this->orders = $this->orderRepository->all();
         return view('livewire.cards', [
             'cards' => $cards,
             'total' => $total,
             'owned' => $owned,
+            'price' => $price,
             'amountOfCards' =>
                 $this->ownedCardRepository->countAmountOfCards() + $this->orderedCardRepository->countAmountOfCards(),
             'percentage' => $total != 0 ? round($owned / $total * 100,2) : 0

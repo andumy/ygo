@@ -21,8 +21,7 @@ use function strtoupper;
  * @property int set_id
  * @property OwnedCard ownedCard
  * @property Collection<OrderedCard> orderedCards
- * @property Collection<Price> prices
- * @property Price lastPrice
+ * @property Price price
  * @property string card_set_code
  * @property string rarity_verbose
  * @property string rarity
@@ -54,13 +53,9 @@ class CardInstance extends Model
         return $this->hasMany(OrderedCard::class);
     }
 
-    public function prices(): HasMany
+    public function price(): HasOne
     {
-        return $this->hasMany(Price::class);
-    }
-
-    public function getLastPriceAttribute(): Price{
-        return $this->prices()->orderBy('date','desc')->first();
+        return $this->hasOne(Price::class);
     }
 
     public function getRarityAttribute(): string

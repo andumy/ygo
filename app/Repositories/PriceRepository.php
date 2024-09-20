@@ -7,8 +7,8 @@ use Carbon\Carbon;
 
 class PriceRepository
 {
-    public function firstOrCreate(array $find, array $data): Price{
-        return Price::firstOrCreate($find, $data);
+    public function updateOrCreate(array $find, array $data): Price{
+        return Price::updateOrCreate($find, $data);
     }
 
 }

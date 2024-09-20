@@ -141,19 +141,19 @@ class FetchPricesCommand extends Command
 
                     $priceObject = $instance['price_data']['data']['prices'];
 
-                    $price = $priceRepository->firstOrCreate([
+                    $price = $priceRepository->updateOrCreate([
                         'card_instance_id' => $cardInstance->id,
-                        'date' => Carbon::parse($priceObject['updated_at'])->format('Y-m-d'),
                     ], [
+                        'date' => Carbon::parse($priceObject['updated_at'])->format('Y-m-d'),
                         'low' => $priceObject['low'] ?? 0,
                         'high' => $priceObject['high'] ?? 0,
                         'avg' => $priceObject['average'] ?? 0
                     ]);
 
                     if($price->wasRecentlyCreated){
-                        $this->info("Price for {$card->name} in {$set->name} was created");
+                        $this->info("Price for $card->name in $set->name was created");
                     } else {
-                        $this->info("Price for {$card->name} in {$set->name} was updated");
+                        $this->info("Price for $card->name in $set->name was updated");
                     }
                 }
             }

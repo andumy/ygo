@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Models\CardInstance;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use function dd;
 
 class CardInstanceRepository
 {
@@ -40,5 +42,23 @@ class CardInstanceRepository
             ->distinct()
             ->get()
             ->pluck('rarity_verbose');
+    }
+
+    /**
+     * @return array{low: float, avg: float, high: float}
+     */
+    public function priceForOwnOrOrder(): array
+    {
+        return CardInstance::leftJoin('owned_cards', 'card_instances.id', '=', 'owned_cards.card_instance_id')
+            ->leftJoin(
+                DB::raw('(SELECT card_instance_id, SUM(amount) as total_ordered_amount FROM ordered_cards GROUP BY card_instance_id) as ordered_summary'), 'card_instances.id', '=', 'ordered_summary.card_instance_id')
+            ->join('prices', 'card_instances.id', '=', 'prices.card_instance_id')
+            ->selectRaw(
+                'SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.low) as low,
+                 SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.avg) as avg,
+                 SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.high) as high'
+            )
+            ->first()
+            ->toArray();
     }
 }
