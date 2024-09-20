@@ -67,6 +67,7 @@ class AddSetCommand extends Command
                 $response = $cardService->updateCardStock(
                     code: $code . $i,
                     rarity: $rarity,
+                    shouldIncrease: true
                 );
 
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {

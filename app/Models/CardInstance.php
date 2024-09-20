@@ -16,12 +16,15 @@ use function strtoupper;
  * @property int id
  * @property string name
  * @property Card card
+ * @property int card_id
  * @property Set set
+ * @property int set_id
  * @property OwnedCard ownedCard
  * @property Collection<OrderedCard> orderedCards
+ * @property Collection<Price> prices
+ * @property Price lastPrice
  * @property string card_set_code
  * @property string rarity_verbose
- * @property string rarity_code
  * @property string rarity
  */
 class CardInstance extends Model
@@ -51,12 +54,17 @@ class CardInstance extends Model
         return $this->hasMany(OrderedCard::class);
     }
 
+    public function prices(): HasMany
+    {
+        return $this->hasMany(Price::class);
+    }
+
+    public function getLastPriceAttribute(): Price{
+        return $this->prices()->orderBy('date','desc')->first();
+    }
+
     public function getRarityAttribute(): string
     {
-        if($this->rarity_code){
-            return $this->rarity_code;
-        }
-
         return '(' . collect(explode(" ",$this->rarity_verbose))->reduce(function($c, $word){
             $c .= strtoupper($word[0]);
             return $c;

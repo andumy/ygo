@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
  * @property int id
  * @property int ygo_id
  * @property string name
+ * @property string alias
  * @property string type
  * @property Collection<CardInstance> cardInstances
  * @property Collection<Set> sets

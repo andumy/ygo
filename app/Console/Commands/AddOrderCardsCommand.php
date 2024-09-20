@@ -45,6 +45,7 @@ class AddOrderCardsCommand extends Command
                     code: $card,
                     rarity: $rarity,
                     orderId: $order->id,
+                    shouldIncrease: true
                 );
 
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {

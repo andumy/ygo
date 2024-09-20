@@ -25,7 +25,8 @@ class CardService
         ?string $rarity = null,
         int $orderId = null,
         int $orderAmount = 1,
-        int $ownAmount = 1
+        int $ownAmount = 1,
+        bool $shouldIncrease = false
     ): AddCardResponse
     {
         /** @var Collection<CardInstance> $cardInstances */
@@ -55,7 +56,8 @@ class CardService
             $cardInstance,
             $orderId,
             $orderAmount,
-            $ownAmount
+            $ownAmount,
+            $shouldIncrease
         );
     }
 
@@ -63,18 +65,20 @@ class CardService
         CardInstance $cardInstance,
         int $orderId = null,
         int $orderAmount = 1,
-        int $ownAmount = 1
+        int $ownAmount = 1,
+        bool $shouldIncrease = false
     ): AddCardResponse
     {
         if($orderId){
-            return $this->handleOrderedCards($cardInstance, $orderId, $orderAmount);
+            return $this->handleOrderedCards($cardInstance, $orderId, $orderAmount, $shouldIncrease);
         }
-        return $this->handleOwnedCards($cardInstance, $ownAmount);
+        return $this->handleOwnedCards($cardInstance, $ownAmount, $shouldIncrease);
     }
 
     private function handleOwnedCards(
         CardInstance $cardInstance,
-        int $ownAmount
+        int $ownAmount,
+        bool $shouldIncrease
     ): AddCardResponse
     {
         //delete owned
@@ -89,7 +93,10 @@ class CardService
         //update owned
         if($cardInstance->ownedCard){
             $this->ownedCardRepository
-                ->updateAmount($cardInstance->ownedCard, $cardInstance->ownedCard->amount + $ownAmount);
+                ->updateAmount(
+                    $cardInstance->ownedCard,
+                    $shouldIncrease ? $cardInstance->ownedCard->amount + $ownAmount : $ownAmount
+                );
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
                 cardName: $cardInstance->card->name
@@ -112,6 +119,7 @@ class CardService
         CardInstance $cardInstance,
         int $orderId,
         int $orderAmount,
+        bool $shouldIncrease
     ): AddCardResponse
     {
         //delete order
@@ -125,7 +133,10 @@ class CardService
 
         //update order
         if($orderedCard = $this->orderedCardRepository->findByInstanceAndOrder($cardInstance->id, $orderId)){
-            $this->orderedCardRepository->updateAmount($orderedCard, $orderedCard->amount + $orderAmount);
+            $this->orderedCardRepository->updateAmount(
+                $orderedCard,
+                $shouldIncrease ? $orderedCard->amount + $orderAmount : $orderAmount
+            );
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
                 cardName: $cardInstance->card->name

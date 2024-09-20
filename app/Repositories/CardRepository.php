@@ -12,9 +12,27 @@ class CardRepository
         return Card::firstOrCreate($find, $data);
     }
 
+    public function create(string $name, ?int $ygoId, string $type): Card
+    {
+        return Card::create([
+            'name' => $name,
+            'ygo_id' => $ygoId,
+            'type' => $type
+        ]);
+    }
+
+    /** @return string[] */
+    public function types(): array{
+        return Card::select('type')
+            ->distinct()
+            ->get()
+            ->pluck('type')
+            ->toArray();
+    }
+
     public function findByName(string $name): ?Card
     {
-        return Card::where('name', $name)->first();
+        return Card::where('name', $name)->orWhere('alias', $name)->first();
     }
 
     public function paginate(string $search, string $set, bool $hideOwned, int $pagination)
@@ -47,7 +65,7 @@ class CardRepository
 
     public function countOwnedAndOrdered(string $search = '', string $set = '', bool $hideOwned = false): int {
         return $this->searchQuery($search , $set, $hideOwned)
-            ->whereHas('cardInstances', function ($query) use ($search) {
+            ->whereHas('cardInstances', function ($query) {
                 $query->whereHas('ownedCard')
                     ->orWhereHas('orderedCards');
             })->count();

@@ -2,38 +2,32 @@
 
 namespace App\Models;
 
-use App\Enums\OrderCardStatuses;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
 /**
- * @property int id
- * @property CardInstance cardInstance
- * @property int amount
- * @property int order_id
- * @property Order order
- * @property OrderCardStatuses $status
+ * @property float low
+ * @property float high
+ * @property float avg
+ * @property Carbon $date
+ * @property int card_instance_id
+ * @property CardInstance $cardInstance
  */
-class OrderedCard extends Model
+
+class Price extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
     protected $guarded = [];
-
     public $casts = [
-        'status' => OrderCardStatuses::class
+        'date' => 'date'
     ];
 
     public function cardInstance(): BelongsTo
     {
         return $this->belongsTo(CardInstance::class);
-    }
-
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class);
     }
 }

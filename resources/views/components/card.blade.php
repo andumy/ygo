@@ -34,19 +34,46 @@
                 <div class="flex flex-col">
                     <p>{{$instance->card_set_code}}</p>
                     <div class="p-2">
-                        Owned: <input
+                        <label for="ownedCards.{{$instance->id}}">Owned: </label>
+                        <input
                             class="appearance-none border rounded text-black"
-                            type="text"
+                            type="number"
+                            id="ownedCards.{{$instance->id}}"
                             wire:model="ownedCards.{{$instance->id}}"
-                            value="{{$instance->ownedCard?->amount ?? 0}}"
                         >
+                        <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="updateOwn({{$instance->id}})">
+                            Update Own
+                        </button>
                     </div>
                     <div class="p-2">
-                        Ordered: <input
+                        @if($instance->orderedCards->count() > 0)
+                            <p>Ordered: </p>
+                        @endif
+                        @foreach($instance->orderedCards as $orderedCard)
+                            <label for="orderedCards.{{$instance->id}}.{{$orderedCard->id}}">
+                                {{$orderedCard->order->name}}:
+                            </label>
+                            <input
+                                class="appearance-none border rounded text-black"
+                                type="number"
+                                wire:model="orderedCards.{{$instance->id}}.{{$orderedCard->order_id}}"
+                                id="orderedCards.{{$instance->id}}.{{$orderedCard->id}}"
+                            >
+                        @endforeach
+                        @if($instance->orderedCards->count() > 0)
+                            <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="updateOrders({{$instance->id}})">
+                                Update Orders
+                            </button>
+                        @endif
+                    </div>
+                    <div class="p-2">
+                        <label for="orderedCards.{{$instance->id}}.0">
+                            New Order:
+                        </label>
+                        <input
                             class="appearance-none border rounded text-black"
                             type="text"
-                            wire:model="orderedCards.{{$instance->id}}"
-                            value="{{$instance->ownedCard?->order_amaount ?? 0}}"
+                            wire:model="orderedCards.{{$instance->id}}.0"
                         >
                         <select wire:model="orderId.{{$instance->id}}" class="px-4 mx-4">
                             <option value="" selected>Select Order</option>
@@ -54,10 +81,10 @@
                                 <option value="{{$o->id}}">{{$o->name}}</option>
                             @endforeach
                         </select>
+                        <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="addOrder({{$instance->id}})">
+                            Add Order
+                        </button>
                     </div>
-                    <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="updateStock({{$instance->id}})">
-                        Update
-                    </button>
                 </div>
             </div>
         </div>
