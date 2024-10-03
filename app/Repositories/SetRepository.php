@@ -17,6 +17,11 @@ class SetRepository
         return Set::find($id);
     }
 
+    public function findByName(string $name): ?Set
+    {
+        return Set::where('name',$name)->orWhere('alias',$name)->first();
+    }
+
     public function updateOrCreate(array $find, array $data): Set
     {
         return Set::updateOrCreate($find, $data);

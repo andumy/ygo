@@ -100,29 +100,6 @@ class FetchPricesCommand extends Command
                             $cardInstance = $filteredCardInstances->first();
                         } else {
                             $createNew = true;
-//                            $existentOptions = [];
-//                            foreach ($cardInstances as $ci) {
-//                                $existentOptions [] =
-//                                    "{$ci->card->name} ($ci->card_id) / " .
-//                                    "{$ci->set->name} ($ci->set_id) / " .
-//                                    "$ci->rarity_verbose";
-//                            }
-//                            $existentOptions [] = "Create a new instance";
-//
-//                            $cardInstanceOption = $this->choice(
-//                                "Select card instance for data $card->name ($card->id) / " .
-//                                "$set->name ($set->id) / " .
-//                                "{$instance['rarity']}",
-//                                $existentOptions
-//                            );
-//
-//                            $cardInstanceOptionIndex = array_search($cardInstanceOption, $existentOptions);
-//
-//                            if ($cardInstanceOptionIndex == $cardInstances->count()) {
-//                                $createNew = true;
-//                            } else {
-//                                $cardInstance = $cardInstances->get($cardInstanceOptionIndex);
-//                            }
                         }
                     }
 

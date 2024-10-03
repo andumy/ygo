@@ -6,6 +6,7 @@ return [
     'image_url' => env('YGO_IMAGE_URL'),
     'price' => [
         'sets' => env('YGO_PRICE_SETS_URL'),
-        'cards_in_set' => env('YGO_PRICE_SET_DATA_URL')
+        'cards_in_set' => env('YGO_PRICE_SET_DATA_URL'),
+        'parser' => env('YGO_PRICE_PARSER_URL'),
     ],
 ];

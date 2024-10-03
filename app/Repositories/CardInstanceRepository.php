@@ -25,10 +25,10 @@ class CardInstanceRepository
         return CardInstance::where('card_set_code', $code)->get();
     }
 
-    /** @return Collection<CardInstance> */
-    public function findBySetCodeAndRarity(string $code, string $rarity): Collection
+    /** @return CardInstance */
+    public function findBySetCodeAndRarity(string $code, string $rarity): ?CardInstance
     {
-        return CardInstance::where('card_set_code', $code)->where('rarity_verbose', $rarity)->get();
+        return CardInstance::where('card_set_code', $code)->where('rarity_verbose', $rarity)->first();
     }
 
     public function findById(int $id): ?CardInstance
@@ -45,7 +45,7 @@ class CardInstanceRepository
     }
 
     /**
-     * @return array{low: float, avg: float, high: float}
+     * @return array{low: float, avg: float, high: float, market: float}
      */
     public function priceForOwnOrOrder(): array
     {
@@ -56,7 +56,8 @@ class CardInstanceRepository
             ->selectRaw(
                 'SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.low) as low,
                  SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.avg) as avg,
-                 SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.high) as high'
+                 SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.high) as high,
+                 SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.market) as market'
             )
             ->first()
             ->toArray();

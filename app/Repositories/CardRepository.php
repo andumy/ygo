@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Card;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class CardRepository
@@ -10,6 +11,11 @@ class CardRepository
     public function firstOrCreate(array $find, array $data): Card
     {
         return Card::firstOrCreate($find, $data);
+    }
+
+    public function updateLastPriceFetched(Card $card): void{
+        $card->last_price_fetch = Carbon::now()->format('Y-m-d');
+        $card->save();
     }
 
     public function create(string $name, ?int $ygoId, string $type): Card

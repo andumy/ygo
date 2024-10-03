@@ -31,7 +31,7 @@
                     <p class="text-xs pointer-events-none m-0"> {{$instance->rarity}}</p>
                 </div>
                 <p class="text-xs pointer-events-none pb-2 m-0 text-center">
-                    {{$instance->price?->low ?? '-'}} € / {{$instance->price?->avg ?? '-'}} € / {{$instance->price?->high ?? '-'}} €
+                    {{$instance->price?->low ?? '-'}} €
                 </p>
             </div>
             <div id="tooltip-{{$instance->id}}" class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">

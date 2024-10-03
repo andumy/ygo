@@ -101,7 +101,6 @@ class SetsAndInstances extends Component
             'set_id' => $this->set->id,
             'card_set_code' => $this->card_set_code,
             'rarity_verbose' => $this->rarities[$this->rarity],
-            'rarity_code' => $this->rarity,
         ],[]);
 
         $this->message = $this->card->name . ' added to ' . $this->set->name .

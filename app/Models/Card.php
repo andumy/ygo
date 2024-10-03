@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,6 +20,7 @@ use Illuminate\Support\Collection;
  * @property Collection<Set> sets
  * @property boolean isOwned
  * @property boolean isOrdered
+ * @property Carbon last_price_fetch
  */
 class Card extends Model
 {
@@ -26,6 +28,8 @@ class Card extends Model
 
     public $timestamps = false;
     protected $guarded = [];
+
+    public $casts = ['last_price_fetch' => 'date'];
 
     public function cardInstances(): HasMany
     {

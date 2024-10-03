@@ -94,6 +94,8 @@ class AddSetCommand extends Command
                     throw new \Exception('To be implemented');
             }
         }
+
+        $this->info(count($entries). " cards were added");
     }
 
     function generateRangeWithLeadingZeros($start, $end) {

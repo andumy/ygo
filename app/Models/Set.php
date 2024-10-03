@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
  * @property int id
  * @property string name
  * @property string code
+ * @property string alias
  * @property int card_amount
  * @property Carbon date
  * @property Collection<CardInstance> cardInstances

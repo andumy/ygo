@@ -10,6 +10,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use function config;
 use function dd;
+use function var_dump;
 
 class FetchCardsCommand extends Command
 {
@@ -52,9 +53,9 @@ class FetchCardsCommand extends Command
             );
         }
 
-        $response = Http::get(config('ygo.cards'))->json();
+        $response = Http::get(config('ygo.cards'));
 
-        foreach ($response['data'] as $data) {
+        $response->lazy('/data')->each(function ($data, $key) use ($cardRepository, $setRepository, $cardInstanceRepository) {
             $card = $cardRepository->firstOrCreate(
                 [
                     'ygo_id' => $data['id']
@@ -66,26 +67,26 @@ class FetchCardsCommand extends Command
             );
 
             foreach ($data['card_sets'] ?? [] as $dataSet){
-                $set = $setRepository->firstOrCreate(
+                $set = $setRepository->findByName($dataSet['set_name']);
+                if(!$set){
+                    $this->error("Set {$dataSet['set_name']} not found.");
+                    continue;
+                }
+
+                $ci = $cardInstanceRepository->firstOrCreate(
                     [
-                        'name' => $dataSet['set_name'],
-                        'code' => $dataSet['set_code']
+                        'card_id' => $card->id,
+                        'set_id' => $set->id,
+                        'card_set_code' => $dataSet['set_code'],
+                        'rarity_verbose' => $dataSet['set_rarity'],
                     ],
                     []
                 );
 
-                $cardInstanceRepository->firstOrCreate(
-                    [
-                        'card_id' => $card->id,
-                        'set_id' => $set->id,
-                        'card_set_code' => $dataSet['set_code']
-                    ],
-                    [
-                        'rarity_verbose' => $dataSet['set_rarity'],
-                        'rarity_code' => $dataSet['set_rarity_code'],
-                    ]
-                );
+                if($ci->wasRecentlyCreated){
+                    $this->info("Card {$card->name} from set {$set->name} added with set code {$ci->card_set_code}.");
+                }
             }
-        }
+        });
     }
 }
