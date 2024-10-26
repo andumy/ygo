@@ -21,7 +21,7 @@
                     {{$amountOfCards}} Physical Cards
                 </h3>
                 <div class="pt-2">
-                    <p class="text-lg font-bold text-cyan-700">Estimated value: {{$price['low']}} €</p>
+                    <p class="text-lg font-bold text-cyan-700">Estimated value: {{$totalPrice['low']}} €</p>
                 </div>
             </div>
         </div>
@@ -51,8 +51,11 @@
         </div>
         <div class="flex flex-col xl:flex-row justify-center my-4 xl:my-0">
             <div class="flex">
-                <input type="checkbox" wire:model="hideOwned" wire:change="refresh" id="hideOwned" name="hideOwned">
-                <label for="hideOwned" class="flex justify-center items-center ps-2">Hide owned?</label>
+                <select id="ownedFilter" name="ownedFilter" wire:model="ownedFilter" wire:change="refresh">
+                    <option value="0">All</option>
+                    <option value="1">Owned</option>
+                    <option value="-1">Missing</option>
+                </select>
             </div>
             <select wire:model="set" wire:change="refresh" class="my-4 xl:mx-4 xl:my-0">
                 <option value="">All sets</option>

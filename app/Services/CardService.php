@@ -43,7 +43,8 @@ class CardService
             return new AddCardResponse(
                 status: AddCardStatuses::MULTIPLE_OPTIONS,
                 rarities: $cardInstances->pluck('rarity_verbose')->toArray(),
-                cardName: $cardInstances->first()->card->name
+                cardName: $cardInstances->first()->card->name,
+                cardInstance: $cardInstances->first()
             );
         }
         $cardInstance = $cardInstances->first();
@@ -86,7 +87,8 @@ class CardService
             $this->ownedCardRepository->delete($cardInstance->id);
             return new AddCardResponse(
                 status: AddCardStatuses::DELETE,
-                cardName: $cardInstance->card->name
+                cardName: $cardInstance->card->name,
+                cardInstance: $cardInstance
             );
         }
 
@@ -99,7 +101,8 @@ class CardService
                 );
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
-                cardName: $cardInstance->card->name
+                cardName: $cardInstance->card->name,
+                cardInstance: $cardInstance
             );
         }
 
@@ -111,7 +114,8 @@ class CardService
 
         return new AddCardResponse(
             status: AddCardStatuses::NEW_CARD,
-            cardName: $cardInstance->card->name
+            cardName: $cardInstance->card->name,
+            cardInstance: $cardInstance
         );
     }
 
@@ -127,7 +131,8 @@ class CardService
             $this->orderedCardRepository->delete($cardInstance->id, $orderId);
             return new AddCardResponse(
                 status: AddCardStatuses::DELETE,
-                cardName: $cardInstance->card->name
+                cardName: $cardInstance->card->name,
+                cardInstance: $cardInstance
             );
         }
 
@@ -139,7 +144,8 @@ class CardService
             );
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
-                cardName: $cardInstance->card->name
+                cardName: $cardInstance->card->name,
+                cardInstance: $cardInstance
             );
         }
 
@@ -147,7 +153,8 @@ class CardService
         $this->orderedCardRepository->firstOrCreate($cardInstance->id, $orderAmount, $orderId);
         return new AddCardResponse(
             status: AddCardStatuses::NEW_CARD,
-            cardName: $cardInstance->card->name
+            cardName: $cardInstance->card->name,
+            cardInstance: $cardInstance
         );
     }
 }

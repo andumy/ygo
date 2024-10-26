@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\AddCardStatuses;
 use App\Models\CardInstance;
+use App\Models\OwnedCard;
 use App\Repositories\CardRepository;
 use App\Repositories\OrderedCardRepository;
 use App\Repositories\OrderRepository;
@@ -116,14 +117,14 @@ class Orders extends Component
     public function render()
     {
         $this->orders = $this->orderRepository->all();
-        $cards = [];
+        $orderedCards = [];
 
         if($this->orderId) {
-            $cards = $this->cardRepository->getForOrder($this->orderId);
+            $orderedCards = $this->orderRepository->findById($this->orderId)?->orderedCards;
         }
 
         return view('livewire.orders', [
-            'cards' => $cards
+            'orderedCards' => $orderedCards
         ]);
     }
 }

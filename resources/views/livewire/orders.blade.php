@@ -40,11 +40,24 @@
             </button>
         </div>
     </div>
-    @if($cards)
-        <div class="grid gap-6 grid-cols-10 grid-rows-1 py-5">
-            @foreach($cards as $card)
-                @include('components.card', ['card' => $card])
+    @if($orderedCards)
+        <table>
+            <thead>
+            <tr>
+                <th>Card Name</th>
+                <th>Card Code</th>
+                <th>Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($orderedCards as $oc)
+                <tr class="py-2">
+                    <td>{{$oc->cardInstance->card->name}}</td>
+                    <td>{{$oc->cardInstance->card_set_code}}</td>
+                    <td>{{$oc->amount}}</td>
+                </tr>
             @endforeach
-        </div>
+            </tbody>
+        </table>
     @endif
 </div>

@@ -11,18 +11,21 @@ use App\Repositories\CardRepository;
 use App\Repositories\OrderedCardRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OwnedCardRepository;
+use App\Repositories\PriceRepository;
 use App\Repositories\SetRepository;
 use App\Services\CardService;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
 use function array_key_exists;
+use function dd;
 
 class Cards extends Component
 {
     use WithPagination;
 
-    public bool $hideOwned = false;
+    public int $ownedFilter = 0; // 0 = all, 1 = owned, -1 = not owned
 
     public string $code = '';
     public string $set = '';
@@ -35,6 +38,7 @@ class Cards extends Component
 
     public Collection $orders;
     public array $ownedCards = [];
+    public array $prices = [];
     public array $orderedCards = [];
     public array $orderId = [];
 
@@ -45,6 +49,7 @@ class Cards extends Component
     private OrderedCardRepository $orderedCardRepository;
     private CardService $cardService;
     private SetRepository $setRepository;
+    private PriceRepository $priceRepository;
 
     public function boot(
         CardRepository $cardRepository,
@@ -54,6 +59,7 @@ class Cards extends Component
         SetRepository $setRepository,
         OrderRepository $orderRepository,
         OrderedCardRepository $orderedCardRepository,
+        PriceRepository $priceRepository,
     )
     {
         $this->cardRepository = $cardRepository;
@@ -63,6 +69,7 @@ class Cards extends Component
         $this->setRepository = $setRepository;
         $this->orderRepository = $orderRepository;
         $this->orderedCardRepository = $orderedCardRepository;
+        $this->priceRepository = $priceRepository;
     }
 
     public function updateOwn(int $instanceId): void
@@ -91,6 +98,23 @@ class Cards extends Component
         }
     }
 
+    public function updatePrice(int $instanceId): void
+    {
+        if($this->prices[$instanceId] == ""){
+            $this->priceRepository->deleteForCardInstance($instanceId);
+            return;
+        }
+        $this->priceRepository->updateOrCreate(
+            find: ['card_instance_id' => $instanceId],
+            data: [
+                'low' => $this->prices[$instanceId],
+                'avg' => $this->prices[$instanceId],
+                'high' => $this->prices[$instanceId],
+                'date' => Carbon::now()
+            ]
+        );
+    }
+
     public function addOrder(int $instanceId): void
     {
         $instance = $this->cardInstanceRepository->findById($instanceId);
@@ -103,17 +127,6 @@ class Cards extends Component
             orderId: $orderId,
             orderAmount: $orderAmount,
         );
-    }
-
-    public function mount(): void
-    {
-        $this->sets = $this->setRepository->all();
-        foreach ($this->sets as $set) {
-            $this->fillBySet[$set->name] = [
-                'total' => $this->cardRepository->count('', $set->name),
-                'owned' => $this->cardRepository->countOwnedAndOrdered('', $set->name)
-            ];
-        }
     }
 
     public function addCard(): void
@@ -155,31 +168,44 @@ class Cards extends Component
     {
     }
 
+    public function mount(): void
+    {
+        $this->sets = $this->setRepository->all();
+        foreach ($this->sets as $set) {
+            $this->fillBySet[$set->name] = [
+                'total' => $this->cardRepository->count(set: $set->name),
+                'owned' => $this->cardRepository->countOwnedAndOrdered(set: $set->name)
+            ];
+        }
+    }
+
     public function render()
     {
         /** @var Collection<Card> $cards */
-        $cards = $this->cardRepository->paginate($this->search, $this->set, $this->hideOwned, 50);
+        $cards = $this->cardRepository->paginate($this->search, $this->set, 50, $this->ownedFilter);
         foreach ($cards as $card){
             foreach ($card->cardInstances as $cardInstance) {
                 $this->ownedCards[$cardInstance->id] = $cardInstance->ownedCard?->amount ?? 0;
                 $this->orderedCards[$cardInstance->id] = [];
+                $this->prices[$cardInstance->id] = $cardInstance->price->low ?? 0;
                 foreach ($cardInstance->orderedCards as $orderedCard){
                     $this->orderedCards[$cardInstance->id][$orderedCard->order_id] = $orderedCard->amount ?? 0;
                 }
             }
         }
-        $owned = $this->cardRepository->countOwnedAndOrdered($this->search, $this->set, $this->hideOwned);
-        $total = $this->cardRepository->count($this->search, $this->set, $this->hideOwned);
-        $price = $this->cardInstanceRepository->priceForOwnOrOrder();
+        $owned = $this->cardRepository->countOwnedAndOrdered($this->search, $this->set, $this->ownedFilter);
+        $total = $this->cardRepository->count($this->search, $this->set, $this->ownedFilter);
+        $totalPrice = $this->cardInstanceRepository->priceForOwnOrOrder();
         $this->orders = $this->orderRepository->all();
         return view('livewire.cards', [
             'cards' => $cards,
             'total' => $total,
             'owned' => $owned,
-            'price' => $price,
+            'totalPrice' => $totalPrice,
             'amountOfCards' =>
                 $this->ownedCardRepository->countAmountOfCards() + $this->orderedCardRepository->countAmountOfCards(),
-            'percentage' => $total != 0 ? round($owned / $total * 100,2) : 0
+            'percentage' => $total != 0 ? round($owned / $total * 100,2) : 0,
+            'setCode' => $this->setRepository->findByName($this->set)?->code ?? '',
         ]);
     }
 }

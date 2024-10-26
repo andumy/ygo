@@ -41,9 +41,9 @@ class CardRepository
         return Card::where('name', $name)->orWhere('alias', $name)->first();
     }
 
-    public function paginate(string $search, string $set, bool $hideOwned, int $pagination)
+    public function paginate(string $search, string $set, int $pagination, int $ownedFilter = 0)
     {
-        return $this->searchQuery($search, $set, $hideOwned)->paginate($pagination);
+        return $this->searchQuery($search, $set, $ownedFilter)->paginate($pagination);
     }
 
     public function getForOrder(int $orderId): Collection
@@ -65,19 +65,19 @@ class CardRepository
         return Card::where('ygo_id', $id)->first();
     }
 
-    public function count(string $search = '', string $set = '', bool $hideOwned = false): int {
-        return $this->searchQuery($search, $set, $hideOwned)->count();
+    public function count(string $search = '', string $set = '', int $ownedFilter = 0): int {
+        return $this->searchQuery($search, $set, $ownedFilter)->count();
     }
 
-    public function countOwnedAndOrdered(string $search = '', string $set = '', bool $hideOwned = false): int {
-        return $this->searchQuery($search , $set, $hideOwned)
+    public function countOwnedAndOrdered(string $search = '', string $set = '', int $ownedFilter = 0): int {
+        return $this->searchQuery($search , $set, $ownedFilter)
             ->whereHas('cardInstances', function ($query) {
                 $query->whereHas('ownedCard')
                     ->orWhereHas('orderedCards');
             })->count();
     }
 
-    private function searchQuery(string $search = '', string $set = '', bool $hideOwned = false) {
+    private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0) {
         return Card::when($search !== '', function($q) use ($search){
             return $q->where(function ($qq) use ($search) {
                 $qq
@@ -93,8 +93,14 @@ class CardRepository
                     $qq->where('name', $set);
                 });
             })
-            ->when($hideOwned, function($q) {
+            ->when($ownedFilter === -1, function($q) {
                 return $q->whereDoesntHave('cardInstances', function ($qq) {
+                    $qq->whereHas('ownedCard')
+                        ->orWhereHas('orderedCards');
+                });
+            })
+            ->when($ownedFilter === 1, function($q) {
+                return $q->whereHas('cardInstances', function ($qq) {
                     $qq->whereHas('ownedCard')
                         ->orWhereHas('orderedCards');
                 });

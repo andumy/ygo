@@ -12,6 +12,7 @@
         <a href="/" class="text-blue-500 hover:text-blue-800 pe-5">Library</a>
         <a href="/sets-instances" class="text-blue-500 hover:text-blue-800 ps-5">Sets and Instances</a>
         <a href="/orders" class="text-blue-500 hover:text-blue-800 ps-5">Orders</a>
+        <a href="/purchase-recommendation" class="text-blue-500 hover:text-blue-800 ps-5">Purchase Recommendation</a>
     </div>
         {{ $slot }}
     <script>

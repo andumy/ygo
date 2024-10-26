@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 /**
  * @property int id
  * @property string name
- * @property OwnedCard[] ownedCards
+ * @property OrderedCard[] orderedCards
  */
 class Order extends Model
 {
@@ -19,13 +19,13 @@ class Order extends Model
     public $timestamps = false;
     protected $guarded = [];
 
-    public function ownedCards(): HasMany
+    public function orderedCards(): HasMany
     {
-        return $this->hasMany(OwnedCard::class);
+        return $this->hasMany(OrderedCard::class);
     }
 
     public function cards(): HasManyThrough
     {
-        return $this->hasManyThrough(Card::class, OwnedCard::class);
+        return $this->hasManyThrough(Card::class, OrderedCard::class);
     }
 }

@@ -8,6 +8,9 @@
         src="{{asset('storage/'. $card->ygo_id . '.jpg')}}">
     <h2 id="card-{{$card->id}}" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500" onclick="copyName({{$card->id}})">{{ $card->name }}</h2>
     @foreach($card->cardInstances as $instance)
+        @if($setCode && $setCode !== "" && !str_contains($instance->card_set_code,$setCode))
+            @continue;
+        @endif
         <div class="flex flex-row justify-center relative has-tooltip
             @if($instance->ownedCard || $instance->orderedCards->count() > 0)
                  font-bold
@@ -36,7 +39,17 @@
             </div>
             <div id="tooltip-{{$instance->id}}" class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
                 <div class="flex flex-col">
-                    <p>{{$instance->card_set_code}}</p>
+                    <div class="flex align-center">
+                        <b>{{$instance->card_set_code}}</b>
+                        <input
+                            class="appearance-none border rounded text-black w-16 ps-2"
+                            type="number"
+                            id="prices.{{$instance->id}}"
+                            wire:model="prices.{{$instance->id}}"
+                            wire:change="updatePrice({{$instance->id}})"
+                        >
+                        <b>€</b>
+                    </div>
                     <div class="p-2">
                         <label for="ownedCards.{{$instance->id}}">Owned: </label>
                         <input
