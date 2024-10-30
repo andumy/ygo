@@ -28,7 +28,7 @@ class PurchaseRecommendation extends Component
     {
         $sets = $this->setRepository->all()->map(function (Set $set) {
             $total = $this->cardRepository->count(set: $set->name);
-            $owned = $this->cardRepository->countOwnedAndOrdered(set: $set->name);
+            $owned = $this->cardRepository->countOwnedAndOrderedInsideSet(set: $set->name);
             return [
                 'code' => $set->code,
                 'name' => $set->name,
@@ -42,7 +42,8 @@ class PurchaseRecommendation extends Component
             ['missing', 'desc']
         ])->toArray();
 
-        $this->completionSets = $sets->sortBy([
+        $this->completionSets = $sets->filter(fn($s) => $s['total'] > 10)
+        ->sortBy([
             ['missing', 'asc'],
             ['total', 'desc'],
         ])->toArray();

@@ -174,7 +174,7 @@ class Cards extends Component
         foreach ($this->sets as $set) {
             $this->fillBySet[$set->name] = [
                 'total' => $this->cardRepository->count(set: $set->name),
-                'owned' => $this->cardRepository->countOwnedAndOrdered(set: $set->name)
+                'owned' => $this->cardRepository->countOwnedAndOrderedInsideSet(set: $set->name)
             ];
         }
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Rarities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -60,9 +61,6 @@ class CardInstance extends Model
 
     public function getRarityAttribute(): string
     {
-        return '(' . collect(explode(" ",$this->rarity_verbose))->reduce(function($c, $word){
-            $c .= strtoupper($word[0]);
-            return $c;
-        },'') . ')';
+        return '(' .Rarities::tryFrom($this->rarity_verbose)->getShortHand(). ')';
     }
 }

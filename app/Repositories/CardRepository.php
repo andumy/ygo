@@ -77,6 +77,17 @@ class CardRepository
             })->count();
     }
 
+    public function countOwnedAndOrderedInsideSet(string $set = ''): int {
+        return $this->searchQuery(set: $set)
+            ->whereHas('cardInstances', function ($query) use($set) {
+                $query->whereHas('set', fn($q) => $q->where('name', $set))
+                    ->where(function($q){
+                        $q->whereHas('ownedCard')
+                            ->orWhereHas('orderedCards');
+                    });
+            })->count();
+    }
+
     private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0) {
         return Card::when($search !== '', function($q) use ($search){
             return $q->where(function ($qq) use ($search) {
