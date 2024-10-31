@@ -62,4 +62,34 @@ class CardInstanceRepository
             ->first()
             ->toArray();
     }
+
+    public function count(string $search = '', string $set = '', int $ownedFilter = 0): int{
+        return $this->searchQuery($search, $set, $ownedFilter)->count();
+    }
+
+
+    private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0) {
+        return CardInstance::when($search !== '', function($q) use ($search){
+            return $q->where(function ($qq) use ($search) {
+                $qq->where('card_set_code', 'like', '%' . $search . '%')
+                    ->orWhereHas('card', function ($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('ygo_id', 'like', '%' . $search . '%');
+                    });
+            });
+        })
+            ->when($set !== '', function($q) use ($set) {
+                return $q->whereHas('set', function ($qq) use ($set) {
+                    $qq->where('name', $set);
+                });
+            })
+            ->when($ownedFilter === -1, function($q) {
+                return $q->whereDoesntHave('ownedCard')
+                    ->orWhereDoesntHave('orderedCards');
+            })
+            ->when($ownedFilter === 1, function($q) {
+                return $q->whereHas('ownedCard')
+                    ->orWhereHas('orderedCards');
+            });
+    }
 }

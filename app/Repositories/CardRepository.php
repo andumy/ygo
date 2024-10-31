@@ -69,14 +69,6 @@ class CardRepository
         return $this->searchQuery($search, $set, $ownedFilter)->count();
     }
 
-    public function countOwnedAndOrdered(string $search = '', string $set = '', int $ownedFilter = 0): int {
-        return $this->searchQuery($search , $set, $ownedFilter)
-            ->whereHas('cardInstances', function ($query) {
-                $query->whereHas('ownedCard')
-                    ->orWhereHas('orderedCards');
-            })->count();
-    }
-
     public function countOwnedAndOrderedInsideSet(string $set = ''): int {
         return $this->searchQuery(set: $set)
             ->whereHas('cardInstances', function ($query) use($set) {

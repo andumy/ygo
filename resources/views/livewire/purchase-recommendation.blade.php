@@ -26,7 +26,7 @@
                         <td>{{$set["name"]}}</td>
                         <td>{{$set["total"]}}</td>
                         <td>{{$set["owned"]}}</td>
-                        <td class="color-red">{{$set["total"] - $set["owned"] }}</td>
+                        <td class="color-red">{{$set["missing"]}}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -52,8 +52,8 @@
                         <td>{{$set["code"]}}</td>
                         <td>{{$set["name"]}}</td>
                         <td>{{$set["total"]}}</td>
-                        <td>{{$set["owned"]}}</td>
-                        <td class="color-red">{{$set["total"] - $set["owned"] }}</td>
+                        <td>{{$set["setOwned"]}}</td>
+                        <td class="color-red">{{$set["setMissing"]}}</td>
                     </tr>
                 @endforeach
                 </tbody>

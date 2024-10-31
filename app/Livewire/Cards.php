@@ -20,6 +20,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use function array_key_exists;
 use function dd;
+use function round;
 
 class Cards extends Component
 {
@@ -193,18 +194,25 @@ class Cards extends Component
                 }
             }
         }
-        $owned = $this->cardRepository->countOwnedAndOrdered($this->search, $this->set, $this->ownedFilter);
+        $owned = $this->cardRepository->count($this->search, $this->set, 1);
         $total = $this->cardRepository->count($this->search, $this->set, $this->ownedFilter);
+
+        $ownedInstances = $this->cardInstanceRepository->count($this->search, $this->set, 1);
+        $totalInstances = $this->cardInstanceRepository->count($this->search, $this->set, $this->ownedFilter);
+
         $totalPrice = $this->cardInstanceRepository->priceForOwnOrOrder();
         $this->orders = $this->orderRepository->all();
         return view('livewire.cards', [
-            'cards' => $cards,
-            'total' => $total,
             'owned' => $owned,
+            'total' => $total,
+            'percentage' => $total != 0 ? round($owned / $total * 100,2) : 0,
+            'ownedInstances' => $ownedInstances,
+            'totalInstances' => $totalInstances,
+            'percentageInstances' => $totalInstances != 0 ? round($ownedInstances / $totalInstances * 100,2) : 0,
+            'cards' => $cards,
             'totalPrice' => $totalPrice,
             'amountOfCards' =>
                 $this->ownedCardRepository->countAmountOfCards() + $this->orderedCardRepository->countAmountOfCards(),
-            'percentage' => $total != 0 ? round($owned / $total * 100,2) : 0,
             'setCode' => $this->setRepository->findByName($this->set)?->code ?? '',
         ]);
     }

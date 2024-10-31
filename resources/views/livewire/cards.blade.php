@@ -4,21 +4,35 @@
             YU-GI-OH! Library
         </h1>
         <div class="flex pt-2 justify-between">
-            <div class="flex">
-                <h3 class="text-lg font-bold text-cyan-400">
-                    {{$owned}} Owned
-                </h3>
-                <p class="px-5 text-lg">/</p>
-                <h3 class="text-lg font-bold">
-                    {{$total}} Total
-                </h3>
-                <h3 class="text-lg font-bold ps-10 text-stone-300">
-                    ({{$percentage}} %)
-                </h3>
+            <div class="flex-col">
+                <div class="flex">
+                    <h3 class="text-lg font-bold text-cyan-400">
+                        {{$owned}} Owned
+                    </h3>
+                    <p class="px-5 text-lg">/</p>
+                    <h3 class="text-lg font-bold">
+                        {{$total}} Total
+                    </h3>
+                    <h3 class="text-lg font-bold ps-10 text-stone-300">
+                        ({{$percentage}} %)
+                    </h3>
+                </div>
+                <div class="flex">
+                    <h3 class="text-lg font-bold text-cyan-400">
+                        {{$ownedInstances}} Owned Instances
+                    </h3>
+                    <p class="px-5 text-lg">/</p>
+                    <h3 class="text-lg font-bold">
+                        {{$totalInstances}} Total Instances
+                    </h3>
+                    <h3 class="text-lg font-bold ps-10 text-stone-300">
+                        ({{$percentageInstances}} %)
+                    </h3>
+                </div>
             </div>
             <div class="flex flex-col">
                 <h3 class="text-lg font-bold text-cyan-700">
-                    {{$amountOfCards}} Physical Cards
+                    {{$amountOfCards}} Physical Cards ({{$amountOfCards - $ownedInstances}} duplicates)
                 </h3>
                 <div class="pt-2">
                     <p class="text-lg font-bold text-cyan-700">Estimated value: {{$totalPrice['low']}} €</p>
