@@ -35,7 +35,7 @@
                     {{$amountOfCards}} Physical Cards ({{$amountOfCards - $ownedInstances}} duplicates)
                 </h3>
                 <div class="pt-2">
-                    <p class="text-lg font-bold text-cyan-700">Estimated value: {{$totalPrice['low']}} €</p>
+                    <p class="text-lg font-bold text-cyan-700">Estimated value: {{$totalPrice}} €</p>
                 </div>
             </div>
         </div>
@@ -90,7 +90,7 @@
         </div>
     </div>
     {{$cards->links()}}
-    <div class="grid gap-6 grid-cols-1 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 grid-rows-1 py-5">
+    <div class="grid gap-3 grid-cols-1 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-9 grid-rows-1 py-5">
         @foreach($cards as $card)
             @include('components.card', ['card' => $card])
         @endforeach

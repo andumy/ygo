@@ -14,8 +14,14 @@
            @endif
         @endif
 
-        src="{{asset('storage/'. $card->ygo_id . '.jpg')}}">
-    <h2 id="card-{{$card->id}}" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500" onclick="copyName({{$card->id}})">{{ $card->name }}</h2>
+        src="
+        @if (file_exists(public_path('storage/'. $card->ygo_id . '.jpg')))
+            {{asset('storage/'. $card->ygo_id . '.jpg')}}
+        @elseif (file_exists(public_path('storage/'. $card->ygo_id . '.png')))
+            {{asset('storage/'. $card->ygo_id . '.png')}}
+        @endif
+        ">
+    <h2 id="card-{{$card->id}}" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2" onclick="copyName({{$card->id}})">{{ $card->name }}</h2>
     @foreach($card->cardInstances->filter(fn($ci) => !($setCode && $setCode !== "" && !str_contains($ci->card_set_code,$setCode))) as $instance)
         <div class="flex flex-row justify-center relative has-tooltip
             @if($instance->ownedCard || $instance->orderedCards->count() > 0)
@@ -38,10 +44,11 @@
                     @endif
                     <p class="text-xs pointer-events-none m-0"> {{$instance->card_set_code}}</p>
                     <p class="text-xs pointer-events-none m-0"> {{$instance->rarity}}</p>
+                    <p class="text-xs pointer-events-none m-0 text-center">
+                        : {{$instance->price?->price ?? '-'}} €
+                    </p>
                 </div>
-{{--                <p class="text-xs pointer-events-none pb-2 m-0 text-center">--}}
-{{--                    {{$instance->price?->low ?? '-'}} €--}}
-{{--                </p>--}}
+
             </div>
             <div id="tooltip-{{$instance->id}}" class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
                 <div class="flex flex-col">

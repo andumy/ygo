@@ -29,7 +29,7 @@ class PurchaseRecommendation extends Component
         $sets = $this->setRepository->all()->map(function (Set $set) {
             $total = $this->cardRepository->count(set: $set->name);
             $setOwned = $this->cardRepository->countOwnedAndOrderedInsideSet(set: $set->name);
-            $owned = $this->cardRepository->countOwnedAndOrdered(set: $set->name);
+            $owned = $this->cardRepository->count(set: $set->name, ownedFilter: 1);
             return [
                 'code' => $set->code,
                 'name' => $set->name,

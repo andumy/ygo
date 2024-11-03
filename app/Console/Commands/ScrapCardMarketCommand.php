@@ -5,6 +5,10 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * @deprecated
+ * @experimental
+ */
 class ScrapCardMarketCommand extends Command
 {
     /**

@@ -16,6 +16,9 @@ use function config;
 use function file_get_contents;
 use function preg_match;
 
+/**
+ * @deprecated
+ */
 class FetchPricesViaParserCommand extends Command
 {
     /**

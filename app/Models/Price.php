@@ -8,10 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property float low
- * @property float high
- * @property float avg
- * @property float market
+ * @property float price
  * @property Carbon $date
  * @property int card_instance_id
  * @property CardInstance $cardInstance

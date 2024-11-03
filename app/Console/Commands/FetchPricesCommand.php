@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Http;
 use function array_search;
 use function config;
 use function dd;
+use function explode;
 use function str_contains;
 
 class FetchPricesCommand extends Command
@@ -45,13 +46,6 @@ class FetchPricesCommand extends Command
 
         $sets = Http::get(config('ygo.price.sets'))->json();
         foreach ($sets as $setName) {
-            $set = $setRepository->firstOrCreate(
-                ['name' => $setName],
-                []
-            );
-            if ($set->wasRecentlyCreated) {
-                $this->info("$setName set was created");
-            }
 
             $response = Http::get(config('ygo.price.cards_in_set') . $setName)->json();
 
@@ -60,7 +54,10 @@ class FetchPricesCommand extends Command
 
                 if (!$card) {
                     if (str_contains($cardObject['name'],'Token')) {
-                        $card = $cardRepository->create($cardObject['name'], null, 'Token');
+                        $card = $cardRepository->firstOrCreate([
+                            'name' => $cardObject['name'],
+                            'type' => 'Token'
+                        ],[]);
                     } elseif (
                         $this->choice(
                             "Does the card {$cardObject['name']} already exists?",
@@ -85,31 +82,42 @@ class FetchPricesCommand extends Command
                     if ($cardInstances->isEmpty()) {
                         $createNew = true;
                     }
-                    if ($cardInstances->count() === 1) {
-                        $cardInstance = $cardInstances->first();
-                    }
                     if ($cardInstances->count() > 1) {
                         $filteredCardInstances = $cardInstances->filter(
-                            function (CardInstance $ci) use ($instance, $card, $set) {
+                            function (CardInstance $ci) use ($instance, $card) {
                                 return $ci->card_id === $card->id &&
-                                    $ci->set_id === $set->id &&
                                     $ci->rarity_verbose === $instance['rarity'];
                             }
                         );
-                        if($filteredCardInstances->count() == 1){
-                            $cardInstance = $filteredCardInstances->first();
-                        } else {
+                        if($filteredCardInstances->count() == 0){
                             $createNew = true;
                         }
                     }
 
                     if ($createNew) {
-                        $cardInstance = $cardInstanceRepository->firstOrCreate([
+                        $set = $setRepository->getByCode(current(explode('-', $instance['print_tag'])));
+                        if($set->count() > 1){
+                            $setName = $this->choice(
+                                "Select set for {$card->name} {$instance['print_tag']}",
+                                $set->pluck('name')->toArray()
+                            );
+                            $set = $set->filter(
+                                function ($s) use ($setName) {
+                                    return $s->name === $setName;
+                                }
+                            );
+                        } elseif($set->isEmpty()) {
+                            continue;
+                        } else {
+                            $set = $set->first();
+                        }
+
+                        $cardInstances = collect([$cardInstanceRepository->firstOrCreate([
                             'card_id' => $card->id,
                             'set_id' => $set->id,
                             'card_set_code' => $instance['print_tag'],
                             'rarity_verbose' => $instance['rarity']
-                        ], []);
+                        ], [])]);
                     }
 
                     if ($instance['price_data']['status'] === 'fail') {
@@ -118,19 +126,19 @@ class FetchPricesCommand extends Command
 
                     $priceObject = $instance['price_data']['data']['prices'];
 
-                    $price = $priceRepository->updateOrCreate([
-                        'card_instance_id' => $cardInstance->id,
-                    ], [
-                        'date' => Carbon::parse($priceObject['updated_at'])->format('Y-m-d'),
-                        'low' => $priceObject['low'] ?? 0,
-                        'high' => $priceObject['high'] ?? 0,
-                        'avg' => $priceObject['average'] ?? 0
-                    ]);
+                    foreach ($cardInstances as $cardInstance){
+                        $price = $priceRepository->updateOrCreate([
+                            'card_instance_id' => $cardInstance->id,
+                        ], [
+                            'date' => Carbon::parse($priceObject['updated_at'])->format('Y-m-d'),
+                            'price' => $priceObject['low'] ?? 0,
+                        ]);
 
-                    if($price->wasRecentlyCreated){
-                        $this->info("Price for $card->name in $set->name was created");
-                    } else {
-                        $this->info("Price for $card->name in $set->name was updated");
+                        if($price->wasRecentlyCreated){
+                            $this->info("Price for $card->name in {$cardInstance->set->name} was created");
+                        } else {
+                            $this->info("Price for $card->name in {$cardInstance->set->name} was updated");
+                        }
                     }
                 }
             }

@@ -13,6 +13,18 @@ class CardRepository
         return Card::firstOrCreate($find, $data);
     }
 
+    public function setYgoId(Card $card, string $ygoId): void
+    {
+        $card->ygo_id = $ygoId;
+        $card->save();
+    }
+
+    public function markHasImage(Card $card): void
+    {
+        $card->has_image = true;
+        $card->save();
+    }
+
     public function updateLastPriceFetched(Card $card): void{
         $card->last_price_fetch = Carbon::now()->format('Y-m-d');
         $card->save();
@@ -107,6 +119,7 @@ class CardRepository
                     $qq->whereHas('ownedCard')
                         ->orWhereHas('orderedCards');
                 });
-            });
+            })
+            ->whereHas('cardInstances');
     }
 }

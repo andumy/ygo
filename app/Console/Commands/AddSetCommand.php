@@ -84,11 +84,11 @@ class AddSetCommand extends Command
             switch ($response->status) {
                 case AddCardStatuses::NEW_CARD:
                     $this->info('New card added: ' . $response->cardName);
-                    $total += $response->cardInstance?->price?->low ?? 0;
+                    $total += $response->cardInstance?->price?->price ?? 0;
                     break;
                 case AddCardStatuses::INCREMENT:
                     $this->info($response->cardName . ' incremented');
-                    $total += $response->cardInstance?->price?->low ?? 0;
+                    $total += $response->cardInstance?->price?->price ?? 0;
                     break;
                 case AddCardStatuses::NOT_FOUND:
                     $this->error($response->cardName. ' not found');

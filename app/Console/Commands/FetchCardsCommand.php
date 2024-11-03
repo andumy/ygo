@@ -41,16 +41,20 @@ class FetchCardsCommand extends Command
 
         foreach ($response as $data) {
             $date = Carbon::parse($data['tcg_date']);
-            $setRepository->updateOrCreate(
-                [
-                    'name' => $data['set_name'],
-                ],
-                [
-                    'code' => $data['set_code'],
-                    'card_amount' => $data['num_of_cards'],
-                    'date' => $date->year > 0 ? $date->format('Y-m-d') : null
-                ]
-            );
+            $set = $setRepository->findByName($data['set_name']);
+
+            if(!$set){
+                $setRepository->updateOrCreate(
+                    [
+                        'name' => $data['set_name'],
+                    ],
+                    [
+                        'code' => $data['set_code'],
+                        'card_amount' => $data['num_of_cards'],
+                        'date' => $date->year > 0 ? $date->format('Y-m-d') : null
+                    ]
+                );
+            }
         }
 
         $response = Http::get(config('ygo.cards'));
@@ -58,7 +62,7 @@ class FetchCardsCommand extends Command
         $response->lazy('/data')->each(function ($data, $key) use ($cardRepository, $setRepository, $cardInstanceRepository) {
             $card = $cardRepository->firstOrCreate(
                 [
-                    'ygo_id' => $data['id']
+                    'ygo_id' => $data['id'],
                 ],
                 [
                     'name' => $data['name'],

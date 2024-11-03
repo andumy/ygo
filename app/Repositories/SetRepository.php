@@ -22,6 +22,12 @@ class SetRepository
         return Set::where('name',$name)->orWhere('alias',$name)->first();
     }
 
+    /** @return Collection<Set> */
+    public function getByCode(string $code): Collection
+    {
+        return Set::where('code',$code)->get();
+    }
+
     public function updateOrCreate(array $find, array $data): Set
     {
         return Set::updateOrCreate($find, $data);

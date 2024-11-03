@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
  * @property string name
  * @property string alias
  * @property string type
+ * @property bool has_image
  * @property Collection<CardInstance> cardInstances
  * @property Collection<Set> sets
  * @property boolean isOwned
@@ -29,7 +30,10 @@ class Card extends Model
     public $timestamps = false;
     protected $guarded = [];
 
-    public $casts = ['last_price_fetch' => 'date'];
+    public $casts = [
+        'last_price_fetch' => 'date',
+        'has_image' => 'boolean',
+    ];
 
     public function cardInstances(): HasMany
     {

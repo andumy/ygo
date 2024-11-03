@@ -108,9 +108,7 @@ class Cards extends Component
         $this->priceRepository->updateOrCreate(
             find: ['card_instance_id' => $instanceId],
             data: [
-                'low' => $this->prices[$instanceId],
-                'avg' => $this->prices[$instanceId],
-                'high' => $this->prices[$instanceId],
+                'price' => $this->prices[$instanceId],
                 'date' => Carbon::now()
             ]
         );
@@ -183,12 +181,12 @@ class Cards extends Component
     public function render()
     {
         /** @var Collection<Card> $cards */
-        $cards = $this->cardRepository->paginate($this->search, $this->set, 50, $this->ownedFilter);
+        $cards = $this->cardRepository->paginate($this->search, $this->set, 45, $this->ownedFilter);
         foreach ($cards as $card){
             foreach ($card->cardInstances as $cardInstance) {
                 $this->ownedCards[$cardInstance->id] = $cardInstance->ownedCard?->amount ?? 0;
                 $this->orderedCards[$cardInstance->id] = [];
-                $this->prices[$cardInstance->id] = $cardInstance->price->low ?? 0;
+                $this->prices[$cardInstance->id] = $cardInstance->price->price ?? 0;
                 foreach ($cardInstance->orderedCards as $orderedCard){
                     $this->orderedCards[$cardInstance->id][$orderedCard->order_id] = $orderedCard->amount ?? 0;
                 }
