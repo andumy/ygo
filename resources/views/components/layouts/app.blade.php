@@ -12,31 +12,9 @@
         <a href="/" class="text-blue-500 hover:text-blue-800 pe-5">Library</a>
         <a href="/sets-instances" class="text-blue-500 hover:text-blue-800 ps-5">Sets and Instances</a>
         <a href="/orders" class="text-blue-500 hover:text-blue-800 ps-5">Orders</a>
+        <a href="/tradable" class="text-blue-500 hover:text-blue-800 ps-5">Tradable</a>
         <a href="/purchase-recommendation" class="text-blue-500 hover:text-blue-800 ps-5">Purchase Recommendation</a>
     </div>
         {{ $slot }}
-    <script>
-        function copyName(id) {
-            const name = document.getElementById('card-'+id).innerText;
-            navigator.clipboard.writeText(name);
-        }
-
-        function registerTooltips() {
-            document.body.addEventListener('click', function (event) {
-                const tooltip = event.target.getAttribute('data-tooltip-target');
-                if(!tooltip){
-                    return;
-                }
-                document.querySelectorAll('.js-tooltip').forEach((element) => {
-                    element.classList.add('hidden');
-                });
-                document.getElementById('tooltip-'+tooltip)?.classList.remove('hidden');
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            registerTooltips();
-        });
-    </script>
     </body>
 </html>

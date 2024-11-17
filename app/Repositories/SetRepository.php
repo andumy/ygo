@@ -37,4 +37,13 @@ class SetRepository
     {
         return Set::orderBy('code')->get();
     }
+
+    public function allWithCardsAndNewStock(): Collection
+    {
+        return Set::whereHas('cardInstances', function($q) {
+            $q->whereHas('ownedCard');
+        })
+            ->where('stock_changed', true)
+            ->orderBy('code')->get();
+    }
 }

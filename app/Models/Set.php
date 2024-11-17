@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
  * @property string name
  * @property string code
  * @property string alias
+ * @property bool stock_changed
  * @property int card_amount
  * @property Carbon date
  * @property Collection<CardInstance> cardInstances
@@ -27,7 +28,8 @@ class Set extends Model
     protected $guarded = [];
 
     public $casts = [
-        'date' => 'date'
+        'date' => 'date',
+        'stock_changed' => 'boolean'
     ];
     public function cardInstances(): HasMany
     {

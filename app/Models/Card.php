@@ -7,16 +7,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Support\Collection;
 
 /**
  * @property int id
  * @property int ygo_id
+ * @property int card_id
  * @property string name
  * @property string alias
  * @property string type
  * @property bool has_image
+ * @property Card original
+ * @property Collection<Card> variants
  * @property Collection<CardInstance> cardInstances
  * @property Collection<Set> sets
  * @property boolean isOwned
@@ -48,6 +52,17 @@ class Card extends Model
             'card_id',
             'set_id'
         );
+    }
+
+
+    public function original(): HasOne
+    {
+        return $this->hasOne(Card::class);
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(Card::class, 'card_id');
     }
 
     public function getIsOwnedAttribute(): bool

@@ -170,12 +170,12 @@ class Cards extends Component
     public function mount(): void
     {
         $this->sets = $this->setRepository->all();
-        foreach ($this->sets as $set) {
-            $this->fillBySet[$set->name] = [
-                'total' => $this->cardRepository->count(set: $set->name),
-                'owned' => $this->cardRepository->countOwnedAndOrderedInsideSet(set: $set->name)
-            ];
-        }
+//        foreach ($this->sets as $set) {
+//            $this->fillBySet[$set->name] = [
+//                'total' => $this->cardRepository->count(set: $set->name),
+//                'owned' => $this->cardRepository->countOwnedAndOrderedInsideSet(set: $set->name)
+//            ];
+//        }
     }
 
     public function render()

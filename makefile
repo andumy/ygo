@@ -26,3 +26,8 @@ bash:
 
 regenerate-env:
 	cd deploy && ./generate_env.sh local
+
+fetch:
+	php artisan fetch:cards
+	php artisan fetch:images
+	php artisan fetch:prices

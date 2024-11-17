@@ -1,4 +1,4 @@
-<div class="flex flex-col text-stone-400">
+<div class="flex flex-col text-stone-400" data-hide-tooltip="true">
     <img
         @if(!$card->isOrdered && !$card->isOwned)
             class="grayscale opacity-80"
@@ -23,33 +23,25 @@
         ">
     <h2 id="card-{{$card->id}}" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2" onclick="copyName({{$card->id}})">{{ $card->name }}</h2>
     @foreach($card->cardInstances->filter(fn($ci) => !($setCode && $setCode !== "" && !str_contains($ci->card_set_code,$setCode))) as $instance)
-        <div class="flex flex-row justify-center relative has-tooltip
-            @if($instance->ownedCard || $instance->orderedCards->count() > 0)
-                 font-bold
-                 @if($instance->ownedCard)
-                     text-cyan-500
-                 @else
-                    text-yellow-500
-                 @endif
-            @endif">
-            <div data-tooltip-target="{{$instance->id}}" class="flex flex-col cursor-pointer justify-center align-center">
-                <div class="flex justify-center">
-                    @if($instance->orderedCards->count() > 0)
-                        <p class="text-xs text-yellow-500">({{ $instance->orderedCards->reduce(fn($c, $oc) => $c + $oc->amount,0) }})</p>
-                    @endif
+        <div class="flex flex-row justify-center relative has-tooltip cursor-pointer
+        @if($instance->ownedCard || $instance->orderedCards->count() > 0)
+             font-bold
+             @if($instance->ownedCard)
+                 text-cyan-500
+             @else
+                text-yellow-500
+             @endif
+        @endif">
+            @if($instance->orderedCards->count() > 0)
+                <p class="text-xs text-yellow-500">({{ $instance->orderedCards->reduce(fn($c, $oc) => $c + $oc->amount,0) }})</p>
+            @endif
 
-                    @if($instance->ownedCard)
-                        <p class="text-xs text-cyan-500"> {{$instance->ownedCard->amount}}</p>
-                        <p class="text-xs px-1 text-cyan-500">x</p>
-                    @endif
-                    <p class="text-xs pointer-events-none m-0"> {{$instance->card_set_code}}</p>
-                    <p class="text-xs pointer-events-none m-0"> {{$instance->rarity}}</p>
-                    <p class="text-xs pointer-events-none m-0 text-center">
-                        : {{$instance->price?->price ?? '-'}} €
-                    </p>
-                </div>
+            @if($instance->ownedCard)
+                <p class="text-xs text-cyan-500"> {{$instance->ownedCard->amount}} x&nbsp;</p>
+            @endif
 
-            </div>
+            <p data-tooltip-target="{{$instance->id}}"  class="text-xs m-0"> {{$instance->card_set_code}} {{$instance->rarity}} : {{$instance->price?->price ?? '-'}} €</p>
+
             <div id="tooltip-{{$instance->id}}" class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
                 <div class="flex flex-col">
                     <div class="flex align-center">
@@ -118,5 +110,41 @@
                 </div>
             </div>
         </div>
+
+
     @endforeach
 </div>
+
+<script>
+    function copyName(id) {
+        const name = document.getElementById('card-'+id).innerText;
+        navigator.clipboard.writeText(name);
+    }
+
+    function registerTooltips() {
+        document.body.addEventListener('click', function (event) {
+            const tooltip = event.target.getAttribute('data-tooltip-target');
+            const hideTooltip = event.target.getAttribute('data-hide-tooltip');
+
+            if(hideTooltip){
+                hideAllTooltips();
+            }
+
+            if(!tooltip){
+                return;
+            }
+            hideAllTooltips();
+            document.getElementById('tooltip-'+tooltip)?.classList.remove('hidden');
+        });
+    }
+
+    function hideAllTooltips() {
+        document.querySelectorAll('.js-tooltip').forEach((element) => {
+            element.classList.add('hidden');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        registerTooltips();
+    });
+</script>

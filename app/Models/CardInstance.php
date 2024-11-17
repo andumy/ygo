@@ -22,6 +22,7 @@ use function strtoupper;
  * @property int set_id
  * @property OwnedCard ownedCard
  * @property Collection<OrderedCard> orderedCards
+ * @property TradableCard tradableCard
  * @property Price price
  * @property string card_set_code
  * @property string rarity_verbose
@@ -52,6 +53,11 @@ class CardInstance extends Model
     public function orderedCards(): HasMany
     {
         return $this->hasMany(OrderedCard::class);
+    }
+
+    public function tradableCard(): HasOne
+    {
+        return $this->hasOne(TradableCard::class);
     }
 
     public function price(): HasOne

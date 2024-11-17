@@ -76,7 +76,7 @@
                 @foreach($sets as $s)
                     <option value="{{$s->name}}">
                         {{$s->code}} : {{$s->name}}
-                        ({{$fillBySet[$s->name]['owned']}} / {{$fillBySet[$s->name]['total']}})
+{{--                        ({{$fillBySet[$s->name]['owned']}} / {{$fillBySet[$s->name]['total']}})--}}
                     </option>
                 @endforeach
             </select>

@@ -8,6 +8,7 @@ use App\Repositories\SetRepository;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use function array_key_exists;
 use function config;
 use function dd;
 use function var_dump;
@@ -60,35 +61,56 @@ class FetchCardsCommand extends Command
         $response = Http::get(config('ygo.cards'));
 
         $response->lazy('/data')->each(function ($data, $key) use ($cardRepository, $setRepository, $cardInstanceRepository) {
-            $card = $cardRepository->firstOrCreate(
+            $this->info("Processing card {$data['name']}.");
+
+            $variants = [
                 [
-                    'ygo_id' => $data['id'],
+                    'id' => $data['id']
                 ],
-                [
-                    'name' => $data['name'],
-                    'type' => $data['type']
-                ]
-            );
-
-            foreach ($data['card_sets'] ?? [] as $dataSet){
-                $set = $setRepository->findByName($dataSet['set_name']);
-                if(!$set){
-                    $this->error("Set {$dataSet['set_name']} not found.");
-                    continue;
-                }
-
-                $ci = $cardInstanceRepository->firstOrCreate(
+                ...$data['card_images']
+            ];
+            $ogId = null;
+            foreach ($variants as $variant) {
+                $isOg = $data['id'] == $variant['id'];
+                $card = $cardRepository->firstOrCreate(
                     [
-                        'card_id' => $card->id,
-                        'set_id' => $set->id,
-                        'card_set_code' => $dataSet['set_code'],
-                        'rarity_verbose' => $dataSet['set_rarity'],
+                        'ygo_id' => $variant['id'],
                     ],
-                    []
+                    [
+                        'name' => $data['name'],
+                        'type' => $data['type'],
+                        'card_id' => $isOg ? null : $ogId
+                    ]
                 );
 
-                if($ci->wasRecentlyCreated){
-                    $this->info("Card {$card->name} from set {$set->name} added with set code {$ci->card_set_code}.");
+                if($isOg){
+                    $ogId = $card->id;
+                }
+
+                if($card->wasRecentlyCreated && $card->card_id){
+                    $this->info("Card {$card->name} variant was added with id {$card->id}.");
+                }
+
+                foreach ($data['card_sets'] ?? [] as $dataSet){
+                    $set = $setRepository->findByName($dataSet['set_name']);
+                    if(!$set){
+                        $this->error("Set {$dataSet['set_name']} not found.");
+                        continue;
+                    }
+
+                    $ci = $cardInstanceRepository->firstOrCreate(
+                        [
+                            'card_id' => $card->id,
+                            'set_id' => $set->id,
+                            'card_set_code' => $dataSet['set_code'],
+                            'rarity_verbose' => $dataSet['set_rarity'],
+                        ],
+                        []
+                    );
+
+                    if($ci->wasRecentlyCreated){
+                        $this->info("Card {$card->name} from set {$set->name} added with set code {$ci->card_set_code}.");
+                    }
                 }
             }
         });

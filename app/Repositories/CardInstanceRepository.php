@@ -63,6 +63,11 @@ class CardInstanceRepository
         return $this->searchQuery($search, $set, $ownedFilter)->count();
     }
 
+    /** @return Collection<CardInstance> */
+    public function search(string $search = '', string $set = '', int $ownedFilter = 0): Collection{
+        return $this->searchQuery($search, $set, $ownedFilter)->get();
+    }
+
 
     private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0) {
         return CardInstance::when($search !== '', function($q) use ($search){
