@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Dtos\AddCardResponse;
 use App\Enums\AddCardStatuses;
+use App\Events\StockUpdateEvent;
 use App\Models\CardInstance;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\OrderedCardRepository;
 use App\Repositories\OwnedCardRepository;
 use Illuminate\Support\Collection;
+use function collect;
 
 class CardService
 {
@@ -22,7 +24,7 @@ class CardService
 
     public function updateCardStock(
         string $code,
-        ?string $rarity = null,
+        ?CardInstance $option = null,
         int $orderId = null,
         int $orderAmount = 1,
         int $ownAmount = 1,
@@ -35,22 +37,21 @@ class CardService
         if($cardInstances->isEmpty()){
             return new AddCardResponse(
                 status: AddCardStatuses::NOT_FOUND,
-                cardName: $code
             );
         }
 
-        if($cardInstances->count() > 1 && !$rarity){
+        if($cardInstances->count() > 1 && !$option){
             return new AddCardResponse(
                 status: AddCardStatuses::MULTIPLE_OPTIONS,
-                rarities: $cardInstances->pluck('rarity_verbose')->toArray(),
-                cardName: $cardInstances->first()->card->name,
-                cardInstance: $cardInstances->first()
+                options: $cardInstances,
             );
         }
-        $cardInstance = $cardInstances->first();
+
 
         if($cardInstances->count() > 1) {
-            $cardInstance = $cardInstances->where('rarity_verbose', $rarity)->first();
+            $cardInstance = $option;
+        } else {
+            $cardInstance = $cardInstances->first();
         }
 
         return $this->updateCardStockFromInstance(
@@ -82,13 +83,18 @@ class CardService
         bool $shouldIncrease
     ): AddCardResponse
     {
+
+        StockUpdateEvent::dispatch(
+            $cardInstance->set,
+            true
+        );
+
         //delete owned
         if($ownAmount === 0) {
             $this->ownedCardRepository->delete($cardInstance->id);
             return new AddCardResponse(
                 status: AddCardStatuses::DELETE,
-                cardName: $cardInstance->card->name,
-                cardInstance: $cardInstance
+                options: collect([$cardInstance])
             );
         }
 
@@ -101,8 +107,7 @@ class CardService
                 );
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
-                cardName: $cardInstance->card->name,
-                cardInstance: $cardInstance
+                options: collect([$cardInstance])
             );
         }
 
@@ -114,8 +119,7 @@ class CardService
 
         return new AddCardResponse(
             status: AddCardStatuses::NEW_CARD,
-            cardName: $cardInstance->card->name,
-            cardInstance: $cardInstance
+            options: collect([$cardInstance])
         );
     }
 
@@ -131,8 +135,7 @@ class CardService
             $this->orderedCardRepository->delete($cardInstance->id, $orderId);
             return new AddCardResponse(
                 status: AddCardStatuses::DELETE,
-                cardName: $cardInstance->card->name,
-                cardInstance: $cardInstance
+                options: collect([$cardInstance])
             );
         }
 
@@ -144,8 +147,7 @@ class CardService
             );
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
-                cardName: $cardInstance->card->name,
-                cardInstance: $cardInstance
+                options: collect([$cardInstance])
             );
         }
 
@@ -153,8 +155,7 @@ class CardService
         $this->orderedCardRepository->firstOrCreate($cardInstance->id, $orderAmount, $orderId);
         return new AddCardResponse(
             status: AddCardStatuses::NEW_CARD,
-            cardName: $cardInstance->card->name,
-            cardInstance: $cardInstance
+            options: collect([$cardInstance])
         );
     }
 }

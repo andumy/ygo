@@ -36,6 +36,7 @@ class CardInstanceRepository
         return CardInstance::find($id);
     }
 
+
     public function rarities(): Collection
     {
         return CardInstance::select('rarity_verbose')
@@ -65,7 +66,7 @@ class CardInstanceRepository
 
     /** @return Collection<CardInstance> */
     public function search(string $search = '', string $set = '', int $ownedFilter = 0): Collection{
-        return $this->searchQuery($search, $set, $ownedFilter)->get();
+        return $this->searchQuery($search, $set, $ownedFilter)->orderBy('card_set_code')->get();
     }
 
 
@@ -85,12 +86,12 @@ class CardInstanceRepository
                 });
             })
             ->when($ownedFilter === -1, function($q) {
-                return $q->whereDoesntHave('ownedCard')
-                    ->orWhereDoesntHave('orderedCards');
+                return $q->where(fn($qq) => $qq->whereDoesntHave('ownedCard')
+                    ->orWhereDoesntHave('orderedCards'));
             })
             ->when($ownedFilter === 1, function($q) {
-                return $q->whereHas('ownedCard')
-                    ->orWhereHas('orderedCards');
+                return $q->where(fn($qq) => $qq->whereHas('ownedCard')
+                    ->orWhereHas('orderedCards'));
             });
     }
 }

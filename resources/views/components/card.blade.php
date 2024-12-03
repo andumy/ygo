@@ -1,4 +1,4 @@
-<div class="flex flex-col text-stone-400" data-hide-tooltip="true">
+<div class="flex flex-col text-stone-400 relative" data-hide-tooltip="true">
     <img
         @if(!$card->isOrdered && !$card->isOwned)
             class="grayscale opacity-80"
@@ -21,7 +21,11 @@
             {{asset('storage/'. $card->ygo_id . '.png')}}
         @endif
         ">
-    <h2 id="card-{{$card->id}}" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2" onclick="copyName({{$card->id}})">{{ $card->name }}</h2>
+        @if($card->card_id)
+            <div class="absolute bg-red-600 w-[20px] h-[20px] rounded-full top-[-10px] left-[-10px]"></div>
+        @endif
+    <p id="id-{{$card->id}}" class="text-xs text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400" onclick="copyName('id-{{$card->id}}')">{{ $card->ygo_id }}</p>
+    <h2 id="card-{{$card->id}}" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2" onclick="copyName('card-{{$card->id}}')">{{ $card->name }}</h2>
     @foreach($card->cardInstances->filter(fn($ci) => !($setCode && $setCode !== "" && !str_contains($ci->card_set_code,$setCode))) as $instance)
         <div class="flex flex-row justify-center relative has-tooltip cursor-pointer
         @if($instance->ownedCard || $instance->orderedCards->count() > 0)
@@ -116,8 +120,8 @@
 </div>
 
 <script>
-    function copyName(id) {
-        const name = document.getElementById('card-'+id).innerText;
+    function copyName(selector) {
+        const name = document.getElementById(selector).innerText;
         navigator.clipboard.writeText(name);
     }
 

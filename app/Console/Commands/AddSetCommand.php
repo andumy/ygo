@@ -3,8 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Enums\AddCardStatuses;
+use App\Models\CardInstance;
+use App\Repositories\CardInstanceRepository;
 use App\Services\CardService;
 use Illuminate\Console\Command;
+use function array_map;
 use function count;
 use function explode;
 
@@ -34,7 +37,7 @@ class AddSetCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(CardService $cardService)
+    public function handle(CardService $cardService, CardInstanceRepository $cardInstanceRepository)
     {
         $code = $this->argument('code');
         $cards = $this->argument('cards');
@@ -65,33 +68,43 @@ class AddSetCommand extends Command
         foreach ($entries as $i) {
             $rarity = null;
             do {
+                if(!$rarity){
+                    $option = null;
+                } else {
+                    $option = $cardInstanceRepository->findBySetCodeAndRarity($code . $i, $rarity);
+                }
+
                 $response = $cardService->updateCardStock(
                     code: $code . $i,
-                    rarity: $rarity,
+                    option: $option,
                     shouldIncrease: true
                 );
 
+
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {
-                    $rarity = $this->choice(
-                        "Select rarity for: " . $response->cardName . '( ' . $code . $i . ' )',
-                        $response->rarities,
-                        0
-                    );
+
+                    $rarity = explode(" #",
+                        $this->choice(
+                            "Select rarity for: " . $response->options->first()->card->name . '( ' . $code . $i . ' )',
+                            $response->options->map(fn(CardInstance $option) => $option->rarity_verbose. " #". $option->card->ygo_id)->toArray(),
+                            0
+                        )
+                    )[0];
                 }
 
             } while ($response->status === AddCardStatuses::MULTIPLE_OPTIONS);
 
             switch ($response->status) {
                 case AddCardStatuses::NEW_CARD:
-                    $this->info('New card added: ' . $response->cardName);
+                    $this->info('New card added: ' . $response->options->first()->card->name);
                     $total += $response->cardInstance?->price?->price ?? 0;
                     break;
                 case AddCardStatuses::INCREMENT:
-                    $this->info($response->cardName . ' incremented');
+                    $this->info($response->options->first()->card->name . ' incremented');
                     $total += $response->cardInstance?->price?->price ?? 0;
                     break;
                 case AddCardStatuses::NOT_FOUND:
-                    $this->error($response->cardName. ' not found');
+                    $this->error($response->options->first()->card->name. ' not found');
                     break;
                 default:
                     throw new \Exception('To be implemented');

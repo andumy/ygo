@@ -65,7 +65,7 @@ class CardController extends Controller
 
         $response = $cardService->updateCardStock(
             code: $cardInstances->first()->card_set_code,
-            rarity: $rarity,
+            option: $rarity,
             orderId: $order->id,
             shouldIncrease: true
         );

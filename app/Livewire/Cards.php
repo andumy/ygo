@@ -133,24 +133,27 @@ class Cards extends Component
         $this->message = '';
         if($this->code === '') return;
 
+
+        $cardInstances = $this->cardInstanceRepository->findBySetCodeAndRarity($this->code, $this->rarity);
+
         $response = $this->cardService->updateCardStock(
             code: $this->code,
-            rarity: $this->rarity,
+            option: $cardInstances,
             shouldIncrease: true
         );
 
         switch ($response->status) {
             case AddCardStatuses::MULTIPLE_OPTIONS:
                 $this->message = 'Select the rarity';
-                $this->rarities = $response->rarities;
+                $this->rarities = $response->options->pluck('rarity_verbose')->toArray();
                 break;
             case AddCardStatuses::NEW_CARD:
-                $this->message = 'New card added: ' . $response->cardName;
+                $this->message = 'New card added: ' . $response->options->first()->card->name;
                 $this->rarities = [];
                 $this->rarity = '';
                 break;
             case AddCardStatuses::INCREMENT:
-                $this->message =  $response->cardName . ' incremented';
+                $this->message =  $response->options->first()->card->name . ' incremented';
                 $this->rarities = [];
                 $this->rarity = '';
                 break;

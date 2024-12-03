@@ -46,4 +46,10 @@ class SetRepository
             ->where('stock_changed', true)
             ->orderBy('code')->get();
     }
+
+    public function updateStock(Set $set, bool $stockState): void
+    {
+        $set->stock_changed = $stockState;
+        $set->save();
+    }
 }
