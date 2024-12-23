@@ -60,17 +60,17 @@ class CardInstanceRepository
         return round($rawPrice, 2);
     }
 
-    public function count(string $search = '', string $set = '', int $ownedFilter = 0): int{
-        return $this->searchQuery($search, $set, $ownedFilter)->count();
+    public function count(string $search = '', string $set = '', int $ownedFilter = 0, bool $excludeOrdered = false): int{
+        return $this->searchQuery($search, $set, $ownedFilter, $excludeOrdered)->count();
     }
 
     /** @return Collection<CardInstance> */
-    public function search(string $search = '', string $set = '', int $ownedFilter = 0): Collection{
-        return $this->searchQuery($search, $set, $ownedFilter)->orderBy('card_set_code')->get();
+    public function search(string $search = '', string $set = '', int $ownedFilter = 0, bool $excludeOrdered = false): Collection{
+        return $this->searchQuery($search, $set, $ownedFilter, $excludeOrdered)->orderBy('card_set_code')->get();
     }
 
 
-    private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0) {
+    private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0, bool $excludeOrdered = false) {
         return CardInstance::when($search !== '', function($q) use ($search){
             return $q->where(function ($qq) use ($search) {
                 $qq->where('card_set_code', 'like', '%' . $search . '%')
@@ -89,9 +89,13 @@ class CardInstanceRepository
                 return $q->where(fn($qq) => $qq->whereDoesntHave('ownedCard')
                     ->orWhereDoesntHave('orderedCards'));
             })
-            ->when($ownedFilter === 1, function($q) {
-                return $q->where(fn($qq) => $qq->whereHas('ownedCard')
-                    ->orWhereHas('orderedCards'));
+            ->when($ownedFilter === 1, function($q) use ($excludeOrdered){
+                return $q->where(function($qq) use ($excludeOrdered) {
+                    $qq->whereHas('ownedCard');
+                    if(!$excludeOrdered){
+                        $qq->orWhereHas('orderedCards');
+                    }
+                });
             });
     }
 }

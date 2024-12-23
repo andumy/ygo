@@ -65,10 +65,10 @@ class CardService
 
     public function updateCardStockFromInstance(
         CardInstance $cardInstance,
+        bool $shouldIncrease,
         int $orderId = null,
         int $orderAmount = 1,
         int $ownAmount = 1,
-        bool $shouldIncrease = false
     ): AddCardResponse
     {
         if($orderId){

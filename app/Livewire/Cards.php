@@ -80,6 +80,7 @@ class Cards extends Component
 
         $this->cardService->updateCardStockFromInstance(
             cardInstance: $instance,
+            shouldIncrease: false,
             ownAmount: $owned
         );
     }
@@ -93,6 +94,7 @@ class Cards extends Component
         foreach ($orders as $orderId => $orderAmount){
             $this->cardService->updateCardStockFromInstance(
                 cardInstance: $instance,
+                shouldIncrease: false,
                 orderId: $orderId,
                 orderAmount: $orderAmount,
             );
@@ -123,8 +125,9 @@ class Cards extends Component
 
         $this->cardService->updateCardStockFromInstance(
             cardInstance: $instance,
+            shouldIncrease: true,
             orderId: $orderId,
-            orderAmount: $orderAmount,
+            orderAmount: $orderAmount
         );
     }
 

@@ -6,7 +6,7 @@
         <select wire:model="set" wire:change="refresh" class="my-4 xl:mx-4 xl:my-0">
             <option value="">All sets</option>
             @foreach($sets as $s)
-                <option value="{{$s->name}}">
+                <option {{$this->set === $s->name ? 'selected' : ''}} value="{{$s->name}}">
                     {{$s->code}} : {{$s->name}}
                 </option>
             @endforeach

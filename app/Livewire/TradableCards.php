@@ -41,7 +41,7 @@ class TradableCards extends Component
     }
     public function refresh(){
         $this->cardInstances = [];
-        foreach ($this->cardInstanceRepository->search(set: $this->set, ownedFilter: 1) as $ci){
+        foreach ($this->cardInstanceRepository->search(set: $this->set, ownedFilter: 1, excludeOrdered: true) as $ci){
             $this->cardInstances[] = [
                 'id' => $ci->id,
                 'ygo_id' => $ci->card->ygo_id,

@@ -71,6 +71,7 @@ class Orders extends Component
 
             $response = $this->cardService->updateCardStockFromInstance(
                 cardInstance: $orderedCard->cardInstance,
+                shouldIncrease: true,
                 ownAmount: $orderedCard->amount
             );
 
