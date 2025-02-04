@@ -47,30 +47,37 @@ class CardInstanceRepository
 
     public function priceForOwnOrOrder(): float
     {
-        $rawPrice = CardInstance::leftJoin('owned_cards', 'card_instances.id', '=', 'owned_cards.card_instance_id')
-            ->leftJoin(
-                DB::raw('(SELECT card_instance_id, SUM(amount) as total_ordered_amount FROM ordered_cards GROUP BY card_instance_id) as ordered_summary'), 'card_instances.id', '=', 'ordered_summary.card_instance_id')
-            ->join('prices', 'card_instances.id', '=', 'prices.card_instance_id')
-            ->selectRaw(
-                'SUM((COALESCE(owned_cards.amount, 0) + COALESCE(ordered_summary.total_ordered_amount, 0)) * prices.price) as price'
-            )
-            ->first()
-            ->toArray()['price'];
+        $result = DB::select(
+    'select sum(p.price) as total from card_instances as ci, owned_cards as oc, prices as p where
+            ci.id = oc.card_instance_id and
+            ci.id = p.card_instance_id and
+            oc.batch is not null'
+        );
 
-        return round($rawPrice, 2);
+        return round(current($result)->total, 2);
     }
 
-    public function count(string $search = '', string $set = '', int $ownedFilter = 0, bool $excludeOrdered = false): int{
-        return $this->searchQuery($search, $set, $ownedFilter, $excludeOrdered)->count();
+    public function count(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): int{
+        return $this->searchQuery(
+            search: $search,
+            set: $set,
+            onlyOwned: $onlyOwned,
+            excludeOrdered: $excludeOrdered
+        )->count();
     }
 
     /** @return Collection<CardInstance> */
-    public function search(string $search = '', string $set = '', int $ownedFilter = 0, bool $excludeOrdered = false): Collection{
-        return $this->searchQuery($search, $set, $ownedFilter, $excludeOrdered)->orderBy('card_set_code')->get();
+    public function search(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): Collection{
+        return $this->searchQuery(
+            search: $search,
+            set: $set,
+            onlyOwned: $onlyOwned,
+            excludeOrdered: $excludeOrdered
+        )->orderBy('card_set_code')->get();
     }
 
 
-    private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0, bool $excludeOrdered = false) {
+    private function searchQuery(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false) {
         return CardInstance::when($search !== '', function($q) use ($search){
             return $q->where(function ($qq) use ($search) {
                 $qq->where('card_set_code', 'like', '%' . $search . '%')
@@ -85,15 +92,15 @@ class CardInstanceRepository
                     $qq->where('name', $set);
                 });
             })
-            ->when($ownedFilter === -1, function($q) {
-                return $q->where(fn($qq) => $qq->whereDoesntHave('ownedCard')
-                    ->orWhereDoesntHave('orderedCards'));
+            ->when($onlyOwned === false, function($q) {
+                return $q->where(fn($qq) => $qq->whereDoesntHave('ownedCards'));
             })
-            ->when($ownedFilter === 1, function($q) use ($excludeOrdered){
+            ->when($onlyOwned, function($q) use ($excludeOrdered){
                 return $q->where(function($qq) use ($excludeOrdered) {
-                    $qq->whereHas('ownedCard');
-                    if(!$excludeOrdered){
-                        $qq->orWhereHas('orderedCards');
+                    if($excludeOrdered){
+                        $qq->whereHas('ownedCards', fn($q) => $q->whereNull('order_id'));
+                    } else {
+                        $qq->whereHas('ownedCards');
                     }
                 });
             });

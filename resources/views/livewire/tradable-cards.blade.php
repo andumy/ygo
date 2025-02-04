@@ -1,3 +1,4 @@
+@php use App\Enums\Condition;use App\Enums\Lang; @endphp
 <div class="p-10 text-stone-700">
     <p class="bg-green-300 text-stone-700">
         {{$message}}
@@ -16,34 +17,50 @@
         <table>
             <thead>
             <tr>
-                <th>Ygo Id</th>
-                <th>Card</th>
-                <th>Rarity</th>
-                <th>Code</th>
-                <th>Total</th>
-                <th>Collectable</th>
-                <th>Tradable</th>
-                <th>Code</th>
+                <th class="text-center px-4">Ygo Id</th>
+                <th class="text-center px-4">Card</th>
+                <th class="text-center px-4">Rarity</th>
+                <th class="text-center px-4">Code</th>
+                <th class="text-center px-4">Not Set</th>
+                <th class="text-center px-4">Collectable</th>
+                <th class="text-center px-4">Tradable</th>
+                <th class="text-center px-4">Language</th>
+                <th class="text-center px-4">Condition</th>
+                <th class="text-center px-4">1st Edition</th>
             </tr>
             </thead>
             <tbody>
-            @foreach($cardInstances ?? [] as $index => $ci)
-                <tr class="py-2" wire:key="cardInstances.{{ $ci['id'] }}">
-                    <td class="px-2">{{$ci['ygo_id']}}</td>
-                    <td class="px-2">{{$ci['card_name']}}</td>
-                    <td class="px-2">{{$ci['rarity']}}</td>
-                    <td class="px-2">{{$ci['card_set_code']}}</td>
-                    <td class="px-2 {{($ci['collectable'] == 0 && $ci['tradable'] == 0) ? '' : ($ci['valid'] ? 'text-green-600' : 'text-red-700')}}">{{$ci['total']}}</td>
-                    <td class="px-2"><input type="number" wire:model="cardInstances.{{$index}}.collectable" wire:blur="revalidate"></td>
-                    <td class="px-2"><input type="number" wire:model="cardInstances.{{$index}}.tradable"wire:blur="revalidate"></td>
-                    <td class="px-2">{{$ci['card_set_code']}}</td>
-                </tr>
+            @foreach($cardInstances ?? [] as $cardInstanceId => $cardInstanceArray)
+                @foreach($cardInstanceArray as $lang => $langArray)
+                    @foreach($langArray as $cond => $condArray)
+                        @foreach($condArray as $isFirstEd => $ownedCard)
+                            <tr class="py-2"
+                                wire:key="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}">
+                                <td class="px-2 text-center">{{$ownedCard['ygo_id']}}</td>
+                                <td class="px-2 text-center">{{$ownedCard['card_name']}}</td>
+                                <td class="px-2 text-center">{{$ownedCard['rarity']}}</td>
+                                <td class="px-2 text-center">{{$ownedCard['card_set_code']}}</td>
+                                <td class="px-2 text-center {{$ownedCard['not_set'] == 0 ? 'text-green-400' : ($ownedCard['not_set'] < 0 ? 'text-red-400' : '')}}">{{ $ownedCard['not_set'] }}</td>
+                                <td class="px-2 text-center"><input type="number" class="w-[100px]" wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_collectable" wire:blur="revalidate"></td>
+                                <td class="px-2 text-center"><input type="number" class="w-[100px]" wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_tradable"wire:blur="revalidate"></td>
+                                <td class="px-2 text-center"><img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-full w-auto pe-2"></td>
+                                <td class="px-2 text-center">{!! Condition::from($cond)->getShortHand() !!}</td>
+                                <td class="px-2 text-center">{!! $isFirstEd ? '<span>✔️</span>' : '' !!}</td>
+                            </tr>
+                        @endforeach
+                    @endforeach
+                @endforeach
             @endforeach
             </tbody>
         </table>
-        <button class="dark:bg-green-800 hover:bg-green-700 text-white font-bold py-1 px-4 rounded" wire:click="autofill">Autofill</button>
-        <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="save">Save</button>
+        <button class="dark:bg-green-800 hover:bg-green-700 text-white font-bold py-1 px-4 rounded"
+                wire:click="autofill">Autofill
+        </button>
+        <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="save">
+            Save
+        </button>
         <p>Total Collectable: {{$totalCollectable}}</p>
         <p>Total Tradable: {{$totalTradable}}</p>
+        <p>Total Not Set: {{$totalNotSet}}</p>
     </div>
 </div>

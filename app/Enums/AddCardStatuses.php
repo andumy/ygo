@@ -10,4 +10,5 @@ enum AddCardStatuses: int
     case MULTIPLE_OPTIONS = 3;
     case PART_OF_ANOTHER_ORDER = 5;
     case DELETE = 6;
+    case NO_CHANGE = 7;
 }

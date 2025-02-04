@@ -60,4 +60,35 @@
             </table>
         </div>
     </div>
+    <div class="flex justify-between">
+        <div>
+            <h2 class="text-lg font-bold text-cyan-400">
+                Recommended individuals
+            </h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Set Code</th>
+                    <th>Set</th>
+                    <th>Card</th>
+                    <th>Card set code</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($cis as $set)
+                    @foreach($set as $ci)
+                        <tr class="py-2">
+                            <td>{{$ci->set->code}}</td>
+                            <td>{{$ci->set->name}}</td>
+                            <td id="ci-{{$ci->id}}" onclick="copyName('ci-{{$ci->id}}')" class="text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2">{{$ci->card->name}}</td>
+                            <td>{{$ci->card_set_code}}</td>
+                            <td>{{$ci->price->price}}</td>
+                        </tr>
+                    @endforeach
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

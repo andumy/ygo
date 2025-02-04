@@ -3,12 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Enums\AddCardStatuses;
+use App\Enums\Lang;
 use App\Models\CardInstance;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\OwnedCardRepository;
 use App\Services\CardService;
 use Illuminate\Console\Command;
-
+/** TODO: FIX THIS FILE */
 class AddOrderCardsCommand extends Command
 {
     /**
@@ -33,16 +35,21 @@ class AddOrderCardsCommand extends Command
     public function handle(
         CardService $cardService,
         OrderRepository $orderRepository,
-        CardInstanceRepository $cardInstanceRepository
+        CardInstanceRepository $cardInstanceRepository,
+        OwnedCardRepository $ownedCardRepository
     )
     {
         $orderName = $this->argument('order');
+        $lang = Lang::from($this->argument('lang'));
+
         $order = $orderRepository->findByName($orderName);
         if(!$order){
             $this->error('Order not found');
             return;
         }
         $cards = $this->argument('cards');
+
+        $batch = $ownedCardRepository->fetchNextBatch();
 
         foreach ($cards as $card) {
             $rarity = null;
@@ -55,9 +62,12 @@ class AddOrderCardsCommand extends Command
 
                 $response = $cardService->updateCardStock(
                     code: $card,
+                    batch: $batch,
                     option: $option,
                     orderId: $order->id,
-                    shouldIncrease: true
+                    amount: 1,
+                    shouldIncrease: true,
+                    lang: $lang
                 );
 
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {

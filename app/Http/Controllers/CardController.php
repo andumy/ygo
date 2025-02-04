@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AddCardStatuses;
+use App\Enums\Condition;
+use App\Enums\Lang;
 use App\Models\CardInstance;
 use App\Repositories\CardRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\OwnedCardRepository;
 use App\Services\CardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use function response;
 use function str_contains;
+use function var_dump;
 
+/** TODO: FIX CHROME EXTENSION */
 class CardController extends Controller
 {
     public function cardInfo(Request $request, CardRepository $cardRepository)
@@ -35,13 +40,16 @@ class CardController extends Controller
         Request $request,
         CardRepository $cardRepository,
         OrderRepository $orderRepository,
-        CardService $cardService
+        CardService $cardService,
+        OwnedCardRepository $ownedCardRepository
     ) {
         $cardName = $request->get('card');
         $orderName = $request->get('order');
         $code = $request->get('code');
         $rarity = $request->get('rarity');
-
+        $lang = Lang::from($request->get('lang') ?? 'EN');
+        $condition = Condition::from($request->get('condition') ?? 'NM');
+        $batch = $ownedCardRepository->fetchNextBatch();
         if($rarity === 'undefined'){
             $rarity = null;
         }
@@ -56,7 +64,7 @@ class CardController extends Controller
 
 
         if($cardInstances->count() > 1){
-            return response()->json(['message' => 'Multiple instances found']);
+            return response()->json(['message' => 'Multiple instances found', 'instances' => $cardInstances->pluck('id')->toArray()]);
         }
 
         if($cardInstances->isEmpty()){
@@ -65,9 +73,13 @@ class CardController extends Controller
 
         $response = $cardService->updateCardStock(
             code: $cardInstances->first()->card_set_code,
-            option: $rarity,
+            batch: $batch,
+            option: $cardInstances->first(),
             orderId: $order->id,
-            shouldIncrease: true
+            amount: 1,
+            shouldIncrease: true,
+            lang: $lang,
+            condition: $condition
         );
 
         if(

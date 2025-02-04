@@ -3,14 +3,16 @@
 namespace App\Console\Commands;
 
 use App\Enums\AddCardStatuses;
+use App\Enums\Lang;
 use App\Models\CardInstance;
 use App\Repositories\CardInstanceRepository;
+use App\Repositories\OwnedCardRepository;
 use App\Services\CardService;
 use Illuminate\Console\Command;
 use function array_map;
 use function count;
 use function explode;
-
+/** TODO: FIX THIS FILE */
 class AddSetCommand extends Command
 {
     /**
@@ -20,7 +22,9 @@ class AddSetCommand extends Command
      */
     protected $signature = 'add:set
                                     {code : the set base code}
-                                    {cards : the cards as structural syntax}';
+                                    {cards : the cards as structural syntax}
+                                    {lang=EN : the pack language}
+                                    ';
 
 
     /**
@@ -31,16 +35,22 @@ class AddSetCommand extends Command
     protected $description = '
         Fast add multiple cards:
         Syntax:
-        001x4,002:029,003x2
+        php artisan add:set BODE-EN 001x4,002:029,003x2 FR
     ';
 
     /**
      * Execute the console command.
      */
-    public function handle(CardService $cardService, CardInstanceRepository $cardInstanceRepository)
+    public function handle(
+        CardService $cardService,
+        CardInstanceRepository $cardInstanceRepository,
+        OwnedCardRepository $ownedCardRepository
+    )
     {
         $code = $this->argument('code');
         $cards = $this->argument('cards');
+        $lang = Lang::from($this->argument('lang'));
+        $batch = $ownedCardRepository->fetchNextBatch();
         $entries = [];
 
         $rules = explode(',', $cards);
@@ -76,8 +86,11 @@ class AddSetCommand extends Command
 
                 $response = $cardService->updateCardStock(
                     code: $code . $i,
+                    batch: $batch,
                     option: $option,
-                    shouldIncrease: true
+                    amount: 1,
+                    shouldIncrease: true,
+                    lang: $lang
                 );
 
 

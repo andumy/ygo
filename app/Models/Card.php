@@ -25,6 +25,7 @@ use Illuminate\Support\Collection;
  * @property Collection<Set> sets
  * @property boolean isOwned
  * @property boolean isOrdered
+ * @property boolean isMissing
  * @property Carbon last_price_fetch
  */
 class Card extends Model
@@ -68,13 +69,18 @@ class Card extends Model
     public function getIsOwnedAttribute(): bool
     {
         return $this->cardInstances->filter(function (CardInstance $instance) {
-            return $instance->ownedCard?->amount > 0;
+            return $instance->isOwned;
         })->isNotEmpty();
     }
     public function getIsOrderedAttribute(): bool
     {
         return $this->cardInstances->filter(function (CardInstance $instance) {
-            return $instance->orderedCards->count() > 0;
+            return $instance->isOrdered;
         })->isNotEmpty() && !$this->isOwned;
+    }
+
+    public function getIsMissingAttribute(): bool
+    {
+        return !$this->isOwned && !$this->isOrdered;
     }
 }

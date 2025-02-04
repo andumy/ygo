@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Collection;
 
 /**
  * @property int id
  * @property string name
- * @property OrderedCard[] orderedCards
+ * @property Collection<OwnedCard> ownedCards
  */
 class Order extends Model
 {
@@ -19,13 +20,13 @@ class Order extends Model
     public $timestamps = false;
     protected $guarded = [];
 
-    public function orderedCards(): HasMany
+    public function ownedCards(): HasMany
     {
-        return $this->hasMany(OrderedCard::class);
+        return $this->hasMany(OwnedCard::class);
     }
 
     public function cards(): HasManyThrough
     {
-        return $this->hasManyThrough(Card::class, OrderedCard::class);
+        return $this->hasManyThrough(Card::class, OwnedCard::class);
     }
 }

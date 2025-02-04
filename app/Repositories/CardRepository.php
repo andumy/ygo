@@ -53,15 +53,19 @@ class CardRepository
         return Card::where('name', $name)->orWhere('alias', $name)->first();
     }
 
-    public function paginate(string $search, string $set, int $pagination, int $ownedFilter = 0)
+    public function paginate(string $search, string $set, int $pagination, ?bool $onlyOwned = null)
     {
-        return $this->searchQuery($search, $set, $ownedFilter)->paginate($pagination);
+        return $this->searchQuery(
+            search: $search,
+            set: $set,
+            onlyOwned: $onlyOwned
+        )->paginate($pagination);
     }
 
     public function getForOrder(int $orderId): Collection
     {
         return Card::whereHas('cardInstances', function ($query) use ($orderId) {
-            $query->whereHas('orderedCards', function ($query) use ($orderId) {
+            $query->whereHas('ownedCards', function ($query) use ($orderId) {
                 $query->where('order_id', $orderId);
             });
         })->get();
@@ -77,8 +81,13 @@ class CardRepository
         return Card::where('ygo_id', $id)->first();
     }
 
-    public function count(string $search = '', string $set = '', int $ownedFilter = 0, bool $includeVariants = true): int {
-        return $this->searchQuery($search, $set, $ownedFilter, $includeVariants)->count();
+    public function count(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $includeVariants = true): int {
+        return $this->searchQuery(
+            search: $search,
+            set: $set,
+            onlyOwned: $onlyOwned,
+            includeVariants: $includeVariants
+        )->count();
     }
 
     public function countOwnedAndOrderedInsideSet(string $set = ''): int {
@@ -86,13 +95,12 @@ class CardRepository
             ->whereHas('cardInstances', function ($query) use($set) {
                 $query->whereHas('set', fn($q) => $q->where('name', $set))
                     ->where(function($q){
-                        $q->whereHas('ownedCard')
-                            ->orWhereHas('orderedCards');
+                        $q->whereHas('ownedCards');
                     });
             })->count();
     }
 
-    private function searchQuery(string $search = '', string $set = '', int $ownedFilter = 0, bool $includeVariants = true) {
+    public function searchQuery(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $includeVariants = true) {
         return Card::when($search !== '', function($q) use ($search){
             return $q->where(function ($qq) use ($search) {
                 $qq
@@ -108,16 +116,14 @@ class CardRepository
                     $qq->where('name', $set);
                 });
             })
-            ->when($ownedFilter === -1, function($q) {
+            ->when($onlyOwned === false, function($q) {
                 return $q->whereDoesntHave('cardInstances', function ($qq) {
-                    $qq->whereHas('ownedCard')
-                        ->orWhereHas('orderedCards');
+                    $qq->whereHas('ownedCards');
                 });
             })
-            ->when($ownedFilter === 1, function($q) {
+            ->when($onlyOwned, function($q) {
                 return $q->whereHas('cardInstances', function ($qq) {
-                    $qq->whereHas('ownedCard')
-                        ->orWhereHas('orderedCards');
+                    $qq->whereHas('ownedCards');
                 });
             })
             ->when(!$includeVariants, function($q) {

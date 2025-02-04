@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\Sale;
 use App\Models\Set;
 use Illuminate\Support\Collection;
 
@@ -38,18 +39,12 @@ class SetRepository
         return Set::orderBy('code')->get();
     }
 
-    public function allWithCardsAndNewStock(): Collection
+    public function allWithUnsetOwnedCards(): Collection
     {
-        return Set::whereHas('cardInstances', function($q) {
-            $q->whereHas('ownedCard');
-        })
-            ->where('stock_changed', true)
-            ->orderBy('code')->get();
-    }
-
-    public function updateStock(Set $set, bool $stockState): void
-    {
-        $set->stock_changed = $stockState;
-        $set->save();
+        return Set::whereHas('cardInstances', function($q){
+            $q->whereHas('ownedCards', function($q){
+                $q->where('sale',Sale::NOT_SET)->whereNull('order_id');
+            });
+        })->orderBy('code')->get();
     }
 }

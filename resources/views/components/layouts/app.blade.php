@@ -16,5 +16,11 @@
         <a href="/purchase-recommendation" class="text-blue-500 hover:text-blue-800 ps-5">Purchase Recommendation</a>
     </div>
         {{ $slot }}
+    <script>
+        function copyName(selector) {
+            const name = document.getElementById(selector).innerText;
+            navigator.clipboard.writeText(name);
+        }
+    </script>
     </body>
 </html>

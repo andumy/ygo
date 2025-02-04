@@ -2,24 +2,15 @@
 
 namespace App\Livewire;
 
-use App\Enums\AddCardStatuses;
-use App\Models\CardInstance;
-use App\Models\OwnedCard;
-use App\Repositories\CardRepository;
-use App\Repositories\OrderedCardRepository;
 use App\Repositories\OrderRepository;
-use App\Services\CardService;
+use App\Repositories\OwnedCardRepository;
 use Illuminate\Support\Collection;
 use Livewire\Component;
-use function array_unique;
-use function count;
 
 class Orders extends Component
 {
     private OrderRepository $orderRepository;
-    private OrderedCardRepository $orderedCardRepository;
-    private CardService $cardService;
-    private CardRepository $cardRepository;
+    private OwnedCardRepository $ownedCardRepository;
 
     public string $message = '';
     public string $orderName;
@@ -28,15 +19,11 @@ class Orders extends Component
 
     public function boot(
         OrderRepository $orderRepository,
-        CardRepository $cardRepository,
-        OrderedCardRepository $orderedCardRepository,
-        CardService $cardService
+        OwnedCardRepository $ownedCardRepository,
     )
     {
         $this->orderRepository = $orderRepository;
-        $this->cardRepository = $cardRepository;
-        $this->orderedCardRepository = $orderedCardRepository;
-        $this->cardService = $cardService;
+        $this->ownedCardRepository = $ownedCardRepository;
     }
 
 
@@ -52,67 +39,13 @@ class Orders extends Component
 
     public function shipOrder()
     {
-        $newCards = [];
-        $newPhysicalCards = 0;
 
-        $duplicateCards = [];
-        $duplicatePhysicalCards = 0;
+        $this->ownedCardRepository->shipOrder($this->orderId);
 
-        $duplicateOrderedCards = [];
-        $duplicatePhysicalOrderedCards = 0;
+        $this->message = 'Order shipped';
 
-        $addedCards = [];
-        $totalPhysicalAddedCardsToOwned = 0;
-        $orderedCards = $this->orderedCardRepository->getByOrderId($this->orderId);
-
-        foreach ($orderedCards as $orderedCard) {
-            $addedCards[] = $orderedCard->cardInstance->card->id;
-            $totalPhysicalAddedCardsToOwned += $orderedCard->amount;
-
-            $response = $this->cardService->updateCardStockFromInstance(
-                cardInstance: $orderedCard->cardInstance,
-                shouldIncrease: true,
-                ownAmount: $orderedCard->amount
-            );
-
-            switch($response->status){
-                case AddCardStatuses::INCREMENT:
-                    $duplicateCards[] = $orderedCard->cardInstance->card->id;
-                    $duplicatePhysicalCards += $orderedCard->amount;
-                    break;
-                case AddCardStatuses::NEW_CARD:
-                    if(
-                        $orderedCard
-                            ->cardInstance
-                            ->card
-                            ->cardInstances->filter(function (CardInstance $ci) use ($orderedCard){
-                                return $ci->orderedCards()
-                                    ->where('order_id','!=', $orderedCard->order_id)
-                                    ->exists();
-                            })->isEmpty()
-                    ){
-                        $newCards[] = $orderedCard->cardInstance->card->id;
-                        $newPhysicalCards += $orderedCard->amount;
-                    } else {
-                        $duplicateOrderedCards[] = $orderedCard->cardInstance->card->id;
-                        $duplicatePhysicalOrderedCards += $orderedCard->amount;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        $totalAddedCardsToOwned = count(array_unique($addedCards));
         $this->orderRepository->delete($this->orderId);
         $this->orderId = null;
-
-        $this->message = "
-            A total of $totalAddedCardsToOwned cards were added ($totalPhysicalAddedCardsToOwned physical),
-            out of which ".count(array_unique($newCards))." ($newPhysicalCards physical) were new, ".
-            count(array_unique($duplicateCards)) ." ($duplicatePhysicalCards physical) were duplicates and ".
-            count(array_unique($duplicateOrderedCards)) ." ($duplicatePhysicalOrderedCards physical) were already ordered.
-        ";
     }
 
     public function render()
@@ -121,7 +54,7 @@ class Orders extends Component
         $orderedCards = [];
 
         if($this->orderId) {
-            $orderedCards = $this->orderRepository->findById($this->orderId)?->orderedCards;
+            $orderedCards = $this->ownedCardRepository->fetchByOrderWithAmount($this->orderId);
         }
 
         return view('livewire.orders', [

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Lang;
 use App\Enums\Rarities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
+use function array_key_exists;
 use function collect;
 use function explode;
 use function strtoupper;
@@ -20,13 +22,19 @@ use function strtoupper;
  * @property int card_id
  * @property Set set
  * @property int set_id
- * @property OwnedCard ownedCard
- * @property Collection<OrderedCard> orderedCards
- * @property TradableCard tradableCard
+ * @property Collection<OwnedCard> ownedCards
  * @property Price price
  * @property string card_set_code
  * @property string rarity_verbose
+ *
  * @property string rarity
+ * @property array orderAmountByLangAndCond
+ * @property array ownAmountByLangAndCond
+ * @property array orderAmountByLang
+ * @property array ownAmountByLang
+ * @property boolean isOwned
+ * @property boolean isOrdered
+ * @property boolean isMissing
  */
 class CardInstance extends Model
 {
@@ -45,19 +53,9 @@ class CardInstance extends Model
         return $this->belongsTo(Set::class);
     }
 
-    public function ownedCard(): HasOne
+    public function ownedCards(): HasMany
     {
-        return $this->hasOne(OwnedCard::class);
-    }
-
-    public function orderedCards(): HasMany
-    {
-        return $this->hasMany(OrderedCard::class);
-    }
-
-    public function tradableCard(): HasOne
-    {
-        return $this->hasOne(TradableCard::class);
+        return $this->hasMany(OwnedCard::class);
     }
 
     public function price(): HasOne
@@ -69,4 +67,72 @@ class CardInstance extends Model
     {
         return '(' .Rarities::tryFrom($this->rarity_verbose)->getShortHand(). ')';
     }
+
+    public function buildAmountByLang(array $carry, OwnedCard $ownedCard): array {
+        if(!array_key_exists($ownedCard->lang->value, $carry)){
+            $carry[$ownedCard->lang->value] = 1;
+            return $carry;
+        }
+        $carry[$ownedCard->lang->value]++;
+        return $carry;
+    }
+
+    public function getOwnAmountByLangAttribute(): Collection
+    {
+        return collect($this->ownedCards->whereNull('order_id')->reduce([$this, 'buildAmountByLang'], []));
+    }
+
+    public function getOrderAmountByLangAttribute(): Collection
+    {
+        return collect($this->ownedCards->whereNotNull('order_id')->reduce([$this, 'buildAmountByLang'], []));
+    }
+
+    public function buildAmountByLangAndCond(array $carry, OwnedCard $ownedCard): array {
+        if(!array_key_exists($ownedCard->lang->value, $carry)){
+            $carry[$ownedCard->lang->value] = [];
+        }
+
+        if(!array_key_exists($ownedCard->cond->value, $carry[$ownedCard->lang->value])){
+            $carry[$ownedCard->lang->value][$ownedCard->cond->value] = 1;
+            return $carry;
+        }
+
+        $carry[$ownedCard->lang->value][$ownedCard->cond->value]++;
+        return $carry;
+    }
+
+    public function getOwnAmountByLangAndCondAttribute(): Collection
+    {
+        return collect(
+            $this->ownedCards->whereNull('order_id')->reduce([$this, 'buildAmountByLangAndCond'], [])
+        );
+    }
+
+    public function getOrderAmountByLangAndCondAttribute(): Collection
+    {
+        return collect(
+            $this->ownedCards->whereNotNull('order_id')->reduce([$this, 'buildAmountByLangAndCond'], [])
+        );
+    }
+
+    public function getIsOwnedAttribute(): bool
+    {
+        return $this->ownedCards->whereNull('order_id')->count() > 0;
+    }
+
+    public function getIsOrderedAttribute(): bool
+    {
+        return $this->ownedCards->whereNotNull('order_id')->count() > 0 && !$this->isOwned;
+    }
+
+    public function getIsMissingAttribute(): bool
+    {
+        return !$this->isOwned && !$this->isOrdered;
+    }
+
+    public function isOwnedForLang(Lang $lang): bool
+    {
+        return $this->ownedCards->whereNull('order_id')->where('lang', $lang)->count() > 0;
+    }
+
 }
