@@ -25,7 +25,7 @@ class OwnedCardRepository
         Lang $lang = Lang::ENGLISH,
         Condition $condition = Condition::NEAR_MINT,
         int $orderId = null,
-        bool $isFirstEdition = false,
+        ?bool $isFirstEdition = null,
         Sale $sale = Sale::NOT_SET
     ): OwnedCard {
         return OwnedCard::create([
@@ -35,19 +35,9 @@ class OwnedCardRepository
             'batch' => $batch,
             'order_id' => $orderId,
             'sale' => $sale,
-            'is_first_edition' => $isFirstEdition
+            'is_first_edition' => $isFirstEdition === null ? false : $isFirstEdition
         ]);
     }
-
-    /** @return Collection<OwnedCard> */
-    public function fetchByInstanceGroupByLangCondOverAmount(int $cardInstanceId): Collection {
-        return OwnedCard::where('card_instance_id', $cardInstanceId)
-            ->groupBy('card_instance_id','lang', 'cond')
-            ->selectRaw('card_instance_id, lang, cond, count(*) as amount')
-            ->orderBy('amount','DESC')
-            ->get();
-    }
-
     /** @return Collection<OwnedCard> */
     public function fetchByInstanceGroupByAllOverAmount(int $cardInstanceId): Collection {
         return OwnedCard::where('card_instance_id', $cardInstanceId)
@@ -77,13 +67,15 @@ class OwnedCardRepository
         int $cardInstanceId,
         Lang $lang = Lang::ENGLISH,
         ?Condition $condition = null,
-        ?int $orderId = null
+        ?int $orderId = null,
+        ?bool $isFirstEdition = null
     ): Collection{
         return OwnedCard::where('card_instance_id', $cardInstanceId)
             ->where('lang', $lang)
             ->when($condition, fn($query) => $query->where('cond', $condition))
             ->when($orderId, fn($query) => $query->where('order_id', $orderId))
             ->when($orderId === null, fn($query) => $query->whereNull('order_id'))
+            ->when($isFirstEdition !== null, fn($query) => $query->where('is_first_edition', $isFirstEdition))
             ->orderBy('sale')
             ->orderBy('batch','DESC')
             ->get();

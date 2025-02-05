@@ -11,6 +11,7 @@ use App\Repositories\CardInstanceRepository;
 use App\Repositories\OwnedCardRepository;
 use Illuminate\Support\Collection;
 use function collect;
+use function dd;
 
 class CardService
 {
@@ -29,7 +30,8 @@ class CardService
         ?int $amount = null,
         bool $shouldIncrease = false,
         Lang $lang = Lang::ENGLISH,
-        Condition $condition = Condition::NEAR_MINT
+        Condition $condition = Condition::NEAR_MINT,
+        ?bool $isFirstEdition = null
     ): AddCardResponse
     {
         /** @var Collection<CardInstance> $cardInstances */
@@ -63,6 +65,7 @@ class CardService
             condition: $condition,
             orderId: $orderId,
             amount: $amount,
+            isFirstEdition: $isFirstEdition
         );
     }
 
@@ -74,13 +77,15 @@ class CardService
         Condition $condition = Condition::NEAR_MINT,
         ?int $orderId = null,
         ?int $amount = null,
+        ?bool $isFirstEdition = null
     ): AddCardResponse
     {
         $ownedCards = $this->ownedCardRepository->cardsForUpdate(
             cardInstanceId: $cardInstance->id,
             lang: $lang,
             condition: $condition,
-            orderId: $orderId
+            orderId: $orderId,
+            isFirstEdition: $isFirstEdition
         );
         $ownChangeAmount = $shouldIncrease ? $amount : $amount - $ownedCards->count();
 
@@ -99,6 +104,7 @@ class CardService
                     lang: $lang,
                     condition: $condition,
                     orderId: $orderId,
+                    isFirstEdition: $isFirstEdition
                 );
             }
 
@@ -123,42 +129,4 @@ class CardService
             options: collect([$cardInstance])
         );
     }
-
-
-//    private function handleOrderedCards(
-//        CardInstance $cardInstance,
-//        int $orderId,
-//        int $orderAmount,
-//        bool $shouldIncrease,
-//        Lang $lang
-//    ): AddCardResponse
-//    {
-//        //delete order
-//        if($orderAmount === 0) {
-//            $this->orderedCardRepository->delete($cardInstance->id, $orderId);
-//            return new AddCardResponse(
-//                status: AddCardStatuses::DELETE,
-//                options: collect([$cardInstance])
-//            );
-//        }
-//
-//        //update order
-//        if($orderedCard = $this->orderedCardRepository->findByInstanceOrderAndLang($cardInstance->id, $orderId, $lang)){
-//            $this->orderedCardRepository->updateAmount(
-//                $orderedCard,
-//                $shouldIncrease ? $orderedCard->amount + $orderAmount : $orderAmount
-//            );
-//            return new AddCardResponse(
-//                status: AddCardStatuses::INCREMENT,
-//                options: collect([$cardInstance])
-//            );
-//        }
-//
-//        //create order
-//        $this->orderedCardRepository->firstOrCreate($cardInstance->id, $orderAmount, $orderId, $lang);
-//        return new AddCardResponse(
-//            status: AddCardStatuses::NEW_CARD,
-//            options: collect([$cardInstance])
-//        );
-//    }
 }

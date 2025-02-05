@@ -15,6 +15,7 @@ use App\Services\CardService;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
+use function dd;
 use function round;
 
 class Cards extends Component
@@ -68,18 +69,22 @@ class Cards extends Component
         $batch = $this->ownedCardRepository->fetchNextBatch();
         $instance = $this->cardInstanceRepository->findById($instanceId);
         $owned = $this->ownedCards[$instanceId];
-        foreach ($owned as $lang => $own) {
-            foreach ($own as $cond => $amount) {
-                if($amount === ""){
-                    continue;
+
+        foreach ($owned as $lang => $langArray) {
+            foreach ($langArray as $cond => $condArray) {
+                foreach ($condArray as $isFirstEdition => $amount) {
+                    if($amount === ""){
+                        continue;
+                    }
+                    $this->cardService->updateCardStockFromInstance(
+                        cardInstance: $instance,
+                        batch: $batch,
+                        lang: Lang::from($lang),
+                        condition: Condition::from($cond),
+                        amount: (int)$amount,
+                        isFirstEdition: $isFirstEdition,
+                    );
                 }
-                $this->cardService->updateCardStockFromInstance(
-                    cardInstance: $instance,
-                    batch: $batch,
-                    lang: Lang::from($lang),
-                    condition: Condition::from($cond),
-                    amount: $amount,
-                );
             }
         }
     }
@@ -108,9 +113,13 @@ class Cards extends Component
                 $this->ownedCards[$cardInstance->id] = [];
                 $this->prices[$cardInstance->id] = $cardInstance->price->price ?? 0;
 
-                foreach ($this->ownedCardRepository->fetchByInstanceGroupByLangCondOverAmount($cardInstance->id) as $ownedCard){
-                    $this->ownedCards[$cardInstance->id][$ownedCard->lang->value][$ownedCard->cond->value] =
-                        $ownedCard->amount ?? 0;
+                foreach ($this->ownedCardRepository->fetchByInstanceGroupByAllOverAmount($cardInstance->id) as $ownedCard){
+                    $this->ownedCards
+                        [$cardInstance->id]
+                        [$ownedCard->lang->value]
+                        [$ownedCard->cond->value]
+                        [(int)$ownedCard->is_first_edition] =
+                            $ownedCard->amount ?? 0;
                 }
             }
         }

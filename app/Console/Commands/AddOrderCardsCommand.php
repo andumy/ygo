@@ -67,7 +67,9 @@ class AddOrderCardsCommand extends Command
                     orderId: $order->id,
                     amount: 1,
                     shouldIncrease: true,
-                    lang: $lang
+                    lang: $lang,
+                    condition: null,
+                    isFirstEdition: null,
                 );
 
                 if ($response->status === AddCardStatuses::MULTIPLE_OPTIONS) {

@@ -47,8 +47,10 @@ class CardController extends Controller
         $orderName = $request->get('order');
         $code = $request->get('code');
         $rarity = $request->get('rarity');
+        $isFirstEdition = $request->get('is_first_edition');
         $lang = Lang::from($request->get('lang') ?? 'EN');
         $condition = Condition::from($request->get('condition') ?? 'NM');
+
         $batch = $ownedCardRepository->fetchNextBatch();
         if($rarity === 'undefined'){
             $rarity = null;
@@ -79,7 +81,8 @@ class CardController extends Controller
             amount: 1,
             shouldIncrease: true,
             lang: $lang,
-            condition: $condition
+            condition: $condition,
+            isFirstEdition: $isFirstEdition
         );
 
         if(

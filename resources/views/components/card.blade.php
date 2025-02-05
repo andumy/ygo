@@ -97,17 +97,26 @@
                             @if($index % 6 == 0)
                                 <div class="flex flex-col p-2">
                                     @endif
-                                    <div class="flex justify-center items-center pb-2">
-                                        <img src="{{$lang->getFlag()}}" alt="{{$lang->value}}"
-                                             class="h-[20px] w-auto pe-2">
+                                    <div class="flex justify-center items-center pb-4">
+                                        <div class="flex flex-col justify-between items-center h-full">
+                                            <img src="{{$lang->getFlag()}}" alt="{{$lang->value}}"
+                                                 class="h-[20px] w-auto pe-2">
+                                            <span>1st</span>
+                                        </div>
                                         @foreach(Condition::cases() as $condition)
-                                            <div class="flex flex-col">
+                                            <div class="flex flex-col px-1">
                                                 {!! $condition->getShortHand() !!}
+                                                <input
+                                                    class="appearance-none border rounded text-black w-[50px] my-2"
+                                                    type="number"
+                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
+                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
+                                                >
                                                 <input
                                                     class="appearance-none border rounded text-black w-[50px]"
                                                     type="number"
-                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}"
-                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}"
+                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
+                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
                                                 >
                                             </div>
                                         @endforeach

@@ -90,7 +90,9 @@ class AddSetCommand extends Command
                     option: $option,
                     amount: 1,
                     shouldIncrease: true,
-                    lang: $lang
+                    lang: $lang,
+                    condition: null,
+                    isFirstEdition: null,
                 );
 
 
