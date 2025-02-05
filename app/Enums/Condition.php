@@ -15,7 +15,7 @@ enum Condition: string
     public function getShortHand(): string
     {
         return match ($this) {
-            self::MINT => "<p class='text-center p-1 text-xs bg-sky-600 rounded-md text-stone-50'>MN</p>",
+            self::MINT => "<p class='text-center p-1 text-xs bg-sky-600 rounded-md text-stone-50'>MT</p>",
             self::NEAR_MINT => "<p class='text-center p-1 text-xs bg-teal-400 rounded-md text-stone-950'>NM</p>",
             self::EXCELLENT => "<p class='text-center p-1 text-xs bg-green-600 rounded-md text-stone-950'>EX</p>",
             self::GOOD => "<p class='text-center p-1 text-xs bg-amber-400 rounded-md text-stone-950'>GD</p>",

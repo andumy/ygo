@@ -50,8 +50,8 @@ class OwnedCardRepository
     /** @return Collection<OwnedCard> */
     public function fetchByOrderWithAmount(int $orderId): Collection {
         return OwnedCard::where('order_id', $orderId)
-            ->groupBy('card_instance_id','lang', 'cond')
-            ->selectRaw('card_instance_id, lang, cond, count(*) as amount')
+            ->groupBy('card_instance_id','lang', 'cond', 'is_first_edition')
+            ->selectRaw('card_instance_id, lang, cond, is_first_edition, count(*) as amount')
             ->join('card_instances', 'card_instances.id', '=', 'owned_cards.card_instance_id')
             ->orderBy('card_instances.card_set_code','DESC')
             ->get();

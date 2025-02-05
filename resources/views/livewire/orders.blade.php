@@ -54,19 +54,20 @@
         <table>
             <thead>
             <tr>
-                <th>OC ID</th>
-                <th>Card Name</th>
-                <th>Card Code</th>
-                <th>Language</th>
-                <th>Condition</th>
-                <th>Amount</th>
+                <th class="text-center px-2">OC ID</th>
+                <th class="text-center px-2">Card Name</th>
+                <th class="text-center px-2">Card Code</th>
+                <th class="text-center px-2">Language</th>
+                <th class="text-center px-2">Condition</th>
+                <th class="text-center px-2">1st Edition</th>
+                <th class="text-center px-2">Amount</th>
             </tr>
             </thead>
             <tbody>
             @foreach($orderedCards as $oc)
                 <tr class="py-2">
-                    <td>{{$oc->cardInstance->ownedCards->where('lang', $oc->lang)->where('cond', $oc->cond)->where('order_id', $orderId)->pluck('id')->reduce(fn($carry, $id) => "$carry $id",'')}}</td>
-                    <td class="
+                    <td class="text-center px-2">{{$oc->cardInstance->ownedCards->where('lang', $oc->lang)->where('cond', $oc->cond)->where('order_id', $orderId)->pluck('id')->reduce(fn($carry, $id) => "$carry $id",'')}}</td>
+                    <td class="text-center px-2
                     {{
                             $oc->cardInstance->isOwnedForLang($oc->lang) ? 'text-orange-700' : (
                                 $oc->cardInstance->isOwned ? 'text-amber-400' : (
@@ -75,10 +76,11 @@
                             )
                     }}
                     ">{{$oc->cardInstance->card->name}}</td>
-                    <td>{{$oc->cardInstance->card_set_code}}</td>
-                    <td><img src="{{$oc->lang->getFlag()}}" alt="{{$oc->lang->value}}" class="h-[14px]"></td>
-                    <td>{!! $oc->cond->getShortHand() !!}</td>
-                    <td>{{$oc->amount}}</td>
+                    <td class="text-center px-2">{{$oc->cardInstance->card_set_code}}</td>
+                    <td class="text-center px-2"><img src="{{$oc->lang->getFlag()}}" alt="{{$oc->lang->value}}" class="h-[14px]"></td>
+                    <td class="text-center px-2">{!! $oc->cond->getShortHand() !!}</td>
+                    <td class="text-center px-2">{!! $oc->is_first_edition ? '<span>✔️</span>' : '' !!}</td>
+                    <td class="text-center px-2">{{$oc->amount}}</td>
                 </tr>
             @endforeach
             </tbody>

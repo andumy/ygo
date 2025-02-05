@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\AddCardStatuses;
 use App\Enums\Condition;
 use App\Enums\Lang;
+use App\Enums\Rarities;
 use App\Models\CardInstance;
 use App\Repositories\CardRepository;
 use App\Repositories\OrderRepository;
@@ -44,24 +45,21 @@ class CardController extends Controller
         OwnedCardRepository $ownedCardRepository
     ) {
         $cardName = $request->get('card');
-        $orderName = $request->get('order');
         $code = $request->get('code');
-        $rarity = $request->get('rarity');
-        $isFirstEdition = $request->get('is_first_edition');
+        $orderName = $request->get('order');
+        $rarity = Rarities::tryFrom($request->get('rarity'));
+        $isFirstEdition = (bool)$request->get('is_first_edition');
         $lang = Lang::from($request->get('lang') ?? 'EN');
         $condition = Condition::from($request->get('condition') ?? 'NM');
 
         $batch = $ownedCardRepository->fetchNextBatch();
-        if($rarity === 'undefined'){
-            $rarity = null;
-        }
 
         $order = $orderRepository->firstOrCreate($orderName);
         $card = $cardRepository->findByName($cardName);
         /** @var Collection<CardInstance> $cardInstance */
         $cardInstances = $card->cardInstances->filter(function (CardInstance $instance) use ($code, $rarity) {
             return str_contains($instance->card_set_code , $code) &&
-                ($rarity === null || $instance->rarity_verbose === $rarity);
+                ($rarity === null || $instance->rarity_verbose === $rarity->value);
         });
 
 
