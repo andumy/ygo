@@ -17,7 +17,6 @@ use function response;
 use function str_contains;
 use function var_dump;
 
-/** TODO: FIX CHROME EXTENSION */
 class CardController extends Controller
 {
     public function cardInfo(Request $request, CardRepository $cardRepository)
