@@ -11,6 +11,7 @@ use App\Repositories\OwnedCardRepository;
 use App\Services\CardService;
 use Illuminate\Console\Command;
 /** TODO: FIX THIS FILE */
+/** @deprecated  */
 class AddOrderCardsCommand extends Command
 {
     /**

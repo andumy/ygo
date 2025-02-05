@@ -13,6 +13,7 @@ use function array_map;
 use function count;
 use function explode;
 /** TODO: FIX THIS FILE */
+/** @deprecated  */
 class AddSetCommand extends Command
 {
     /**
