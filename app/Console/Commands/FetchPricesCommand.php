@@ -86,7 +86,7 @@ class FetchPricesCommand extends Command
                         $filteredCardInstances = $cardInstances->filter(
                             function (CardInstance $ci) use ($instance, $card) {
                                 return $ci->card_id === $card->id &&
-                                    $ci->rarity_verbose === $instance['rarity'];
+                                    $ci->rarity_verbose->value === $instance['rarity'];
                             }
                         );
                         if($filteredCardInstances->count() == 0){

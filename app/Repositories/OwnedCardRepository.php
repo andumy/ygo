@@ -19,6 +19,31 @@ class OwnedCardRepository
         return OwnedCard::where('sale', Sale::TRADE)->count();
     }
 
+    public function createAmount(
+        int $cardInstanceId,
+        int $batch,
+        int $amount,
+        Lang $lang = Lang::ENGLISH,
+        Condition $condition = Condition::NEAR_MINT,
+        int $orderId = null,
+        ?bool $isFirstEdition = null,
+        Sale $sale = Sale::NOT_SET
+    ): Collection {
+        $ownedCards = collect();
+        for($i = 0; $i < $amount; $i++){
+            $ownedCards->push($this->create(
+                cardInstanceId: $cardInstanceId,
+                batch: $batch,
+                lang: $lang,
+                condition: $condition,
+                orderId: $orderId,
+                isFirstEdition: $isFirstEdition,
+                sale: $sale
+            ));
+        }
+        return $ownedCards;
+    }
+
     public function create(
         int $cardInstanceId,
         int $batch,

@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use function Laravel\Prompts\search;
+
 enum Rarities: string
 {
     case COMMON = "Common";
@@ -50,6 +52,8 @@ enum Rarities: string
     case PARALLEL_RARE = "Parallel Rare";
     case ULTRA_PHARAOHS_RARE = "Ultra Pharaoh’s Rare";
     case SECRET_PHARAOHS_RARE = "Secret Pharaoh’s Rare";
+    case DUEL_TERMINAL_NORMAL_RARE_PARALLEL_RARE = "Duel Terminal Normal Rare Parallel Rare";
+    case MISSING = "";
 
     public function getShortHand(): string
     {
@@ -100,6 +104,7 @@ enum Rarities: string
             self::PARALLEL_RARE => "PR",
             self::ULTRA_PHARAOHS_RARE => "UPR",
             self::SECRET_PHARAOHS_RARE => "SPHR",
+            self::DUEL_TERMINAL_NORMAL_RARE_PARALLEL_RARE => "DTNRPR",
             default => "N/A",
         };
     }

@@ -12,6 +12,19 @@ enum Condition: string
     case PLAYED = 'PLAYED';
     case POOR = 'POOR';
 
+    public static function revertShortHand(string $shortHand): self
+    {
+        return match ($shortHand) {
+            'MT' => self::MINT,
+            'NM' => self::NEAR_MINT,
+            'EX' => self::EXCELLENT,
+            'GD' => self::GOOD,
+            'LP' => self::LIGHT_PLAYED,
+            'PL' => self::PLAYED,
+            'PO' => self::POOR,
+        };
+    }
+
     public function getShortHand(): string
     {
         return match ($this) {

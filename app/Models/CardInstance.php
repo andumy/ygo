@@ -25,7 +25,7 @@ use function strtoupper;
  * @property Collection<OwnedCard> ownedCards
  * @property Price price
  * @property string card_set_code
- * @property string rarity_verbose
+ * @property Rarities rarity_verbose
  *
  * @property string rarity
  * @property array orderAmountByLangAndCond
@@ -42,6 +42,10 @@ class CardInstance extends Model
 
     public $timestamps = false;
     protected $guarded = [];
+
+    protected $casts = [
+        'rarity_verbose' => Rarities::class,
+    ];
 
     public function card(): BelongsTo
     {
@@ -63,9 +67,9 @@ class CardInstance extends Model
         return $this->hasOne(Price::class);
     }
 
-    public function getRarityAttribute(): string
+    public function getShortRarityAttribute(): string
     {
-        return '(' .Rarities::tryFrom($this->rarity_verbose)->getShortHand(). ')';
+        return '(' .Rarities::tryFrom($this->rarity_verbose->value)->getShortHand(). ')';
     }
 
     public function buildAmountByLang(array $carry, OwnedCard $ownedCard): array {
@@ -117,12 +121,12 @@ class CardInstance extends Model
 
     public function getIsOwnedAttribute(): bool
     {
-        return $this->ownedCards->whereNull('order_id')->count() > 0;
+        return $this->ownedCards->whereNull('order_id')->collect()->count() > 0;
     }
 
     public function getIsOrderedAttribute(): bool
     {
-        return $this->ownedCards->whereNotNull('order_id')->count() > 0 && !$this->isOwned;
+        return $this->ownedCards->whereNotNull('order_id')->collect()->count() > 0 && !$this->isOwned;
     }
 
     public function getIsMissingAttribute(): bool
@@ -132,7 +136,7 @@ class CardInstance extends Model
 
     public function isOwnedForLang(Lang $lang): bool
     {
-        return $this->ownedCards->whereNull('order_id')->where('lang', $lang)->count() > 0;
+        return $this->ownedCards->whereNull('order_id')->where('lang', $lang)->collect()->count() > 0;
     }
 
 }

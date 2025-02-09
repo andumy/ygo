@@ -58,7 +58,7 @@ class CardController extends Controller
         /** @var Collection<CardInstance> $cardInstance */
         $cardInstances = $card->cardInstances->filter(function (CardInstance $instance) use ($code, $rarity) {
             return str_contains($instance->card_set_code , $code) &&
-                ($rarity === null || $instance->rarity_verbose === $rarity->value);
+                ($rarity === null || $instance->rarity_verbose->value === $rarity->value);
         });
 
 

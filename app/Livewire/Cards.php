@@ -104,7 +104,7 @@ class Cards extends Component
         $cards = $this->cardRepository->paginate(
             search: $this->search,
             set: $this->set,
-            pagination: 45,
+            pagination: 10,
             onlyOwned: $this->onlyOwned
         );
 

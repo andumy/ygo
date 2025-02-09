@@ -63,7 +63,7 @@ class TradableCards extends Component
                     'ygo_id' => $cardInstance->card->ygo_id,
                     'card_set_code' => $cardInstance->card_set_code,
                     'card_name' => $cardInstance->card->name,
-                    'rarity' => $cardInstance->rarity_verbose,
+                    'rarity' => $cardInstance->rarity_verbose->value,
                     'collectable' => ($ownedCard->sale === Sale::IN_COLLECTION ? $ownedCard->amount : 0) + ($currentElement['collectable'] ?? 0),
                     'tradable' => ($ownedCard->sale === Sale::TRADE ? $ownedCard->amount : 0) + ($currentElement['tradable'] ?? 0),
                     'not_set' => ($ownedCard->sale === Sale::NOT_SET ? $ownedCard->amount : 0) + ($currentElement['not_set'] ?? 0),

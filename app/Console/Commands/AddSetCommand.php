@@ -102,7 +102,7 @@ class AddSetCommand extends Command
                     $rarity = explode(" #",
                         $this->choice(
                             "Select rarity for: " . $response->options->first()->card->name . '( ' . $code . $i . ' )',
-                            $response->options->map(fn(CardInstance $option) => $option->rarity_verbose. " #". $option->card->ygo_id)->toArray(),
+                            $response->options->map(fn(CardInstance $option) => $option->rarity_verbose->value. " #". $option->card->ygo_id)->toArray(),
                             0
                         )
                     )[0];
