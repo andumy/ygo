@@ -11,8 +11,4 @@ class PriceRepository
         return Price::updateOrCreate($find, $data);
     }
 
-    public function deleteForCardInstance(int $cardId): void{
-        Price::where('card_instance_id', $cardId)->delete();
-    }
-
 }

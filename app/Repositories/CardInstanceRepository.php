@@ -25,12 +25,6 @@ class CardInstanceRepository
         return CardInstance::where('card_set_code', $code)->get();
     }
 
-    /** @return CardInstance */
-    public function findBySetCodeAndRarity(string $code, string $rarity): ?CardInstance
-    {
-        return CardInstance::where('card_set_code', $code)->where('rarity_verbose', $rarity)->first();
-    }
-
     public function findById(int $id): ?CardInstance
     {
         return CardInstance::find($id);

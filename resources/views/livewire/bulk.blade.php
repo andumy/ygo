@@ -32,6 +32,7 @@
                         @foreach($condArray as $isFirstEd => $cardObject)
                             @php
                             try{
+
                             @endphp
                             <tr class="py-2 border-b-2">
                                 <td class="text-center px-2">{{$cardObject['cardInstance']->first()->card->name}}</td>
@@ -84,7 +85,7 @@
                             </tr>
                             @php
                                 }catch (Exception $e){
-                                    dd($code);
+                                    dump($code);
                                 }
                             @endphp
                         @endforeach

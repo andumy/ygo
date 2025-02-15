@@ -8,6 +8,7 @@ use App\Enums\Sale;
 use App\Models\CardInstance;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\OwnedCardRepository;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
@@ -18,6 +19,7 @@ use function array_unique;
 use function count;
 use function current;
 use function dd;
+use function mb_strtoupper;
 use function storage_path;
 
 class Bulk extends Component
@@ -50,20 +52,27 @@ class Bulk extends Component
 
 
         $index = 2;
+        $lang = Lang::ENGLISH;
+        $set = '';
+        $version = 2;
         do{
-            $lang = $spreadsheet->getActiveSheet()->getCell("B$index")->getValue();
-            $code = $spreadsheet->getActiveSheet()->getCell("A$index")->getValue() .
-                $spreadsheet->getActiveSheet()->getCell("C$index")->getValue();
-            $amount = $spreadsheet->getActiveSheet()->getCell("D$index")->getValue();
-            $isFirstEdition = $spreadsheet->getActiveSheet()->getCell("E$index")->getValue() != '';
-            $condition = $spreadsheet->getActiveSheet()->getCell("F$index")->getValue();
+            $lang = $spreadsheet->getActiveSheet()->getCell("C$index")->getValue() ?? $lang->value;
+            $set = $spreadsheet->getActiveSheet()->getCell("A$index")->getValue() ?? $set;
+            $version = $spreadsheet->getActiveSheet()->getCell("B$index")->getValue() ?? $version;
+            $cardIndex = $spreadsheet->getActiveSheet()->getCell("D$index")->getValue();
+            $amount = $spreadsheet->getActiveSheet()->getCell("E$index")->getValue();
+            $isFirstEdition = $spreadsheet->getActiveSheet()->getCell("F$index")->getValue() != '';
+            $condition = $spreadsheet->getActiveSheet()->getCell("G$index")->getValue();
 
-            if(!$code){
+            if(!$cardIndex){
                 break;
             }
 
-            $lang = Lang::from($lang);
-            $condition = Condition::revertShortHand($condition);
+            $code = mb_strtoupper($set) . ($version == 2 ? '-EN' : ($version == 1 ? '-E' : '-')) . $cardIndex;
+
+            $lang = Lang::from(mb_strtoupper($lang));
+            $condition = Condition::revertShortHand(mb_strtoupper($condition));
+
 
             $cardInstances = $this->cardInstanceRepository->findBySetCode($code);
 

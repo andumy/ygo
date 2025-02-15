@@ -25,11 +25,6 @@ class CardRepository
         $card->save();
     }
 
-    public function updateLastPriceFetched(Card $card): void{
-        $card->last_price_fetch = Carbon::now()->format('Y-m-d');
-        $card->save();
-    }
-
     public function create(string $name, ?int $ygoId, string $type): Card
     {
         return Card::create([

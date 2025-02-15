@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\Rarities;
 use App\Models\Card;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;
@@ -39,20 +40,20 @@ class FetchCardsCommand extends Command
         CardInstanceRepository $cardInstanceRepository
     ): void
     {
-        $response = Http::get(config('ygo.sets'))->json();
+        $sets = Http::get(config('ygo.sets'))->json();
 
-        foreach ($response as $data) {
-            $date = Carbon::parse($data['tcg_date']);
-            $set = $setRepository->findByName($data['set_name']);
+        foreach ($sets as $setData) {
+            $date = Carbon::parse($setData['tcg_date']);
+            $set = $setRepository->findByName($setData['set_name']);
 
             if(!$set){
                 $setRepository->updateOrCreate(
                     [
-                        'name' => $data['set_name'],
+                        'name' => $setData['set_name'],
                     ],
                     [
-                        'code' => $data['set_code'],
-                        'card_amount' => $data['num_of_cards'],
+                        'code' => $setData['set_code'],
+                        'card_amount' => $setData['num_of_cards'],
                         'date' => $date->year > 0 ? $date->format('Y-m-d') : null
                     ]
                 );
@@ -70,6 +71,7 @@ class FetchCardsCommand extends Command
                 ],
                 ...$data['card_images']
             ];
+
             $ogId = null;
             foreach ($variants as $variant) {
                 $isOg = $data['id'] == $variant['id'];
@@ -128,7 +130,7 @@ class FetchCardsCommand extends Command
                     'card_id' => $card->id,
                     'set_id' => $set->id,
                     'card_set_code' => $dataSet['set_code'],
-                    'rarity_verbose' => $dataSet['set_rarity'],
+                    'rarity_verbose' => Rarities::tryFrom($dataSet['set_rarity'])?->value ?? Rarities::MISSING->value,
                 ],
                 []
             );
