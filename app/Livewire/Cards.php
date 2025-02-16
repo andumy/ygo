@@ -17,6 +17,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use function dd;
 use function round;
+use function trim;
 
 class Cards extends Component
 {
@@ -102,7 +103,7 @@ class Cards extends Component
     {
         /** @var Collection<Card> $cards */
         $cards = $this->cardRepository->paginate(
-            search: $this->search,
+            search: trim($this->search),
             set: $this->set,
             pagination: 10,
             onlyOwned: $this->onlyOwned
@@ -128,12 +129,12 @@ class Cards extends Component
             'metrics' => [
                 'total_cards' => [
                     'owned' => $totalCardsOwned = $this->cardRepository->count(
-                        search: $this->search,
+                        search: trim($this->search),
                         set: $this->set,
                         onlyOwned: true
                     ),
                     'total' => $totalCardsTotal = $this->cardRepository->count(
-                        search: $this->search,
+                        search: trim($this->search),
                         set: $this->set,
                         onlyOwned: $this->onlyOwned
                     ),
@@ -142,12 +143,12 @@ class Cards extends Component
                 ],
                 'total_instances' => [
                     'owned' => $totalInstancesOwned = $this->cardInstanceRepository->count(
-                        search: $this->search,
+                        search: trim($this->search),
                         set: $this->set,
                         onlyOwned: true
                     ),
                     'total' => $totalInstancesTotal = $this->cardInstanceRepository->count(
-                        search: $this->search,
+                        search: trim($this->search),
                         set: $this->set,
                         onlyOwned: $this->onlyOwned
                     ),

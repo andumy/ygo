@@ -68,7 +68,9 @@ class Bulk extends Component
                 break;
             }
 
-            $code = mb_strtoupper($set) . ($version == 2 ? '-EN' : ($version == 1 ? '-E' : '-')) . $cardIndex;
+            $code = mb_strtoupper($set) .
+                ($version == 2 ? '-EN' : ($version == 1 ? '-E' : '-')) .
+                mb_strtoupper($cardIndex);
 
             $lang = Lang::from(mb_strtoupper($lang));
             $condition = Condition::revertShortHand(mb_strtoupper($condition));
