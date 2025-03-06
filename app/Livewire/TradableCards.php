@@ -11,6 +11,8 @@ use App\Repositories\SetRepository;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use function array_fill;
+use function dd;
+use function in_array;
 use function max;
 
 class TradableCards extends Component
@@ -67,7 +69,7 @@ class TradableCards extends Component
                     'collectable' => ($ownedCard->sale === Sale::IN_COLLECTION ? $ownedCard->amount : 0) + ($currentElement['collectable'] ?? 0),
                     'tradable' => ($ownedCard->sale === Sale::TRADE ? $ownedCard->amount : 0) + ($currentElement['tradable'] ?? 0),
                     'not_set' => ($ownedCard->sale === Sale::NOT_SET ? $ownedCard->amount : 0) + ($currentElement['not_set'] ?? 0),
-
+                    'at_least_one_collected' => $this->ownedCardRepository->atLeastOneCollected($cardInstance->card_set_code),
                 ];
 
                 $currentElement['new_collectable'] = $currentElement['collectable'];
@@ -91,7 +93,6 @@ class TradableCards extends Component
                     [$ownedCard->cond->value]
                     [(int)$ownedCard->is_first_edition] = $currentElement;
             }
-
         }
     }
 

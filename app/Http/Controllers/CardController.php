@@ -46,19 +46,37 @@ class CardController extends Controller
         $cardName = $request->get('card');
         $code = $request->get('code');
         $orderName = $request->get('order');
+        $version = $request->get('version');
         $rarity = Rarities::tryFrom($request->get('rarity'));
         $isFirstEdition = (bool)$request->get('is_first_edition');
         $lang = Lang::from($request->get('lang') ?? 'EN');
         $condition = Condition::from($request->get('condition') ?? 'NM');
+
+
 
         $batch = $ownedCardRepository->fetchNextBatch();
 
         $order = $orderRepository->firstOrCreate($orderName);
         $card = $cardRepository->findByName($cardName);
         /** @var Collection<CardInstance> $cardInstance */
-        $cardInstances = $card->cardInstances->filter(function (CardInstance $instance) use ($code, $rarity) {
-            return str_contains($instance->card_set_code , $code) &&
-                ($rarity === null || $instance->rarity_verbose->value === $rarity->value);
+        $cardInstances = $card->cardInstances->filter(function (CardInstance $instance) use ($code, $rarity, $version) {
+            $cond = false;
+            switch ($version){
+                case 0:
+                    $cond = str_contains($instance->card_set_code , "$code-EN");
+                    break;
+                case 1:
+                    $cond = !str_contains($instance->card_set_code , "$code-EN") &&
+                        str_contains($instance->card_set_code , "$code-E");
+                    break;
+                case 2:
+                    $cond = !str_contains($instance->card_set_code , "$code-EN") &&
+                        !str_contains($instance->card_set_code , "$code-E") &&
+                        str_contains($instance->card_set_code , "$code-");
+                    break;
+            }
+
+            return $cond && ($rarity === null || $instance->rarity_verbose->value === $rarity->value);
         });
 
 

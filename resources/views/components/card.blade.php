@@ -18,7 +18,7 @@
                 class="sepia opacity-80 w-60"
             @endif
             @if($card->isOwned)
-                @if($setCode && $setCode !== "" && !$card->cardInstances->contains(fn($ci) => str_contains($ci->card_set_code,$setCode) && $ci->ownedCards->reduce(fn($c, $oc) => $c + $oc->amount,0) > 0))
+                @if($setCode && $setCode !== "" && !$card->cardInstances->contains(fn($ci) => str_contains($ci->card_set_code,$setCode) && $ci->ownedCards->count() > 0))
                     class="opacity-50 w-60"
                 @else
                     class="w-60"
@@ -78,7 +78,7 @@
                 @endif
 
                 <p data-tooltip-target="{{$instance->id}}"
-                   class="text-md m-0"> {{$instance->card_set_code}} {{$instance->rarity}}
+                   class="text-md m-0"> {{$instance->card_set_code}} {{$instance->shortRarity}}
                     : {{$instance->price?->price ?? '-'}} €</p>
             </div>
         @endforeach

@@ -115,12 +115,25 @@ class Cards extends Component
                 $this->prices[$cardInstance->id] = $cardInstance->price->price ?? 0;
 
                 foreach ($this->ownedCardRepository->fetchByInstanceGroupByAllOverAmount($cardInstance->id) as $ownedCard){
-                    $this->ownedCards
+                    if(
+                        $this->ownedCards
                         [$cardInstance->id]
                         [$ownedCard->lang->value]
                         [$ownedCard->cond->value]
-                        [(int)$ownedCard->is_first_edition] =
-                            $ownedCard->amount ?? 0;
+                        [(int)$ownedCard->is_first_edition] ?? null
+                    ) {
+                        $this->ownedCards
+                        [$cardInstance->id]
+                        [$ownedCard->lang->value]
+                        [$ownedCard->cond->value]
+                        [(int)$ownedCard->is_first_edition] += $ownedCard->amount;
+                    } else {
+                        $this->ownedCards
+                        [$cardInstance->id]
+                        [$ownedCard->lang->value]
+                        [$ownedCard->cond->value]
+                        [(int)$ownedCard->is_first_edition] = $ownedCard->amount ?? 0;
+                    }
                 }
             }
         }

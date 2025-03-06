@@ -82,6 +82,13 @@ class OwnedCardRepository
             ->get();
     }
 
+    public function atLeastOneCollected(string $code): bool
+    {
+        return OwnedCard::whereHas('cardInstance', fn($query) => $query->where('card_set_code', $code))
+            ->where('sale', Sale::IN_COLLECTION)
+            ->exists();
+    }
+
     public function fetchNextBatch(): int
     {
         return OwnedCard::max('batch') + 1;
