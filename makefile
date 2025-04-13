@@ -30,4 +30,3 @@ regenerate-env:
 fetch:
 	php artisan fetch:cards
 	php artisan fetch:images
-	php artisan fetch:prices

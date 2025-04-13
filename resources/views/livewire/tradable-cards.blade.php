@@ -51,10 +51,15 @@
                                     {{$ownedCard['not_set'] == 0 ? 'text-green-400' : 'text-white'}}
                                     {{$ownedCard['not_set'] == 0 ? '' : ($ownedCard['not_set'] < 0 ? 'bg-red-900' : 'bg-black')}}
                                 ">{{ $ownedCard['not_set'] }}</td>
-                                <td class="px-2 text-center"><input type="number" class="w-[100px]" wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_collectable" wire:blur="revalidate"></td>
-                                <td class="px-2 text-center"><input type="number" class="w-[100px]" wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_tradable" wire:blur="revalidate"></td>
-                                <td class="px-2 text-center"><img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-full w-auto pe-2"></td>
-                                <td class="px-2 text-center">{!! Condition::from($cond)->getShortHand() !!}</td>
+                                <td class="px-2 text-center"><input type="number" class="w-[100px]"
+                                                                    wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_collectable"
+                                                                    wire:blur="revalidate"></td>
+                                <td class="px-2 text-center"><input type="number" class="w-[100px]"
+                                                                    wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_tradable"
+                                                                    wire:blur="revalidate"></td>
+                                <td class="px-2 text-center"><img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}"
+                                                                  class="h-full w-auto pe-2"></td>
+                                <td class="px-2 text-center">{!! Condition::from($cond)->getShortHandRender() !!}</td>
                                 <td class="px-2 text-center">{!! $isFirstEd ? '<span>✔️</span>' : '' !!}</td>
                             </tr>
                         @endforeach

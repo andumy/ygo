@@ -43,7 +43,8 @@ class PurchaseRecommendation extends Component
             ];
         })->filter(fn ($s) => $s['total'] > 0 && $s['total'] !== $s['owned']);
 
-        $this->recommendedSets = $sets->sortBy([
+        $this->recommendedSets = $sets->filter(fn($s) => $s['total'] > 10)
+        ->sortBy([
             ['missing', 'desc']
         ])->toArray();
 

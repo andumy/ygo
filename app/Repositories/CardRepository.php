@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Card;
+use App\Models\CardInstance;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -86,7 +87,7 @@ class CardRepository
     }
 
     public function countOwnedAndOrderedInsideSet(string $set = ''): int {
-        return $this->searchQuery(set: $set)
+        return $this->searchQuery(set: $set, includeVariants: false)
             ->whereHas('cardInstances', function ($query) use($set) {
                 $query->whereHas('set', fn($q) => $q->where('name', $set))
                     ->where(function($q){
@@ -124,6 +125,17 @@ class CardRepository
             ->when(!$includeVariants, function($q) {
                 return $q->whereNull('card_id');
             })
-            ->whereHas('cardInstances');
+            ->whereHas('cardInstances')
+            ->when($set !== '', function($q) use ($set) {
+                return $q->orderBy(
+                    CardInstance::select('card_set_code')
+                        ->whereColumn('card_instances.card_id', 'cards.id')
+                        ->whereHas('set', function ($qq) use ($set) {
+                            $qq->where('name', $set);
+                        })
+                        ->orderBy('card_set_code')
+                        ->limit(1)
+                );
+            });
     }
 }

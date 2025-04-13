@@ -144,12 +144,14 @@ class Cards extends Component
                     'owned' => $totalCardsOwned = $this->cardRepository->count(
                         search: trim($this->search),
                         set: $this->set,
-                        onlyOwned: true
+                        onlyOwned: true,
+                        includeVariants: false
                     ),
                     'total' => $totalCardsTotal = $this->cardRepository->count(
                         search: trim($this->search),
                         set: $this->set,
-                        onlyOwned: $this->onlyOwned
+                        onlyOwned: $this->onlyOwned,
+                        includeVariants: false
                     ),
                     'percentage' => $totalCardsTotal != 0 ?
                         round($totalCardsOwned / $totalCardsTotal * 100,2) : 0,
@@ -158,12 +160,14 @@ class Cards extends Component
                     'owned' => $totalInstancesOwned = $this->cardInstanceRepository->count(
                         search: trim($this->search),
                         set: $this->set,
-                        onlyOwned: true
+                        onlyOwned: true,
+                        includeVariants: false
                     ),
                     'total' => $totalInstancesTotal = $this->cardInstanceRepository->count(
                         search: trim($this->search),
                         set: $this->set,
-                        onlyOwned: $this->onlyOwned
+                        onlyOwned: $this->onlyOwned,
+                        includeVariants: false
                     ),
                     'percentage' => $totalInstancesTotal != 0 ?
                         round($totalInstancesOwned / $totalInstancesTotal * 100,2) : 0,

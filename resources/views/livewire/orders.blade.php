@@ -21,10 +21,10 @@
     <div class="py-10 flex justify-between">
         <div class="flex">
             <input
-                class="appearance-none border rounded text-black"
-                type="text"
-                wire:model="orderName"
-                placeholder="Order name"
+                    class="appearance-none border rounded text-black"
+                    type="text"
+                    wire:model="orderName"
+                    placeholder="Order name"
             >
             <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded"
                     wire:click="addOrder">
@@ -77,8 +77,9 @@
                     }}
                     ">{{$oc->cardInstance->card->name}}</td>
                     <td class="text-center px-2">{{$oc->cardInstance->card_set_code}}</td>
-                    <td class="text-center px-2"><img src="{{$oc->lang->getFlag()}}" alt="{{$oc->lang->value}}" class="h-[14px]"></td>
-                    <td class="text-center px-2">{!! $oc->cond->getShortHand() !!}</td>
+                    <td class="text-center px-2"><img src="{{$oc->lang->getFlag()}}" alt="{{$oc->lang->value}}"
+                                                      class="h-[14px]"></td>
+                    <td class="text-center px-2">{!! $oc->cond->getShortHandRender() !!}</td>
                     <td class="text-center px-2">{!! $oc->is_first_edition ? '<span>✔️</span>' : '' !!}</td>
                     <td class="text-center px-2">{{$oc->amount}}</td>
                 </tr>

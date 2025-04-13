@@ -11,20 +11,20 @@
 <div class="flex text-stone-400 relative items-center border-b-2 border-cyan-700 p-4 my-5" data-hide-tooltip="true">
     <div class="flex flex-col w-100">
         <img
-            @if($card->isMissing)
-                class="grayscale opacity-80 w-60"
-            @endif
-            @if($card->isOrdered)
-                class="sepia opacity-80 w-60"
-            @endif
-            @if($card->isOwned)
-                @if($setCode && $setCode !== "" && !$card->cardInstances->contains(fn($ci) => str_contains($ci->card_set_code,$setCode) && $ci->ownedCards->count() > 0))
-                    class="opacity-50 w-60"
+                @if($card->isMissing)
+                    class="grayscale opacity-80 w-60"
+                @endif
+                @if($card->isOrdered)
+                    class="sepia opacity-80 w-60"
+                @endif
+                @if($card->isOwned)
+                    @if($setCode && $setCode !== "" && !$card->cardInstances->contains(fn($ci) => str_contains($ci->card_set_code,$setCode) && $ci->ownedCards->count() > 0))
+                        class="opacity-50 w-60"
                 @else
                     class="w-60"
                 @endif
-            @endif
-            src="
+                @endif
+                src="
                 @if (file_exists(public_path('storage/'. $card->ygo_id . '.jpg')))
                     {{asset('storage/'. $card->ygo_id . '.jpg')}}
                 @elseif (file_exists(public_path('storage/'. $card->ygo_id . '.png')))
@@ -105,18 +105,18 @@
                                         </div>
                                         @foreach(Condition::cases() as $condition)
                                             <div class="flex flex-col px-1">
-                                                {!! $condition->getShortHand() !!}
+                                                {!! $condition->getShortHandRender() !!}
                                                 <input
-                                                    class="appearance-none border rounded text-black w-[50px] my-2"
-                                                    type="number"
-                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
-                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
+                                                        class="appearance-none border rounded text-black w-[50px] my-2"
+                                                        type="number"
+                                                        wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
+                                                        id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
                                                 >
                                                 <input
-                                                    class="appearance-none border rounded text-black w-[50px]"
-                                                    type="number"
-                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
-                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
+                                                        class="appearance-none border rounded text-black w-[50px]"
+                                                        type="number"
+                                                        wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
+                                                        id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
                                                 >
                                             </div>
                                         @endforeach
