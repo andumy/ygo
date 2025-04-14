@@ -49,12 +49,19 @@ class CardRepository
         return Card::where('name', $name)->orWhere('alias', $name)->first();
     }
 
-    public function paginate(string $search, string $set, int $pagination, ?bool $onlyOwned = null)
+    public function paginate(
+        string $search,
+        string $set,
+        int $pagination,
+        ?bool $onlyOwned = null,
+        bool $includeVariants = false
+    )
     {
         return $this->searchQuery(
             search: $search,
             set: $set,
-            onlyOwned: $onlyOwned
+            onlyOwned: $onlyOwned,
+            includeVariants: $includeVariants
         )->paginate($pagination);
     }
 
@@ -77,7 +84,12 @@ class CardRepository
         return Card::where('ygo_id', $id)->first();
     }
 
-    public function count(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $includeVariants = true): int {
+    public function count(
+        string $search = '',
+        string $set = '',
+        ?bool $onlyOwned = null,
+        bool $includeVariants = true
+    ): int {
         return $this->searchQuery(
             search: $search,
             set: $set,
@@ -96,7 +108,12 @@ class CardRepository
             })->count();
     }
 
-    public function searchQuery(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $includeVariants = true) {
+    public function searchQuery(
+        string $search = '',
+        string $set = '',
+        ?bool $onlyOwned = null,
+        bool $includeVariants = true
+    ) {
         return Card::when($search !== '', function($q) use ($search){
             return $q->where(function ($qq) use ($search) {
                 $qq
@@ -108,26 +125,37 @@ class CardRepository
             });
         })
             ->when($set !== '', function($q) use ($set) {
-                return $q->whereHas('sets', function ($qq) use ($set) {
+                $q->whereHas('sets', function ($qq) use ($set) {
                     $qq->where('name', $set);
                 });
             })
-            ->when($onlyOwned === false, function($q) {
-                return $q->whereDoesntHave('cardInstances', function ($qq) {
+            ->when($onlyOwned === false, function($q) use ($set) {
+                $q->whereDoesntHave('cardInstances', function ($qq) use ($set) {
                     $qq->whereHas('ownedCards');
+                    if($set !== '') {
+                        $qq->whereHas('set', function ($qqq) use ($set) {
+                            $qqq->where('name', $set);
+                        });
+                    }
                 });
+
             })
-            ->when($onlyOwned, function($q) {
-                return $q->whereHas('cardInstances', function ($qq) {
+            ->when($onlyOwned, function($q) use ($set) {
+                $q->whereHas('cardInstances', function ($qq) use ($set) {
                     $qq->whereHas('ownedCards');
+                    if($set !== '') {
+                        $qq->whereHas('set', function ($qqq) use ($set) {
+                            $qqq->where('name', $set);
+                        });
+                    }
                 });
             })
             ->when(!$includeVariants, function($q) {
-                return $q->whereNull('card_id');
+                $q->whereNull('card_id');
             })
             ->whereHas('cardInstances')
             ->when($set !== '', function($q) use ($set) {
-                return $q->orderBy(
+                $q->orderBy(
                     CardInstance::select('card_set_code')
                         ->whereColumn('card_instances.card_id', 'cards.id')
                         ->whereHas('set', function ($qq) use ($set) {

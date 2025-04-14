@@ -42,13 +42,15 @@
         </div>
     </div>
     <div class="py-10 flex flex-col xl:flex-row justify-center xl:justify-end">
-        <div class="flex">
-            <select id="onlyOwned" name="onlyOwned" wire:model="onlyOwned" wire:change="refresh">
-                <option value="">All</option>
-                <option value="1">Owned</option>
-                <option value="0">Missing</option>
-            </select>
-        </div>
+        <select id="showVariants" name="showVariants" wire:model.boolean="showVariants" wire:change="refresh" class="my-4 xl:mx-4 xl:my-0">
+            <option value="0">No Variants</option>
+            <option value="1">With Variants</option>
+        </select>
+        <select id="onlyOwned" name="onlyOwned" wire:model="onlyOwned" wire:change="refresh" class="my-4 xl:mx-4 xl:my-0">
+            <option value="all">All</option>
+            <option value="owned">Owned</option>
+            <option value="missing">Missing</option>
+        </select>
         <select wire:model="set" wire:change="refresh" class="my-4 xl:mx-4 xl:my-0">
             <option value="">All sets</option>
             @foreach($sets as $s)
