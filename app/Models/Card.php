@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -56,9 +57,9 @@ class Card extends Model
     }
 
 
-    public function original(): HasOne
+    public function original(): BelongsTo
     {
-        return $this->hasOne(Card::class);
+        return $this->belongsTo(Card::class, 'card_id', 'id');
     }
 
     public function variants(): HasMany

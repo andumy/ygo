@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property ?int $batch
  * @property ?int $order_id
  * @property Order $order
+ * @property Variant $variant
+ * @property int $variant_id
  */
 class OwnedCard extends Model
 {
@@ -39,6 +41,11 @@ class OwnedCard extends Model
     public function cardInstance(): BelongsTo
     {
         return $this->belongsTo(CardInstance::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(Variant::class);
     }
 
     public function order(): BelongsTo

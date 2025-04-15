@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('variants', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('card_instance_id')->constrained('card_instances');
+            $table->string('ygo_id');
+            $table->unique(['card_instance_id', 'ygo_id'], 'card_instance_id_ygo_id_unique');
         });
     }
 
