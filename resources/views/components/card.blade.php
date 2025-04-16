@@ -8,7 +8,7 @@
 @endphp
 <div class="flex text-stone-400 relative items-start p-4 my-5">
     <div class="flex flex-col">
-        <a href="/card/{{$card->id}}">
+        <a href="/all-variants-for-card/{{$card->id}}">
             <img
                 @if($card->isMissing)
                     class="grayscale opacity-80 w-60"
@@ -44,60 +44,6 @@
                 onclick="copyName('code-{{$card->id}}')">{{ $card->codeForSet($set) }}</h4>
         @endif
     </div>
-
-{{--    <div class="flex flex-col w-100 ps-5">--}}
-{{--        @foreach($card->cardInstances->filter(fn($ci) => !($setCode && $setCode !== "" && !str_contains($ci->card_set_code,$setCode))) as $instance)--}}
-{{--            <div id="tooltip-{{$instance->id}}"--}}
-{{--                 class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">--}}
-{{--                <div class="flex flex-col">--}}
-{{--                    <div class="flex justify-center items-center">--}}
-{{--                        <b>{{$instance->card_set_code}}</b>--}}
-{{--                    </div>--}}
-{{--                    <div class="p-2 flex flex-row">--}}
-{{--                        @foreach(Lang::cases() as $index => $lang)--}}
-{{--                            @if($index % 6 == 0)--}}
-{{--                                <div class="flex flex-col p-2">--}}
-{{--                                    @endif--}}
-{{--                                    <div class="flex justify-center items-center pb-4">--}}
-{{--                                        <div class="flex flex-col justify-between items-center h-full">--}}
-{{--                                            <img src="{{$lang->getFlag()}}" alt="{{$lang->value}}"--}}
-{{--                                                 class="h-[20px] w-auto pe-2">--}}
-{{--                                            <span>1st</span>--}}
-{{--                                        </div>--}}
-{{--                                        @foreach(Condition::cases() as $condition)--}}
-{{--                                            <div class="flex flex-col px-1">--}}
-{{--                                                {!! $condition->getShortHandRender() !!}--}}
-{{--                                                <input--}}
-{{--                                                    class="appearance-none border rounded text-black w-[50px] my-2"--}}
-{{--                                                    type="number"--}}
-{{--                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"--}}
-{{--                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"--}}
-{{--                                                >--}}
-{{--                                                <input--}}
-{{--                                                    class="appearance-none border rounded text-black w-[50px]"--}}
-{{--                                                    type="number"--}}
-{{--                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"--}}
-{{--                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"--}}
-{{--                                                >--}}
-{{--                                            </div>--}}
-{{--                                        @endforeach--}}
-{{--                                    </div>--}}
-{{--                                    @if($index % 6 == 5)--}}
-{{--                                </div>--}}
-{{--                            @endif--}}
-{{--                        @endforeach--}}
-{{--                        @if(count(Lang::cases()) % 6 != 0)--}}
-{{--                    </div>--}}
-{{--                    @endif--}}
-{{--                </div>--}}
-{{--                <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded"--}}
-{{--                        wire:click="updateOwn({{$instance->id}})">--}}
-{{--                    Update Own--}}
-{{--                </button>--}}
-{{--            </div>--}}
-{{--    </div>--}}
-{{--    @endforeach--}}
-{{--    </div>--}}
 </div>
 
 

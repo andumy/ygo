@@ -18,7 +18,7 @@
         @foreach($card->variantCards as $variantCard)
             <div class="flex text-stone-400 relative items-start p-4 my-5">
                 <div class="flex flex-col w-100">
-                    <a href="/variant/{{$variantCard->id}}">
+                    <a href="/single-variant-card/{{$variantCard->id}}">
                         <img
                             @if($variantCard->isMissing)
                                 class="grayscale opacity-80 w-60"
@@ -39,14 +39,14 @@
                         >
                     </a>
                     @if(!$variantCard->is_original)
-                        <div class="absolute bg-red-600 w-[20px] h-[20px] rounded-full top-[-10px] left-[-10px]"></div>
+                        <div class="absolute bg-red-200 w-[40px] h-[40px] rounded-full top-[-10px] right-[-10px] text-white flex items-center justify-center">alt</div>
                     @endif
-                    <p id="id-{{$card->id}}"
+                    <h2 id="card-{{$variantCard->id}}"
+                        class="text-lg text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pt-2"
+                        onclick="copyName('card-{{$variantCard->id}}')">{{ $card->name }}</h2>
+                    <p id="id-{{$variantCard->id}}"
                        class="text-md text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400"
-                       onclick="copyName('id-{{$card->id}}')">{{ $variantCard->ygo_id }}</p>
-                    <h2 id="card-{{$card->id}}"
-                        class="text-lg text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2"
-                        onclick="copyName('card-{{$card->id}}')">{{ $card->name }}</h2>
+                       onclick="copyName('id-{{$variantCard->id}}')">{{ $variantCard->ygo_id }}</p>
                 </div>
             </div>
         @endforeach

@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\Models\Card;
 use Livewire\Component;
 
-class SingleCard extends Component
+class AllVariantsForCard extends Component
 {
     public Card $card;
 
@@ -16,6 +16,6 @@ class SingleCard extends Component
 
     public function render()
     {
-        return view('livewire.single-card');
+        return view('livewire.all-variants-for-card');
     }
 }

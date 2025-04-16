@@ -38,6 +38,8 @@ class Cards extends Component
     public array $ownedCards = [];
     public array $prices = [];
 
+    protected $queryString = ['search'];
+
     private CardRepository $cardRepository;
     private OrderRepository $orderRepository;
     private CardInstanceRepository $cardInstanceRepository;

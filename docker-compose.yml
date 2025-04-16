@@ -17,22 +17,6 @@ services:
         networks:
             - ygo
 
-    ygo-php-old:
-        container_name: ygo-php-old
-        build:
-            context: ./
-            dockerfile: ./docker/php-fpm/Dockerfile
-            args:
-                uid: ${HOST_UID:-1000}
-                gid: ${HOST_GID:-1000}
-        volumes:
-            - .:/var/www/ygo
-            - ./docker/php-fpm/php/php.ini:/usr/local/etc/php/conf.d/php.ini
-        depends_on:
-            - ygo-db
-        networks:
-            - ygo
-
     ygo-nginx:
         container_name: ygo-nginx
         build:
@@ -46,30 +30,12 @@ services:
         depends_on:
             - ygo-db
         ports:
-            - 80:80
+            - ${APP_PORT}:80
         environment:
             - DB_DATABASE=ygo
         networks:
             - ygo
 
-    ygo-nginx-old:
-        container_name: ygo-nginx-old
-        build:
-            context: ./
-            dockerfile: ./docker/nginx/Dockerfile
-            args:
-                uid: ${HOST_UID:-1000}
-                gid: ${HOST_GID:-1000}
-        volumes:
-            - .:/var/www/ygo
-        depends_on:
-            - ygo-db
-        ports:
-            - 8080:80
-        environment:
-            - DB_DATABASE=ygoold
-        networks:
-            - ygo
 
     ygo-db:
         container_name: ygo-db

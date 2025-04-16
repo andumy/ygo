@@ -10,7 +10,7 @@ use App\Models\VariantCard;
 
 <div class="w-screen p-10 text-stone-700">
     <div class="pb-10 flex">
-        <a href="/card/{{$variantCard->cardInstances->first()->card->id}}">
+        <a href="/all-variants-for-card/{{$variantCard->cardInstances->first()->card_id}}" class="hover:text-stone-400">
             <h1 class="text-2xl font-bold">
                 {{$variantCard->cardInstances->first()->card->name}}
             </h1>
@@ -19,9 +19,9 @@ use App\Models\VariantCard;
             &nbsp;- {{$variantCard->ygo_id}}
         </h1>
     </div>
-    <div class="flex text-stone-400 relative items-center border-b-2 border-cyan-700 p-4 my-5"
+    <div class="flex text-stone-400 relative items-start flex-col p-4 my-5"
          data-hide-tooltip="true">
-        <div class="flex flex-col w-100">
+        <div class="flex flex-col w-screen items-center">
             <img
                 @if($variantCard->isMissing)
                     class="grayscale opacity-80 w-60"
@@ -40,56 +40,63 @@ use App\Models\VariantCard;
         @endif
     "
             >
-            @if(!$variantCard->is_original)
-                <div class="absolute bg-red-600 w-[20px] h-[20px] rounded-full top-[-10px] left-[-10px]"></div>
-            @endif
+            <h2 id="card-{{$variantCard->id}}"
+                class="text-lg text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pt-2"
+                onclick="copyName('card-{{$variantCard->id}}')">{{ $variantCard->cardInstances->first()->card->name }}</h2>
             <p id="id-{{$variantCard->id}}"
                class="text-md text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400"
                onclick="copyName('id-{{$variantCard->id}}')">{{ $variantCard->ygo_id }}</p>
-            <h2 id="card-{{$variantCard->id}}"
-                class="text-lg text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2"
-                onclick="copyName('card-{{$variantCard->id}}')">{{ $variantCard->cardInstances->first()->card->name }}</h2>
+
         </div>
-        <div class="flex flex-col w-100 ps-5">
-            @foreach($variantCard->variants as $variant)
-                <div class="flex flex-row justify-start items-center relative has-tooltip cursor-pointer
-                @if(!$variant->isMissing)
-                     font-bold
-                     @if($variant->isOwned)
-                         text-cyan-500
-                     @else
-                        text-yellow-500
-                     @endif
-                @endif">
-                    @if($variant->isOrdered)
-                        <div class="flex flex-col items-start justify-center">
-                            @foreach($variant->orderAmountByLang as $lang => $amount)
-                                <div class="flex flex-row items-center justify-start">
-                                    <p class="text-md text-yellow-500 px-1">{{ $amount }} </p>
-                                    <img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-[14px]">
-                                </div>
-                            @endforeach
-                        </div>
-                        <p class="text-md text-yellow-500 px-1"> x </p>
-                    @endif
+        <div class="flex flex-col ps-5">
+            <table class="w-screen">
+                <tbody>
+                    @foreach($variantCard->variants as $variant)
+                        <tr class="py-2 border-b-2">
+                            <td>
+                                <a href="/single-variant/{{$variant->id}}" class="flex flex-row justify-start items-start relative py-1
+                            @if(!$variant->isMissing)
+                                 font-bold
+                                 @if($variant->isOwned)
+                                     text-cyan-500
+                                 @else
+                                    text-yellow-500
+                                 @endif
+                            @endif">
+                                    @if($variant->isOrdered)
+                                        <div class="flex flex-col items-start justify-center">
+                                            @foreach($variant->orderAmountByLang as $lang => $amount)
+                                                <div class="flex flex-row items-center justify-start">
+                                                    <p class="text-md text-yellow-500 px-1">{{ $amount }} </p>
+                                                    <img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-[14px]">
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <p class="text-md text-yellow-500 px-1"> x </p>
+                                    @endif
 
-                    @if($variant->isOwned)
-                        <div class="flex flex-col items-start justify-center">
-                            @foreach($variant->ownAmountByLang as $lang => $amount)
-                                <div class="flex flex-row items-center justify-start">
-                                    <p class="text-md text-cyan-500 px-1">{{ $amount }} </p>
-                                    <img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-[14px]">
-                                </div>
-                            @endforeach
-                        </div>
-                        <p class="text-md text-cyan-500 px-1"> x </p>
-                    @endif
+                                    @if($variant->isOwned)
+                                        <div class="flex flex-col items-start justify-center">
+                                            @foreach($variant->ownAmountByLang as $lang => $amount)
+                                                <div class="flex flex-row items-center justify-start">
+                                                    <p class="text-md text-cyan-500 px-1">{{ $amount }} </p>
+                                                    <img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-[14px]">
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <p class="text-md text-cyan-500 px-1"> x </p>
+                                    @endif
 
-                    <p data-tooltip-target="{{$variant->id}}"
-                       class="text-md m-0"> {{$variant->cardInstance->card_set_code}} {{$variant->cardInstance->shortRarity}}
-                        : {{$variant->cardInstance->price?->price ?? '-'}} €</p>
-                </div>
-            @endforeach
+                                    <p data-tooltip-target="{{$variant->id}}"
+                                       class="text-md m-0"> {{$variant->cardInstance->card_set_code}} {{$variant->cardInstance->shortRarity}}
+                                        : {{$variant->cardInstance->price?->price ?? '-'}} €</p>
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
         </div>
     </div>
 </div>
