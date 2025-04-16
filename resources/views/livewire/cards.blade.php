@@ -64,10 +64,39 @@
         >
     </div>
     {{$cards->links()}}
-    <div class="flex flex-col py-5">
+    <div class="py-5 grid gap-3 grid-cols-1 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-7 grid-rows-1">
         @foreach($cards as $card)
             @include('components.card', ['card' => $card])
         @endforeach
     </div>
     {{$cards->links()}}
 </div>
+
+<script>
+    function registerTooltips() {
+        document.body.addEventListener('click', function (event) {
+            const tooltip = event.target.getAttribute('data-tooltip-target');
+            const hideTooltip = event.target.getAttribute('data-hide-tooltip');
+
+            if (hideTooltip) {
+                hideAllTooltips();
+            }
+
+            if (!tooltip) {
+                return;
+            }
+            hideAllTooltips();
+            document.getElementById('tooltip-' + tooltip)?.classList.remove('hidden');
+        });
+    }
+
+    function hideAllTooltips() {
+        document.querySelectorAll('.js-tooltip').forEach((element) => {
+            element.classList.add('hidden');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        registerTooltips();
+    });
+</script>

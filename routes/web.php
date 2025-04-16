@@ -7,6 +7,7 @@ use App\Livewire\Orders;
 use App\Livewire\PurchaseRecommendation;
 use App\Livewire\SetsAndInstances;
 use App\Livewire\SingleCard;
+use App\Livewire\SingleVariantCard;
 use App\Livewire\TradableCards;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::get('/tradable', TradableCards::class);
 Route::get('/bulk', Bulk::class);
 
 Route::get('/card/{card}', SingleCard::class);
+Route::get('/variant/{variantCard}', SingleVariantCard::class);
 
 
 Route::get('/card-info', [CardController::class, 'cardInfo']);

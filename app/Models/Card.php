@@ -60,6 +60,11 @@ class Card extends Model
         );
     }
 
+    public function codeForSet(string $set): string {
+        return $this->cardInstances()->whereHas('set', fn ($q) => $q->where('name', $set))
+            ->first()->card_set_code ?? '';
+    }
+
     public function variants(): HasManyThrough
     {
         return $this->hasManyThrough(Variant::class, CardInstance::class);

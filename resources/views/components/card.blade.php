@@ -1,6 +1,4 @@
 @php
-    use App\Enums\Condition;
-    use App\Enums\Lang;
     use App\Models\Card;
     use App\Models\CardInstance;
     /**
@@ -8,8 +6,8 @@
     * @var CardInstance $instance
     * */
 @endphp
-<div class="flex text-stone-400 relative items-center border-b-2 border-cyan-700 p-4 my-5" data-hide-tooltip="true">
-    <div class="flex flex-col w-100">
+<div class="flex text-stone-400 relative items-start p-4 my-5">
+    <div class="flex flex-col">
         <a href="/card/{{$card->id}}">
             <img
                 @if($card->isMissing)
@@ -37,135 +35,69 @@
         @if($card->card_id)
             <div class="absolute bg-red-600 w-[20px] h-[20px] rounded-full top-[-10px] left-[-10px]"></div>
         @endif
-        <p id="id-{{$card->id}}"
-           class="text-md text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400"
-           onclick="copyName('id-{{$card->id}}')">{{ $card->ygoId }}</p>
         <h2 id="card-{{$card->id}}"
-            class="text-lg text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2"
+            class="text-lg text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pt-2"
             onclick="copyName('card-{{$card->id}}')">{{ $card->name }}</h2>
-    </div>
-    <div class="flex flex-col w-100 ps-5">
-        @foreach($card->cardInstances->filter(fn($ci) => !($setCode && $setCode !== "" && !str_contains($ci->card_set_code,$setCode))) as $instance)
-            <div class="flex flex-row justify-start items-center relative has-tooltip cursor-pointer
-        @if(!$instance->isMissing)
-             font-bold
-             @if($instance->isOwned)
-                 text-cyan-500
-             @else
-                text-yellow-500
-             @endif
-        @endif">
-                @if($instance->isOrdered)
-                    <div class="flex flex-col items-start justify-center">
-                        @foreach($instance->orderAmountByLang as $lang => $amount)
-                            <div class="flex flex-row items-center justify-start">
-                                <p class="text-md text-yellow-500 px-1">{{ $amount }} </p>
-                                <img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-[14px]">
-                            </div>
-                        @endforeach
-                    </div>
-                    <p class="text-md text-yellow-500 px-1"> x </p>
-                @endif
-
-                @if($instance->isOwned)
-                    <div class="flex flex-col items-start justify-center">
-                        @foreach($instance->ownAmountByLang as $lang => $amount)
-                            <div class="flex flex-row items-center justify-start">
-                                <p class="text-md text-cyan-500 px-1">{{ $amount }} </p>
-                                <img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}" class="h-[14px]">
-                            </div>
-                        @endforeach
-                    </div>
-                    <p class="text-md text-cyan-500 px-1"> x </p>
-                @endif
-
-                <p data-tooltip-target="{{$instance->id}}"
-                   class="text-md m-0"> {{$instance->card_set_code}} {{$instance->shortRarity}}
-                    : {{$instance->price?->price ?? '-'}} €</p>
-            </div>
-        @endforeach
+        @if($set)
+            <h4 id="code-{{$card->id}}"
+                class="text-sm text-center text-stone-500 hover:text-stone-3 cursor-pointer hover:text-stone-400 pt-2"
+                onclick="copyName('code-{{$card->id}}')">{{ $card->codeForSet($set) }}</h4>
+        @endif
     </div>
 
-    <div class="flex flex-col w-100 ps-5">
-        @foreach($card->cardInstances->filter(fn($ci) => !($setCode && $setCode !== "" && !str_contains($ci->card_set_code,$setCode))) as $instance)
-            <div id="tooltip-{{$instance->id}}"
-                 class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
-                <div class="flex flex-col">
-                    <div class="flex justify-center items-center">
-                        <b>{{$instance->card_set_code}}</b>
-                    </div>
-                    <div class="p-2 flex flex-row">
-                        @foreach(Lang::cases() as $index => $lang)
-                            @if($index % 6 == 0)
-                                <div class="flex flex-col p-2">
-                                    @endif
-                                    <div class="flex justify-center items-center pb-4">
-                                        <div class="flex flex-col justify-between items-center h-full">
-                                            <img src="{{$lang->getFlag()}}" alt="{{$lang->value}}"
-                                                 class="h-[20px] w-auto pe-2">
-                                            <span>1st</span>
-                                        </div>
-                                        @foreach(Condition::cases() as $condition)
-                                            <div class="flex flex-col px-1">
-                                                {!! $condition->getShortHandRender() !!}
-                                                <input
-                                                    class="appearance-none border rounded text-black w-[50px] my-2"
-                                                    type="number"
-                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
-                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
-                                                >
-                                                <input
-                                                    class="appearance-none border rounded text-black w-[50px]"
-                                                    type="number"
-                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
-                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
-                                                >
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                    @if($index % 6 == 5)
-                                </div>
-                            @endif
-                        @endforeach
-                        @if(count(Lang::cases()) % 6 != 0)
-                    </div>
-                    @endif
-                </div>
-                <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded"
-                        wire:click="updateOwn({{$instance->id}})">
-                    Update Own
-                </button>
-            </div>
-    </div>
-    @endforeach
-    </div>
+{{--    <div class="flex flex-col w-100 ps-5">--}}
+{{--        @foreach($card->cardInstances->filter(fn($ci) => !($setCode && $setCode !== "" && !str_contains($ci->card_set_code,$setCode))) as $instance)--}}
+{{--            <div id="tooltip-{{$instance->id}}"--}}
+{{--                 class="js-tooltip absolute hidden bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">--}}
+{{--                <div class="flex flex-col">--}}
+{{--                    <div class="flex justify-center items-center">--}}
+{{--                        <b>{{$instance->card_set_code}}</b>--}}
+{{--                    </div>--}}
+{{--                    <div class="p-2 flex flex-row">--}}
+{{--                        @foreach(Lang::cases() as $index => $lang)--}}
+{{--                            @if($index % 6 == 0)--}}
+{{--                                <div class="flex flex-col p-2">--}}
+{{--                                    @endif--}}
+{{--                                    <div class="flex justify-center items-center pb-4">--}}
+{{--                                        <div class="flex flex-col justify-between items-center h-full">--}}
+{{--                                            <img src="{{$lang->getFlag()}}" alt="{{$lang->value}}"--}}
+{{--                                                 class="h-[20px] w-auto pe-2">--}}
+{{--                                            <span>1st</span>--}}
+{{--                                        </div>--}}
+{{--                                        @foreach(Condition::cases() as $condition)--}}
+{{--                                            <div class="flex flex-col px-1">--}}
+{{--                                                {!! $condition->getShortHandRender() !!}--}}
+{{--                                                <input--}}
+{{--                                                    class="appearance-none border rounded text-black w-[50px] my-2"--}}
+{{--                                                    type="number"--}}
+{{--                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"--}}
+{{--                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"--}}
+{{--                                                >--}}
+{{--                                                <input--}}
+{{--                                                    class="appearance-none border rounded text-black w-[50px]"--}}
+{{--                                                    type="number"--}}
+{{--                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"--}}
+{{--                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"--}}
+{{--                                                >--}}
+{{--                                            </div>--}}
+{{--                                        @endforeach--}}
+{{--                                    </div>--}}
+{{--                                    @if($index % 6 == 5)--}}
+{{--                                </div>--}}
+{{--                            @endif--}}
+{{--                        @endforeach--}}
+{{--                        @if(count(Lang::cases()) % 6 != 0)--}}
+{{--                    </div>--}}
+{{--                    @endif--}}
+{{--                </div>--}}
+{{--                <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded"--}}
+{{--                        wire:click="updateOwn({{$instance->id}})">--}}
+{{--                    Update Own--}}
+{{--                </button>--}}
+{{--            </div>--}}
+{{--    </div>--}}
+{{--    @endforeach--}}
+{{--    </div>--}}
 </div>
 
-<script>
-    function registerTooltips() {
-        document.body.addEventListener('click', function (event) {
-            const tooltip = event.target.getAttribute('data-tooltip-target');
-            const hideTooltip = event.target.getAttribute('data-hide-tooltip');
 
-            if (hideTooltip) {
-                hideAllTooltips();
-            }
-
-            if (!tooltip) {
-                return;
-            }
-            hideAllTooltips();
-            document.getElementById('tooltip-' + tooltip)?.classList.remove('hidden');
-        });
-    }
-
-    function hideAllTooltips() {
-        document.querySelectorAll('.js-tooltip').forEach((element) => {
-            element.classList.add('hidden');
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        registerTooltips();
-    });
-</script>
