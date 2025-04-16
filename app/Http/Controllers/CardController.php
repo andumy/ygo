@@ -6,6 +6,7 @@ use App\Enums\AddCardStatuses;
 use App\Enums\Condition;
 use App\Enums\Lang;
 use App\Enums\Rarities;
+use App\Models\Card;
 use App\Models\CardInstance;
 use App\Repositories\CardRepository;
 use App\Repositories\OrderRepository;
@@ -19,6 +20,7 @@ use function var_dump;
 
 class CardController extends Controller
 {
+
     public function cardInfo(Request $request, CardRepository $cardRepository)
     {
         $cardName = $request->get('card');

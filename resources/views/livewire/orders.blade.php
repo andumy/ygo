@@ -66,17 +66,17 @@
             <tbody>
             @foreach($orderedCards as $oc)
                 <tr class="py-2">
-                    <td class="text-center px-2">{{$oc->cardInstance->ownedCards->where('lang', $oc->lang)->where('cond', $oc->cond)->where('order_id', $orderId)->pluck('id')->reduce(fn($carry, $id) => "$carry $id",'')}}</td>
+                    <td class="text-center px-2">{{$oc->variant->cardInstance->ownedCards->where('lang', $oc->lang)->where('cond', $oc->cond)->where('order_id', $orderId)->pluck('id')->reduce(fn($carry, $id) => "$carry $id",'')}}</td>
                     <td class="text-center px-2
                     {{
-                            $oc->cardInstance->isOwnedForLang($oc->lang) ? 'text-orange-700' : (
-                                $oc->cardInstance->isOwned ? 'text-amber-400' : (
-                                    $oc->cardInstance->card->isOwned ? 'text-teal-400' : ''
+                            $oc->variant->cardInstance->isOwnedForLang($oc->lang) ? 'text-orange-700' : (
+                                $oc->variant->cardInstance->isOwned ? 'text-amber-400' : (
+                                    $oc->variant->cardInstance->card->isOwned ? 'text-teal-400' : ''
                                 )
                             )
                     }}
-                    ">{{$oc->cardInstance->card->name}}</td>
-                    <td class="text-center px-2">{{$oc->cardInstance->card_set_code}}</td>
+                    ">{{$oc->variant->cardInstance->card->name}}</td>
+                    <td class="text-center px-2">{{$oc->variant->cardInstance->card_set_code}}</td>
                     <td class="text-center px-2"><img src="{{$oc->lang->getFlag()}}" alt="{{$oc->lang->value}}"
                                                       class="h-[14px]"></td>
                     <td class="text-center px-2">{!! $oc->cond->getShortHandRender() !!}</td>

@@ -52,8 +52,9 @@ class CardInstanceRepository
     public function priceForOwnOrOrder(): float
     {
         $result = DB::select(
-    'select sum(p.price) as total from card_instances as ci, owned_cards as oc, prices as p where
-            ci.id = oc.card_instance_id and
+    'select sum(p.price) as total from card_instances as ci, owned_cards as oc, prices as p, variants as v where
+            ci.id = v.card_instance_id and
+            oc.variant_id = v.id and
             ci.id = p.card_instance_id and
             oc.batch is not null'
         );
@@ -61,13 +62,12 @@ class CardInstanceRepository
         return round(current($result)->total, 2);
     }
 
-    public function count(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false, bool $includeVariants = true): int{
+    public function count(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): int{
         $sub = $this->searchQuery(
             search: $search,
             set: $set,
             onlyOwned: $onlyOwned,
             excludeOrdered: $excludeOrdered,
-            includeVariants: $includeVariants
         )->groupBy('card_set_code')->select('card_set_code');
 
         return DB::table( DB::raw("({$sub->toSql()}) as sub") )
@@ -77,43 +77,47 @@ class CardInstanceRepository
     }
 
     /** @return Collection<CardInstance> */
-    public function search(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false, bool $includeVariants = true): Collection{
+    public function search(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): Collection{
         return $this->searchQuery(
             search: $search,
             set: $set,
             onlyOwned: $onlyOwned,
             excludeOrdered: $excludeOrdered,
-            includeVariants: $includeVariants
         )->orderBy('card_set_code')->get();
     }
 
 
-    private function searchQuery(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false, bool $includeVariants = true): Builder {
-        return CardInstance::when($search !== '', function($q) use ($search, $includeVariants){
-            return $q->where(function ($qq) use ($search, $includeVariants) {
+    private function searchQuery(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): Builder {
+        return CardInstance::when($search !== '', function($q) use ($search){
+            $q->where(function ($qq) use ($search) {
                 $qq->where('card_set_code', 'like', '%' . $search . '%')
-                    ->orWhereHas('card', function ($query) use ($search, $includeVariants) {
-                        $query->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('ygo_id', 'like', '%' . $search . '%');
-                        if(!$includeVariants){
-                            $query->whereNull('card_id');
-                        }
-                    });
+                    ->orWhereHas('card', fn ($qqq) => $qqq->where('name', 'like', '%' . $search . '%'))
+                    ->orWhereHas('variants', fn ($qqq) => $qqq->whereHas('variantCard',
+                        fn($qqqq) => $qqqq->where('ygo_id', 'like', '%' . $search . '%')
+                    ));
             });
         })
             ->when($set !== '', function($q) use ($set) {
-                return $q->whereHas('set', function ($qq) use ($set) {
+                $q->whereHas('set', function ($qq) use ($set) {
                     $qq->where('name', $set);
                 });
             })
             ->when($onlyOwned === false, function($q) {
-                return $q->where(fn($qq) => $qq->whereDoesntHave('ownedCards'));
+                $q->where(
+                    fn($qq) => $qq->whereDoesntHave('variants',
+                        fn($qqq) => $qqq->whereHas('ownedCards')
+                    )
+                );
             })
             ->when($onlyOwned, function($q) use ($excludeOrdered){
                 if($excludeOrdered){
-                    return $q->whereHas('ownedCards', fn($q) => $q->whereNull('order_id'));
+                    $q->whereHas('variants', function ($qq) {
+                        $qq->whereHas('ownedCards', fn($q) => $q->whereNull('order_id'));
+                    });
                 } else {
-                    return $q->whereHas('ownedCards');
+                    $q->whereHas('variants', function ($qq) {
+                        $qq->whereHas('ownedCards');
+                    });
                 }
             });
     }

@@ -10,7 +10,8 @@
 @endphp
 <div class="flex text-stone-400 relative items-center border-b-2 border-cyan-700 p-4 my-5" data-hide-tooltip="true">
     <div class="flex flex-col w-100">
-        <img
+        <a href="/card/{{$card->id}}">
+            <img
                 @if($card->isMissing)
                     class="grayscale opacity-80 w-60"
                 @endif
@@ -25,19 +26,20 @@
                 @endif
                 @endif
                 src="
-                @if (file_exists(public_path('storage/'. $card->ygo_id . '.jpg')))
-                    {{asset('storage/'. $card->ygo_id . '.jpg')}}
-                @elseif (file_exists(public_path('storage/'. $card->ygo_id . '.png')))
-                    {{asset('storage/'. $card->ygo_id . '.png')}}
+                @if (file_exists(public_path('storage/'. $card->ygoId . '.jpg')))
+                    {{asset('storage/'. $card->ygoId . '.jpg')}}
+                @elseif (file_exists(public_path('storage/'. $card->ygoId . '.png')))
+                    {{asset('storage/'. $card->ygoId . '.png')}}
                 @endif
             "
-        >
+            >
+        </a>
         @if($card->card_id)
             <div class="absolute bg-red-600 w-[20px] h-[20px] rounded-full top-[-10px] left-[-10px]"></div>
         @endif
         <p id="id-{{$card->id}}"
            class="text-md text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400"
-           onclick="copyName('id-{{$card->id}}')">{{ $card->ygo_id }}</p>
+           onclick="copyName('id-{{$card->id}}')">{{ $card->ygoId }}</p>
         <h2 id="card-{{$card->id}}"
             class="text-lg text-center font-bold text-stone-800 cursor-pointer hover:text-stone-500 pb-2"
             onclick="copyName('card-{{$card->id}}')">{{ $card->name }}</h2>
@@ -107,16 +109,16 @@
                                             <div class="flex flex-col px-1">
                                                 {!! $condition->getShortHandRender() !!}
                                                 <input
-                                                        class="appearance-none border rounded text-black w-[50px] my-2"
-                                                        type="number"
-                                                        wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
-                                                        id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
+                                                    class="appearance-none border rounded text-black w-[50px] my-2"
+                                                    type="number"
+                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
+                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"
                                                 >
                                                 <input
-                                                        class="appearance-none border rounded text-black w-[50px]"
-                                                        type="number"
-                                                        wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
-                                                        id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
+                                                    class="appearance-none border rounded text-black w-[50px]"
+                                                    type="number"
+                                                    wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
+                                                    id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"
                                                 >
                                             </div>
                                         @endforeach
@@ -136,7 +138,7 @@
             </div>
     </div>
     @endforeach
-</div>
+    </div>
 </div>
 
 <script>

@@ -8,20 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Support\Collection;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @property int id
- * @property int ygo_id
+ * @property int ygoId
  * @property int card_id
  * @property string name
  * @property string alias
  * @property string type
  * @property bool has_image
- * @property Card original
- * @property Collection<Card> variants
+ * @property Collection<Variant> variants
+ * @property Collection<VariantCard> variantCards
  * @property Collection<CardInstance> cardInstances
  * @property Collection<Set> sets
  * @property boolean isOwned
@@ -32,6 +35,7 @@ use Illuminate\Support\Collection;
 class Card extends Model
 {
     use HasFactory;
+    use HasRelationships;
 
     public $timestamps = false;
     protected $guarded = [];
@@ -56,15 +60,19 @@ class Card extends Model
         );
     }
 
-
-    public function original(): BelongsTo
+    public function variants(): HasManyThrough
     {
-        return $this->belongsTo(Card::class, 'card_id', 'id');
+        return $this->hasManyThrough(Variant::class, CardInstance::class);
     }
 
-    public function variants(): HasMany
+    public function variantCards(): HasManyDeep
     {
-        return $this->hasMany(Card::class, 'card_id');
+        return $this->hasManyDeepFromRelations($this->variants(), (new Variant())->variantCard());
+    }
+
+    public function getVariantCardsAttribute(): Collection
+    {
+        return $this->variantCards()->distinct()->get();
     }
 
     public function getIsOwnedAttribute(): bool
@@ -83,5 +91,12 @@ class Card extends Model
     public function getIsMissingAttribute(): bool
     {
         return !$this->isOwned && !$this->isOrdered;
+    }
+
+    public function getYgoIdAttribute(): string
+    {
+        /** @var VariantCard $variantCard */
+        $variantCard = $this->variantCards()->where('is_original', 1)->first();
+        return $variantCard->ygo_id;
     }
 }

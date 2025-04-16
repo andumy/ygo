@@ -1,7 +1,7 @@
 <div class="p-10 text-stone-700">
     <div class="pb-10">
         <h1 class="text-2xl font-bold">
-            YU-GI-OH! Sets and instances
+            YU-GI-OH! Purchase Recomandations
         </h1>
     </div>
     <div class="flex justify-between">

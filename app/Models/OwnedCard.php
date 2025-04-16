@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int id
- * @property CardInstance cardInstance
- * @property int card_instance_id
  * @property int amount
  * @property Lang $lang
  * @property Sale $sale
@@ -37,11 +35,6 @@ class OwnedCard extends Model
         'sale' => Sale::class,
         'cond' => Condition::class,
     ];
-
-    public function cardInstance(): BelongsTo
-    {
-        return $this->belongsTo(CardInstance::class);
-    }
 
     public function variant(): BelongsTo
     {

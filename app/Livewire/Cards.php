@@ -24,7 +24,6 @@ class Cards extends Component
     use WithPagination;
 
     public string $onlyOwned = 'all';
-    public bool $showVariants = false;
 
     public string $lang = Lang::ENGLISH->value;
     public string $code = '';
@@ -118,37 +117,37 @@ class Cards extends Component
             set: $this->set,
             pagination: 10,
             onlyOwned: $this->getOwnOnlyAsBool(),
-            includeVariants: $this->showVariants,
         );
 
-        foreach ($cards as $card){
-            foreach ($card->cardInstances as $cardInstance) {
-                $this->ownedCards[$cardInstance->id] = [];
-                $this->prices[$cardInstance->id] = $cardInstance->price->price ?? 0;
-
-                foreach ($this->ownedCardRepository->fetchByInstanceGroupByAllOverAmount($cardInstance->id) as $ownedCard){
-                    if(
-                        $this->ownedCards
-                        [$cardInstance->id]
-                        [$ownedCard->lang->value]
-                        [$ownedCard->cond->value]
-                        [(int)$ownedCard->is_first_edition] ?? null
-                    ) {
-                        $this->ownedCards
-                        [$cardInstance->id]
-                        [$ownedCard->lang->value]
-                        [$ownedCard->cond->value]
-                        [(int)$ownedCard->is_first_edition] += $ownedCard->amount;
-                    } else {
-                        $this->ownedCards
-                        [$cardInstance->id]
-                        [$ownedCard->lang->value]
-                        [$ownedCard->cond->value]
-                        [(int)$ownedCard->is_first_edition] = $ownedCard->amount ?? 0;
-                    }
-                }
-            }
-        }
+//        foreach ($cards as $card){
+//            foreach ($card->variants as $variant){
+//                $this->ownedCards[$variant->card_instance_id] = [];
+//                $this->prices[$variant->card_instance_id] = $cardInstance->price->price ?? 0;
+//
+//                foreach ($this->ownedCardRepository->fetchByInstanceGroupByAllOverAmount($variant->card_instance_id) as $ownedCard){
+//                    if(
+//                        $this->ownedCards
+//                        [$variant->card_instance_id]
+//                        [$ownedCard->lang->value]
+//                        [$ownedCard->cond->value]
+//                        [(int)$ownedCard->is_first_edition] ?? null
+//                    ) {
+//                        $this->ownedCards
+//                        [$variant->card_instance_id]
+//                        [$ownedCard->lang->value]
+//                        [$ownedCard->cond->value]
+//                        [(int)$ownedCard->is_first_edition] += $ownedCard->amount;
+//                    } else {
+//                        $this->ownedCards
+//                        [$variant->card_instance_id]
+//                        [$ownedCard->lang->value]
+//                        [$ownedCard->cond->value]
+//                        [(int)$ownedCard->is_first_edition] = $ownedCard->amount ?? 0;
+//                    }
+//                }
+//
+//            }
+//        }
 
         return view('livewire.cards', [
             'metrics' => [
@@ -157,13 +156,11 @@ class Cards extends Component
                         search: trim($this->search),
                         set: $this->set,
                         onlyOwned: true,
-                        includeVariants: $this->showVariants
                     ),
                     'total' => $totalCardsTotal = $this->cardRepository->count(
                         search: trim($this->search),
                         set: $this->set,
                         onlyOwned: $this->getOwnOnlyAsBool(),
-                        includeVariants: $this->showVariants
                     ),
                     'percentage' => $totalCardsTotal != 0 ?
                         round($totalCardsOwned / $totalCardsTotal * 100,2) : 0,
@@ -173,13 +170,11 @@ class Cards extends Component
                         search: trim($this->search),
                         set: $this->set,
                         onlyOwned: true,
-                        includeVariants: $this->showVariants
                     ),
                     'total' => $totalInstancesTotal = $this->cardInstanceRepository->count(
                         search: trim($this->search),
                         set: $this->set,
                         onlyOwned: $this->getOwnOnlyAsBool(),
-                        includeVariants: $this->showVariants
                     ),
                     'percentage' => $totalInstancesTotal != 0 ?
                         round($totalInstancesOwned / $totalInstancesTotal * 100,2) : 0,

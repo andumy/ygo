@@ -29,9 +29,9 @@ class PurchaseRecommendation extends Component
     public function mount()
     {
         $sets = $this->setRepository->all()->map(function (Set $set) {
-            $total = $this->cardRepository->count(set: $set->name, includeVariants: false);
+            $total = $this->cardRepository->count(set: $set->name);
             $setOwned = $this->cardRepository->countOwnedAndOrderedInsideSet(set: $set->name);
-            $owned = $this->cardRepository->count(set: $set->name, onlyOwned: 1, includeVariants: false);
+            $owned = $this->cardRepository->count(set: $set->name, onlyOwned: 1);
             return [
                 'code' => $set->code,
                 'name' => $set->name,
@@ -54,7 +54,7 @@ class PurchaseRecommendation extends Component
             ['total', 'desc'],
         ])->toArray();
 
-        $notOwnedCards = $this->cardRepository->searchQuery(onlyOwned: false, includeVariants: false)->get();
+        $notOwnedCards = $this->cardRepository->searchQuery(onlyOwned: false)->get();
         $this->cis = [];
         foreach ($notOwnedCards as $card) {
             /** @var CardInstance $ci */
