@@ -9,7 +9,7 @@ use App\Models\Variant;
  */
 ?>
 
-<div class="w-screen p-10 text-stone-700">
+<div class="p-10 text-stone-700">
     <div class="pb-10 flex">
         <a href="/all-variants-for-card/{{$variant->cardInstance->card_id}}" class="hover:text-stone-400">
             <h1 class="text-2xl font-bold">
@@ -30,7 +30,7 @@ use App\Models\Variant;
     </div>
     <div class="flex text-stone-400 relative items-start flex-col p-4 my-5"
          data-hide-tooltip="true">
-        <div class="flex flex-col w-screen items-center">
+        <div class="flex flex-col items-center w-[100%]">
             <img
                 @if($variant->isMissing)
                     class="grayscale opacity-80 w-60"
@@ -60,7 +60,7 @@ use App\Models\Variant;
                 class="text-md text-center text-stone-800 cursor-pointer hover:text-stone-500 pb-2"
                 onclick="copyName('card-instance-{{$variant->id}}')">{{$variant->cardInstance->card_set_code}} {{$variant->cardInstance->shortRarity}}</h3>
         </div>
-        <div class="flex flex-col w-screen items-center align-center py-4">
+        <div class="flex flex-col items-center align-center py-4 w-[100%]">
                 <div class="js-tooltip bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
                     <div class="flex flex-col">
                         <div class="p-2 flex flex-row">
@@ -80,14 +80,14 @@ use App\Models\Variant;
                                                     <input
                                                         class="appearance-none border rounded text-black w-[50px] my-2"
                                                         type="number"
-{{--                                                        wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"--}}
-{{--                                                        id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.0"--}}
+                                                        wire:model="ownedCards.{{$lang->value}}.{{$condition->value}}.0"
+                                                        id="ownedCards.{{$lang->value}}.{{$condition->value}}.0"
                                                     >
                                                     <input
                                                         class="appearance-none border rounded text-black w-[50px]"
                                                         type="number"
-{{--                                                        wire:model="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"--}}
-{{--                                                        id="ownedCards.{{$instance->id}}.{{$lang->value}}.{{$condition->value}}.1"--}}
+                                                        wire:model="ownedCards.{{$lang->value}}.{{$condition->value}}.1"
+                                                        id="ownedCards.{{$lang->value}}.{{$condition->value}}.1"
                                                     >
                                                 </div>
                                             @endforeach
@@ -101,7 +101,7 @@ use App\Models\Variant;
                         @endif
                     </div>
                     <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded"
-                            wire:click="updateOwn({{$variant->id}})">
+                            wire:click="updateOwn()">
                         Update Own
                     </button>
                 </div>

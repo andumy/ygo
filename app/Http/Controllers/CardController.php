@@ -60,7 +60,7 @@ class CardController extends Controller
 
         $order = $orderRepository->firstOrCreate($orderName);
         $card = $cardRepository->findByName($cardName);
-        /** @var Collection<CardInstance> $cardInstance */
+        /** @var Collection<CardInstance> $cardInstances */
         $cardInstances = $card->cardInstances->filter(function (CardInstance $instance) use ($code, $rarity, $version) {
             $cond = false;
             switch ($version){
@@ -90,10 +90,13 @@ class CardController extends Controller
             return response()->json(['message' => 'Not Found']);
         }
 
+        /** @var CardInstance $cardInstance */
+        $cardInstance = $cardInstances->first();
+
         $response = $cardService->updateCardStock(
-            code: $cardInstances->first()->card_set_code,
+            code: $cardInstance->card_set_code,
             batch: $batch,
-            option: $cardInstances->first(),
+            variant: $cardInstance->variants()->where('is_original', true)->first(),
             orderId: $order->id,
             amount: 1,
             shouldIncrease: true,

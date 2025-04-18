@@ -6,18 +6,17 @@ use App\Dtos\AddCardResponse;
 use App\Enums\AddCardStatuses;
 use App\Enums\Condition;
 use App\Enums\Lang;
-use App\Models\CardInstance;
-use App\Repositories\CardInstanceRepository;
+use App\Models\Variant;
 use App\Repositories\OwnedCardRepository;
+use App\Repositories\VariantRepository;
 use Illuminate\Support\Collection;
 use function collect;
-use function dd;
 
 class CardService
 {
     public function __construct(
         private readonly OwnedCardRepository    $ownedCardRepository,
-        private readonly CardInstanceRepository $cardInstanceRepository,
+        private readonly VariantRepository $variantRepository,
     )
     {
     }
@@ -25,7 +24,7 @@ class CardService
     public function updateCardStock(
         string $code,
         int $batch,
-        ?CardInstance $option = null,
+        ?Variant $variant = null,
         int $orderId = null,
         ?int $amount = null,
         bool $shouldIncrease = false,
@@ -34,31 +33,29 @@ class CardService
         ?bool $isFirstEdition = null
     ): AddCardResponse
     {
-        /** @var Collection<CardInstance> $cardInstances */
-        $cardInstances = $this->cardInstanceRepository->findBySetCode($code);
+        /** @var Collection<Variant> $variants */
+        $variants = $this->variantRepository->getBySetCode($code);
 
-        if($cardInstances->isEmpty()){
+        if($variants->isEmpty()){
             return new AddCardResponse(
                 status: AddCardStatuses::NOT_FOUND,
             );
         }
 
-        if($cardInstances->count() > 1 && !$option){
+        if($variants->count() > 1 && !$variant){
             return new AddCardResponse(
                 status: AddCardStatuses::MULTIPLE_OPTIONS,
-                options: $cardInstances,
+                options: $variants,
             );
         }
 
 
-        if($cardInstances->count() > 1) {
-            $cardInstance = $option;
-        } else {
-            $cardInstance = $cardInstances->first();
+        if($variants->count() === 1) {
+            $variant = $variants->first();
         }
 
         return $this->updateCardStockFromInstance(
-            cardInstance: $cardInstance,
+            variant: $variant,
             batch: $batch,
             shouldIncrease: $shouldIncrease,
             lang: $lang,
@@ -70,7 +67,7 @@ class CardService
     }
 
     public function updateCardStockFromInstance(
-        CardInstance $cardInstance,
+        Variant $variant,
         int $batch,
         bool $shouldIncrease = false,
         Lang $lang = Lang::ENGLISH,
@@ -81,7 +78,7 @@ class CardService
     ): AddCardResponse
     {
         $ownedCards = $this->ownedCardRepository->cardsForUpdate(
-            cardInstanceId: $cardInstance->id,
+            variantId: $variant->id,
             lang: $lang,
             condition: $condition,
             orderId: $orderId,
@@ -92,14 +89,14 @@ class CardService
         if($ownChangeAmount === 0){
             return new AddCardResponse(
                 status: AddCardStatuses::NO_CHANGE,
-                options: collect([$cardInstance]),
+                options: collect([$variant]),
             );
         }
 
         if($ownChangeAmount > 0){
             for ($i = 0; $i < $ownChangeAmount; $i++) {
                 $this->ownedCardRepository->create(
-                    cardInstanceId: $cardInstance->id,
+                    variantId: $variant->id,
                     batch: $batch,
                     lang: $lang,
                     condition: $condition,
@@ -111,13 +108,13 @@ class CardService
             if($ownedCards->count() === 0) {
                 return new AddCardResponse(
                     status: AddCardStatuses::NEW_CARD,
-                    options: collect([$cardInstance])
+                    options: collect([$variant])
                 );
             }
 
             return new AddCardResponse(
                 status: AddCardStatuses::INCREMENT,
-                options: collect([$cardInstance])
+                options: collect([$variant])
             );
 
         }
@@ -126,7 +123,7 @@ class CardService
 
         return new AddCardResponse(
             status: AddCardStatuses::DELETE,
-            options: collect([$cardInstance])
+            options: collect([$variant])
         );
     }
 }

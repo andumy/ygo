@@ -78,7 +78,7 @@ class FetchPricesCommand extends Command
                 foreach ($cardObject['numbers'] ?? [] as $instance) {
                     $createNew = false;
 
-                    $cardInstances = $cardInstanceRepository->findBySetCode($instance['print_tag']);
+                    $cardInstances = $cardInstanceRepository->getBySetCode($instance['print_tag']);
                     if ($cardInstances->isEmpty()) {
                         $createNew = true;
                     }

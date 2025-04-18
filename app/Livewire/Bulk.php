@@ -5,20 +5,15 @@ namespace App\Livewire;
 use App\Enums\Condition;
 use App\Enums\Lang;
 use App\Enums\Rarities;
-use App\Enums\Sale;
-use App\Models\CardInstance;
-use App\Repositories\CardInstanceRepository;
+use App\Models\Variant;
 use App\Repositories\OwnedCardRepository;
-use Exception;
+use App\Repositories\VariantRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use function array_unique;
-use function count;
-use function current;
 use function dd;
 use function mb_strtoupper;
 use function storage_path;
@@ -35,16 +30,16 @@ class Bulk extends Component
     public array $cards = [];
     public array $amounts = [];
 
-    private CardInstanceRepository $cardInstanceRepository;
     private OwnedCardRepository $ownedCardRepository;
+    private VariantRepository $variantRepository;
 
     public function boot(
-        CardInstanceRepository $cardInstanceRepository,
         OwnedCardRepository $ownedCardRepository,
+        VariantRepository $variantRepository,
     )
     {
-        $this->cardInstanceRepository = $cardInstanceRepository;
         $this->ownedCardRepository = $ownedCardRepository;
+        $this->variantRepository = $variantRepository;
     }
 
     public function loadSheet()
@@ -56,7 +51,6 @@ class Bulk extends Component
         $index = 2;
         $lang = Lang::ENGLISH;
         $condition = Condition::NEAR_MINT;
-        $rarity = Rarities::COMMON;
         $set = '';
         $version = 2;
 
@@ -88,10 +82,10 @@ class Bulk extends Component
 
             if($rarity != ''){
                 $rarity = Rarities::from($rarity);
-                $cardInstances = $this->cardInstanceRepository->findBySetCodeAndRarity($code, $rarity);
+                $variants = $this->variantRepository->getBySetCodeAndRarity($code, $rarity);
             } else {
                 $rarity = Rarities::MISSING;
-                $cardInstances = $this->cardInstanceRepository->findBySetCode($code);
+                $variants = $this->variantRepository->getBySetCode($code);
             }
 
             $currentCard = $this->cards
@@ -108,7 +102,7 @@ class Bulk extends Component
             [$isFirstEdition]
             [$rarity->value] = [
                 'amount' => ($currentCard['amount'] ?? 0) + $amount,
-                'cardInstance' => $cardInstances,
+                'variants' => $variants,
             ];
 
             $this->total += $amount;
@@ -121,7 +115,7 @@ class Bulk extends Component
                     foreach ($conditionArray as $isFirstEdition => $isFirstEditionArray){
                         foreach ($isFirstEditionArray as $rarity => $cardObject) {
 
-                            if($cardObject['cardInstance']->count() == 0) {
+                            if($cardObject['variants']->count() == 0) {
                                 dd($code);
                             }
 
@@ -131,7 +125,7 @@ class Bulk extends Component
                             [$condition]
                             [$isFirstEdition]
                             [$rarity]
-                            [$cardObject['cardInstance']->first()->id] = $cardObject['amount'];
+                            [$cardObject['variants']->first()->id] = $cardObject['amount'];
                         }
                     }
                 }
@@ -151,9 +145,9 @@ class Bulk extends Component
                 foreach ($langArray as $condition => $conditionArray){
                     foreach ($conditionArray as $isFirstEdition => $isFirstEditionArray){
                         foreach ($isFirstEditionArray as $rarity => $cardObject) {
-                            /** @var Collection<CardInstance> $cardInstances */
-                            $cardInstances = $cardObject['cardInstance'];
-                            if ($cardInstances->count() > 1) {
+                            /** @var Collection<Variant> $variants */
+                            $variants = $cardObject['variants'];
+                            if ($variants->count() > 1) {
 
                                 $sum = 0;
                                 foreach ($this->amounts[$code][$lang][$condition][$isFirstEdition][$rarity] ?? [] as $cost) {
@@ -165,14 +159,14 @@ class Bulk extends Component
                                     continue;
                                 }
 
-                                foreach ($cardInstances as $cardInstance) {
-                                    $amount = $this->amounts[$code][$lang][$condition][$isFirstEdition][$rarity][$cardInstance->id] ?? 0;
+                                foreach ($variants as $variant) {
+                                    $amount = $this->amounts[$code][$lang][$condition][$isFirstEdition][$rarity][$variant->id] ?? 0;
                                     if (!$amount) {
                                         continue;
                                     }
 
                                     $this->ownedCardRepository->createAmount(
-                                        cardInstanceId: $cardInstance->id,
+                                        variantId: $variant->id,
                                         batch: $batch,
                                         amount: $amount,
                                         lang: Lang::from($lang),
@@ -182,7 +176,7 @@ class Bulk extends Component
                                 }
                             } else {
                                 $this->ownedCardRepository->createAmount(
-                                    cardInstanceId: $cardInstances->first()->id,
+                                    variantId: $variants->first()->id,
                                     batch: $batch,
                                     amount: $cardObject['amount'],
                                     lang: Lang::from($lang),

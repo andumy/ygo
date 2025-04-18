@@ -20,7 +20,7 @@ class OwnedCardRepository
     }
 
     public function createAmount(
-        int $cardInstanceId,
+        int $variantId,
         int $batch,
         int $amount,
         Lang $lang = Lang::ENGLISH,
@@ -32,7 +32,7 @@ class OwnedCardRepository
         $ownedCards = collect();
         for($i = 0; $i < $amount; $i++){
             $ownedCards->push($this->create(
-                cardInstanceId: $cardInstanceId,
+                variantId: $variantId,
                 batch: $batch,
                 lang: $lang,
                 condition: $condition,
@@ -45,7 +45,7 @@ class OwnedCardRepository
     }
 
     public function create(
-        int $cardInstanceId,
+        int $variantId,
         int $batch,
         Lang $lang = Lang::ENGLISH,
         Condition $condition = Condition::NEAR_MINT,
@@ -54,7 +54,7 @@ class OwnedCardRepository
         Sale $sale = Sale::NOT_SET
     ): OwnedCard {
         return OwnedCard::create([
-            'card_instance_id' => $cardInstanceId,
+            'variant_id' => $variantId,
             'lang' => $lang,
             'cond' => $condition,
             'batch' => $batch,
@@ -64,10 +64,10 @@ class OwnedCardRepository
         ]);
     }
     /** @return Collection<OwnedCard> */
-    public function fetchByInstanceGroupByAllOverAmount(int $cardInstanceId): Collection {
-        return OwnedCard::where('card_instance_id', $cardInstanceId)
-            ->groupBy('card_instance_id', 'lang', 'cond', 'sale', 'is_first_edition')
-            ->selectRaw('card_instance_id, lang, cond, sale, is_first_edition, count(*) as amount')
+    public function fetchByVariantGroupByAllOverAmount(int $variantId): Collection {
+        return OwnedCard::where('variant_id', $variantId)
+            ->groupBy('variant_id', 'lang', 'cond', 'sale', 'is_first_edition')
+            ->selectRaw('variant_id, lang, cond, sale, is_first_edition, count(*) as amount')
             ->orderBy('amount','DESC')
             ->get();
     }
@@ -75,16 +75,21 @@ class OwnedCardRepository
     /** @return Collection<OwnedCard> */
     public function fetchByOrderWithAmount(int $orderId): Collection {
         return OwnedCard::where('order_id', $orderId)
-            ->groupBy('card_instance_id','lang', 'cond', 'is_first_edition')
-            ->selectRaw('card_instance_id, lang, cond, is_first_edition, count(*) as amount')
-            ->join('card_instances', 'card_instances.id', '=', 'owned_cards.card_instance_id')
+            ->groupBy('variant_id','lang', 'cond', 'is_first_edition')
+            ->selectRaw('variant_id, lang, cond, is_first_edition, count(*) as amount')
+            ->join('variants', 'variants.id', '=', 'owned_cards.variant_id')
+            ->join('card_instances', 'card_instances.id', '=', 'variants.card_instance_id')
             ->orderBy('card_instances.card_set_code','DESC')
             ->get();
     }
 
     public function atLeastOneCollected(string $code): bool
     {
-        return OwnedCard::whereHas('cardInstance', fn($query) => $query->where('card_set_code', $code))
+        return OwnedCard::whereHas('variant', function($q) use ($code){
+            $q->whereHas('cardInstance', function($qq) use ($code){
+                $qq->where('card_set_code', $code);
+            });
+        })
             ->where('sale', Sale::IN_COLLECTION)
             ->exists();
     }
@@ -96,13 +101,13 @@ class OwnedCardRepository
 
     /** @return Collection<OwnedCard> */
     public function cardsForUpdate(
-        int $cardInstanceId,
+        int $variantId,
         Lang $lang = Lang::ENGLISH,
         ?Condition $condition = null,
         ?int $orderId = null,
         ?bool $isFirstEdition = null
     ): Collection{
-        return OwnedCard::where('card_instance_id', $cardInstanceId)
+        return OwnedCard::where('variant_id', $variantId)
             ->where('lang', $lang)
             ->when($condition, fn($query) => $query->where('cond', $condition))
             ->when($orderId, fn($query) => $query->where('order_id', $orderId))
@@ -119,13 +124,13 @@ class OwnedCardRepository
     }
 
     public function resetSale(
-        int $cardInstanceId,
+        int $variantId,
         Lang $lang,
         Condition $condition,
         bool $isFirstEdition
     ): void
     {
-        OwnedCard::where('card_instance_id', $cardInstanceId)
+        OwnedCard::where('variant_id', $variantId)
             ->where('lang', $lang)
             ->where('cond', $condition)
             ->where('is_first_edition', $isFirstEdition)

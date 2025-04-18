@@ -36,49 +36,49 @@
 
                                 @endphp
                                 <tr class="py-2 border-b-2">
-                                    <td class="text-center px-2">{{$cardObject['cardInstance']->first()->card->name}}</td>
+                                    <td class="text-center px-2">{{$cardObject['variants']->first()->cardInstance->card->name}}</td>
                                     <td class="text-center px-2">{{$code}}</td>
                                     <td class="text-center px-2"><img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}"
                                                                       class="h-[14px]"></td>
                                     <td class="text-center px-2">{!! Condition::from($cond)->getShortHandRender() !!}</td>
                                     <td class="text-center px-2">{!! $isFirstEd ? '<span>✔️</span>' : '' !!}</td>
-                                    @if($cardObject['cardInstance']->count() == 1)
+                                    @if($cardObject['variants']->count() == 1)
                                         <td class="text-center px-2
                                         {{
-                                                $cardObject['cardInstance']->first()->isOwnedForLang(Lang::from($lang)) ? 'text-orange-700' : (
-                                                    $cardObject['cardInstance']->first()->isOwned ? 'text-amber-400' : (
-                                                        $cardObject['cardInstance']->first()->card->isOwned ? 'text-teal-400' : ''
+                                                $cardObject['variants']->first()->isOwnedForLang(Lang::from($lang)) ? 'text-orange-700' : (
+                                                    $cardObject['variants']->first()->isOwned ? 'text-amber-400' : (
+                                                        $cardObject['variants']->first()->cardInstance->card->isOwned ? 'text-teal-400' : ''
                                                     )
                                                 )
                                         }}
-                                        ">{{$cardObject['cardInstance']->first()->rarity_verbose->value}}</td>
+                                        ">{{$cardObject['variants']->first()->cardInstance->rarity_verbose->value}}</td>
                                     @else
                                         <td class="text-center px-2">
                                             <div class="flex flex-col">
-                                                @foreach($cardObject['cardInstance'] as $ci)
+                                                @foreach($cardObject['variants'] as $variant)
                                                     <p class="
                                                         {{
-                                                            $ci->isOwnedForLang(Lang::from($lang)) ? 'text-orange-700' : (
-                                                                $ci->isOwned ? 'text-amber-400' : (
-                                                                    $ci->card->isOwned ? 'text-teal-400' : ''
+                                                            $variant->isOwnedForLang(Lang::from($lang)) ? 'text-orange-700' : (
+                                                                $variant->isOwned ? 'text-amber-400' : (
+                                                                    $variant->cardInstance->card->isOwned ? 'text-teal-400' : ''
                                                                 )
                                                             )
                                                         }}
-                                                    ">{{$ci->rarity_verbose->value}}({{$ci->card->ygo_id}})</p>
+                                                    ">{{$variant->cardInstance->rarity_verbose->value}}({{$variant->ygo_id}})</p>
                                                 @endforeach
                                             </div>
                                         </td>
                                     @endif
                                     <td class="text-center px-2">
-                                        @if($cardObject['cardInstance']->count() == 1)
+                                        @if($cardObject['variants']->count() == 1)
                                             {{$cardObject['amount']}}
                                         @else
                                             <div class="flex items-center">
                                                 <div class="flex flex-col">
-                                                    @foreach($cardObject['cardInstance'] as $index => $ci)
+                                                    @foreach($cardObject['variants'] as $index => $variant)
                                                         <input class="border" type="number"
-                                                               wire:model="amounts.{{$code}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.{{$rarity}}.{{$ci->id}}"
-                                                               id="{{$ci->id}}">
+                                                               wire:model="amounts.{{$code}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.{{$rarity}}.{{$variant->id}}"
+                                                               id="{{$variant->id}}">
                                                     @endforeach
                                                 </div>
                                                 <p>Out of Max {{$cardObject['amount']}}</p>

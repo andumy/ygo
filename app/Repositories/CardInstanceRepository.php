@@ -2,12 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Enums\Rarities;
 use App\Models\CardInstance;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use function dd;
 
 class CardInstanceRepository
 {
@@ -22,22 +20,9 @@ class CardInstanceRepository
     }
 
     /** @return Collection<CardInstance> */
-    public function findBySetCode(string $code): Collection
+    public function getBySetCode(string $code): Collection
     {
         return CardInstance::where('card_set_code', $code)->get();
-    }
-
-    /** @return Collection<CardInstance> */
-    public function findBySetCodeAndRarity(string $code, Rarities $rarity): Collection
-    {
-        return CardInstance::where('card_set_code', $code)
-            ->where('rarity_verbose', $rarity->value)
-            ->get();
-    }
-
-    public function findById(int $id): ?CardInstance
-    {
-        return CardInstance::find($id);
     }
 
 
@@ -75,17 +60,6 @@ class CardInstanceRepository
             ->count();
 
     }
-
-    /** @return Collection<CardInstance> */
-    public function search(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): Collection{
-        return $this->searchQuery(
-            search: $search,
-            set: $set,
-            onlyOwned: $onlyOwned,
-            excludeOrdered: $excludeOrdered,
-        )->orderBy('card_set_code')->get();
-    }
-
 
     private function searchQuery(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): Builder {
         return CardInstance::when($search !== '', function($q) use ($search){

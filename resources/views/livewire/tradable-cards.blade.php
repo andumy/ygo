@@ -31,8 +31,8 @@
             </thead>
             <tbody>
             @php $bgLight = true; $prevCard = null; @endphp
-            @foreach($cardInstances ?? [] as $cardInstanceId => $cardInstanceArray)
-                @foreach($cardInstanceArray as $lang => $langArray)
+            @foreach($variants ?? [] as $variantId => $variantArray)
+                @foreach($variantArray as $lang => $langArray)
                     @foreach($langArray as $cond => $condArray)
                         @foreach($condArray as $isFirstEd => $ownedCard)
                             @php
@@ -42,7 +42,7 @@
                                 }
                             @endphp
                             <tr class="py-2 {{!$ownedCard['at_least_one_collected'] ? 'bg-red-200' : ($bgLight ? 'bg-gray-100' : 'bg-gray-200')}} {{$ownedCard['not_set'] == 0 ? 'opacity-40' : ''}}"
-                                wire:key="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}">
+                                wire:key="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}">
                                 <td class="px-2 text-center">{{$ownedCard['ygo_id']}}</td>
                                 <td class="px-2 text-center">{{$ownedCard['card_name']}}</td>
                                 <td class="px-2 text-center">{{$ownedCard['rarity']}}</td>
@@ -52,10 +52,10 @@
                                     {{$ownedCard['not_set'] == 0 ? '' : ($ownedCard['not_set'] < 0 ? 'bg-red-900' : 'bg-black')}}
                                 ">{{ $ownedCard['not_set'] }}</td>
                                 <td class="px-2 text-center"><input type="number" class="w-[100px]"
-                                                                    wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_collectable"
+                                                                    wire:model="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_collectable"
                                                                     wire:blur="revalidate"></td>
                                 <td class="px-2 text-center"><input type="number" class="w-[100px]"
-                                                                    wire:model="cardInstances.{{$cardInstanceId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_tradable"
+                                                                    wire:model="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_tradable"
                                                                     wire:blur="revalidate"></td>
                                 <td class="px-2 text-center"><img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}"
                                                                   class="h-full w-auto pe-2"></td>

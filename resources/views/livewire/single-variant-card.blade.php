@@ -8,7 +8,7 @@ use App\Models\VariantCard;
  */
 ?>
 
-<div class="w-screen p-10 text-stone-700">
+<div class="p-10 text-stone-700">
     <div class="pb-10 flex">
         <a href="/all-variants-for-card/{{$variantCard->cardInstances->first()->card_id}}" class="hover:text-stone-400">
             <h1 class="text-2xl font-bold">
@@ -19,9 +19,8 @@ use App\Models\VariantCard;
             &nbsp;- {{$variantCard->ygo_id}}
         </h1>
     </div>
-    <div class="flex text-stone-400 relative items-start flex-col p-4 my-5"
-         data-hide-tooltip="true">
-        <div class="flex flex-col w-screen items-center">
+    <div class="flex text-stone-400 relative items-start flex-col p-4 my-5">
+        <div class="flex flex-col items-center w-[100%]">
             <img
                 @if($variantCard->isMissing)
                     class="grayscale opacity-80 w-60"
@@ -48,8 +47,8 @@ use App\Models\VariantCard;
                onclick="copyName('id-{{$variantCard->id}}')">{{ $variantCard->ygo_id }}</p>
 
         </div>
-        <div class="flex flex-col ps-5">
-            <table class="w-screen">
+        <div class="flex flex-col ps-5 w-[100%]">
+            <table>
                 <tbody>
                     @foreach($variantCard->variants as $variant)
                         <tr class="py-2 border-b-2">

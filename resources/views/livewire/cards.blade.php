@@ -1,4 +1,3 @@
-@php use App\Enums\Lang; @endphp
 <div class="p-10 text-stone-700">
     <div class="pb-10">
         <h1 class="text-2xl font-bold">
