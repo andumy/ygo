@@ -10,6 +10,11 @@ use \Illuminate\Support\Collection;
 class VariantRepository
 {
 
+    public function find(int $variantId): Variant
+    {
+        return Variant::find($variantId);
+    }
+
     /** @return Collection<Variant> */
     public function getBySetCodeAndRarity(string $code, Rarities $rarity): Collection
     {

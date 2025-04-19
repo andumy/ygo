@@ -27,6 +27,7 @@
                 <th class="text-center px-4">Language</th>
                 <th class="text-center px-4">Condition</th>
                 <th class="text-center px-4">1st Edition</th>
+                <th class="text-center px-4">Action</th>
             </tr>
             </thead>
             <tbody>
@@ -41,7 +42,7 @@
                                     $prevCard = $ownedCard['card_set_code'];
                                 }
                             @endphp
-                            <tr class="py-2 {{!$ownedCard['at_least_one_collected'] ? 'bg-red-200' : ($bgLight ? 'bg-gray-100' : 'bg-gray-200')}} {{$ownedCard['not_set'] == 0 ? 'opacity-40' : ''}}"
+                            <tr class="py-2 {{!$isMissing[$ownedCard['card_set_code']] ? 'bg-red-200' : ($bgLight ? 'bg-gray-100' : 'bg-gray-200')}} {{$ownedCard['not_set'] == 0 ? 'opacity-40' : ''}}"
                                 wire:key="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}">
                                 <td class="px-2 text-center">{{$ownedCard['ygo_id']}}</td>
                                 <td class="px-2 text-center">{{$ownedCard['card_name']}}</td>
@@ -61,6 +62,14 @@
                                                                   class="h-full w-auto pe-2"></td>
                                 <td class="px-2 text-center">{!! Condition::from($cond)->getShortHandRender() !!}</td>
                                 <td class="px-2 text-center">{!! $isFirstEd ? '<span>✔️</span>' : '' !!}</td>
+                                <td class="px-2 text-center">
+                                    <button class="dark:bg-green-800 hover:bg-green-700 text-white font-bold py-1 px-4 rounded"
+                                            wire:click="collect({{$variantId}},'{{$lang}}','{{$cond}}',{{$isFirstEd}})">Collect
+                                    </button>
+                                    <button class="dark:bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-4 rounded"
+                                            wire:click="trade({{$variantId}},'{{$lang}}','{{$cond}}',{{$isFirstEd}})">Trade
+                                    </button>
+                                </td>
                             </tr>
                         @endforeach
                     @endforeach

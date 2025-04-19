@@ -96,7 +96,7 @@
                         Confirm
                     </button>
                 </div>
-                <img class="w-60 pt-10" src="{{asset('storage/'. $card->ygo_id . '.jpg')}}">
+                <img class="w-60 pt-10" src="{{asset('storage/'. $card->ygoId . '.jpg')}}">
             </div>
         </div>
     @endif

@@ -11,8 +11,6 @@ use App\Repositories\VariantRepository;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use function array_fill;
-use function dd;
-use function in_array;
 use function max;
 
 class TradableCards extends Component
@@ -21,11 +19,11 @@ class TradableCards extends Component
     public string $set = '';
     public array $variants = [];
     public string $message = '';
+    public array $isMissing = [];
 
     public int $totalCollectable = 0;
     public int $totalTradable = 0;
     public int $totalNotSet = 0;
-
 
     public Collection $sets;
 
@@ -45,6 +43,56 @@ class TradableCards extends Component
 
         $this->sets = $this->setRepository->allWithUnsetOwnedCards();
     }
+
+    public function collect(int $variantId, string $lang, string $cond, int $isFirstEd){
+        $el = $this->variants
+        [$variantId]
+        [$lang]
+        [$cond]
+        [$isFirstEd];
+
+        $this->variants
+        [$variantId]
+        [$lang]
+        [$cond]
+        [$isFirstEd] = [
+            ...$el,
+            'new_collectable' => $el['new_collectable'] + 1,
+            'new_tradable' => $el['new_tradable'] + $el['not_set'] - 1,
+            'collectable' => $el['new_collectable'] + 1,
+            'tradable' => $el['new_tradable'] + $el['not_set'] - 1,
+            'not_set' => 0,
+        ];
+
+        $this->totalTradable += $el['tradable'] + $el['not_set'] - 1;
+        $this->totalCollectable ++;
+        $this->totalNotSet -= $el['not_set'];
+    }
+
+    public function trade(int $variantId, string $lang, string $cond, int $isFirstEd){
+        $el = $this->variants
+        [$variantId]
+        [$lang]
+        [$cond]
+        [$isFirstEd];
+
+        $this->variants
+        [$variantId]
+        [$lang]
+        [$cond]
+        [$isFirstEd] = [
+            ...$el,
+            'new_collectable' => $el['collectable'],
+            'new_tradable' => $el['tradable'] + $el['not_set'],
+            'collectable' => $el['collectable'],
+            'tradable' => $el['tradable'] + $el['not_set'],
+            'not_set' => 0,
+        ];
+
+        $this->totalTradable += $el['tradable'] + $el['not_set'];
+        $this->totalNotSet -= $el['not_set'];
+    }
+
     public function refresh(){
         $this->variants = [];
         $this->totalTradable = 0;
@@ -69,8 +117,9 @@ class TradableCards extends Component
                     'collectable' => ($ownedCard->sale === Sale::IN_COLLECTION ? $ownedCard->amount : 0) + ($currentElement['collectable'] ?? 0),
                     'tradable' => ($ownedCard->sale === Sale::TRADE ? $ownedCard->amount : 0) + ($currentElement['tradable'] ?? 0),
                     'not_set' => ($ownedCard->sale === Sale::NOT_SET ? $ownedCard->amount : 0) + ($currentElement['not_set'] ?? 0),
-                    'at_least_one_collected' => $this->ownedCardRepository->atLeastOneCollected($variant->cardInstance->card_set_code),
                 ];
+
+                $this->isMissing[$variant->cardInstance->card_set_code] = $this->ownedCardRepository->atLeastOneCollected($variant->cardInstance->card_set_code);
 
                 $currentElement['new_collectable'] = $currentElement['collectable'];
                 $currentElement['new_tradable'] = $currentElement['tradable'];
@@ -94,14 +143,12 @@ class TradableCards extends Component
                     [(int)$ownedCard->is_first_edition] = $currentElement;
             }
         }
-
     }
 
     public function revalidate(){
         $this->totalTradable = 0;
         $this->totalCollectable = 0;
         $this->totalNotSet = 0;
-
         foreach($this->variants as $variantId => $variantArray) {
             foreach ($variantArray as $lang => $langArray) {
                 foreach ($langArray as $cond => $condArray) {

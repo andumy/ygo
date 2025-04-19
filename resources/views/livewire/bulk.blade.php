@@ -64,7 +64,7 @@
                                                                 )
                                                             )
                                                         }}
-                                                    ">{{$variant->cardInstance->rarity_verbose->value}}({{$variant->ygo_id}})</p>
+                                                    ">{{$variant->cardInstance->rarity_verbose->value}}({{$variant->variantCard->ygo_id}})</p>
                                                 @endforeach
                                             </div>
                                         </td>
