@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Lang;
+use App\Enums\Sale;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +14,6 @@ use function collect;
 
 /**
  * @property int id
- * @property int ygo_id
  * @property int card_instance_id
  * @property int variant_card_id
  * @property CardInstance cardInstance
@@ -22,6 +22,7 @@ use function collect;
  * @property boolean isOwned
  * @property boolean isOrdered
  * @property boolean isMissing
+ * @property boolean isCollected
  * @property array orderAmountByLangAndCond
  * @property array ownAmountByLangAndCond
  * @property array orderAmountByLang
@@ -65,6 +66,11 @@ class Variant extends Model
         return !$this->isOwned && !$this->isOrdered;
     }
 
+    public function getIsCollectedAttribute(): bool
+    {
+        return $this->ownedCards()->whereNull('order_id')->where('sale', Sale::IN_COLLECTION)->exists();
+    }
+
     public function isOwnedForLang(Lang $lang): bool
     {
         return $this->ownedCards()->whereNull('order_id')->where('lang', $lang)->exists();
@@ -82,12 +88,12 @@ class Variant extends Model
 
     public function getOwnAmountByLangAttribute(): Collection
     {
-        return collect($this->ownedCards->whereNull('order_id')->reduce([$this, 'buildAmountByLang'], []));
+        return collect($this->ownedCards->whereNull('order_id')->where('sale', '!=', Sale::SOLD)->reduce([$this, 'buildAmountByLang'], []));
     }
 
     public function getOrderAmountByLangAttribute(): Collection
     {
-        return collect($this->ownedCards->whereNotNull('order_id')->reduce([$this, 'buildAmountByLang'], []));
+        return collect($this->ownedCards->whereNotNull('order_id')->where('sale', '!=', Sale::SOLD)->reduce([$this, 'buildAmountByLang'], []));
     }
 
     public function buildAmountByLangAndCond(array $carry, OwnedCard $ownedCard): array {

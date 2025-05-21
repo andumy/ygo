@@ -47,4 +47,11 @@ class SetRepository
             });
         })->orderBy('code')->get();
     }
+
+    public function allWithOwnedCards(): Collection
+    {
+        return Set::whereHas('cardInstances', function($q){
+            $q->whereHas('ownedCards');
+        })->orderBy('code')->get();
+    }
 }

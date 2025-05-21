@@ -96,7 +96,7 @@ class CardController extends Controller
         $response = $cardService->updateCardStock(
             code: $cardInstance->card_set_code,
             batch: $batch,
-            variant: $cardInstance->variants()->where('is_original', true)->first(),
+            variant: $cardInstance->variants()->whereHas('variantCard', fn ($q) => $q->where('is_original', true))->first(),
             orderId: $order->id,
             amount: 1,
             shouldIncrease: true,

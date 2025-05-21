@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Lang;
 use App\Enums\Rarities;
+use App\Enums\Sale;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 use function array_key_exists;
 use function collect;
+use function current;
 use function explode;
 use function strtoupper;
 
@@ -27,6 +29,8 @@ use function strtoupper;
  * @property Collection<Variant> variants
  * @property Price price
  * @property string card_set_code
+ * @property string card_set_code_base
+ * @property string card_set_code_nr
  * @property Rarities rarity_verbose
  * @property string shortRarity
  * @property array orderAmountByLangAndCond
@@ -89,12 +93,12 @@ class CardInstance extends Model
 
     public function getOwnAmountByLangAttribute(): Collection
     {
-        return collect($this->ownedCards->whereNull('order_id')->reduce([$this, 'buildAmountByLang'], []));
+        return collect($this->ownedCards->whereNull('order_id')->where('sale', '!=', Sale::SOLD)->reduce([$this, 'buildAmountByLang'], []));
     }
 
     public function getOrderAmountByLangAttribute(): Collection
     {
-        return collect($this->ownedCards->whereNotNull('order_id')->reduce([$this, 'buildAmountByLang'], []));
+        return collect($this->ownedCards->whereNotNull('order_id')->where('sale', '!=', Sale::SOLD)->reduce([$this, 'buildAmountByLang'], []));
     }
 
     public function buildAmountByLangAndCond(array $carry, OwnedCard $ownedCard): array {
@@ -138,6 +142,15 @@ class CardInstance extends Model
     public function getIsMissingAttribute(): bool
     {
         return !$this->isOwned && !$this->isOrdered;
+    }
+
+    public function getCardSetCodeBaseAttribute(): string
+    {
+        return current(explode('-',$this->card_set_code));
+    }
+    public function getCardSetCodeNrAttribute(): string
+    {
+        return substr($this->card_set_code, -3);
     }
 
     public function isOwnedForLang(Lang $lang): bool

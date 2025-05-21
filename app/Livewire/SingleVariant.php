@@ -13,6 +13,7 @@ class SingleVariant extends Component
 {
     public Variant $variant;
     public array $ownedCards = [];
+    public string $message = '';
 
     private OwnedCardRepository $ownedCardRepository;
     private CardService $cardService;
@@ -54,6 +55,8 @@ class SingleVariant extends Component
                 }
             }
         }
+
+        $this->message = 'Stock updated successfully.';
     }
 
     public function render()

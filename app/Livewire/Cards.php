@@ -73,7 +73,7 @@ class Cards extends Component
         $cards = $this->cardRepository->paginate(
             search: trim($this->search),
             set: $this->set,
-            pagination: 100,
+            pagination: 105,
             onlyOwned: $this->getOwnOnlyAsBool(),
         );
 
@@ -110,7 +110,7 @@ class Cards extends Component
                 'total_owned_physical_cards' => [
                     'owned' => $this->ownedCardRepository->count(),
                     'tradable' =>  $this->ownedCardRepository->countTradable(),
-                    'estimated_cost' => $this->cardInstanceRepository->priceForOwnOrOrder(),
+                    'estimated_cost' => $this->cardInstanceRepository->priceForOwnOrOrder() * 1.4,
                 ]
             ],
             'cards' => $cards,

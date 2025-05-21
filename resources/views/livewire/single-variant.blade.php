@@ -10,7 +10,7 @@ use App\Models\Variant;
 ?>
 
 <div class="p-10 text-stone-700">
-    <div class="pb-10 flex">
+    <div class="flex">
         <a href="/all-variants-for-card/{{$variant->cardInstance->card_id}}" class="hover:text-stone-400">
             <h1 class="text-2xl font-bold">
                 {{$variant->cardInstance->card->name}}
@@ -25,12 +25,14 @@ use App\Models\Variant;
             </h1>
         </a>
         <h1 class="text-2xl font-bold">
-            &nbsp;- {{$variant->cardInstance->card_set_code}} {{$variant->cardInstance->shortRarity}}
+            &nbsp;- {{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->rarity_verbose}})
         </h1>
     </div>
-    <div class="flex text-stone-400 relative items-start flex-col p-4 my-5"
-         data-hide-tooltip="true">
-        <div class="flex flex-col items-center w-[100%]">
+    <p class="bg-green-300 text-stone-700">
+        {{$message}}
+    </p>
+    <div class="flex text-stone-400 relative items-center justify-between p-4">
+        <div class="flex flex-col items-center justify-center w-[50%]">
             <img
                 @if($variant->isMissing)
                     class="grayscale opacity-80 w-60"
@@ -58,10 +60,10 @@ use App\Models\Variant;
                onclick="copyName('id-{{$variant->id}}')">{{ $variant->variantCard->ygo_id }}</p>
             <h3 id="card-instance-{{$variant->id}}"
                 class="text-md text-center text-stone-800 cursor-pointer hover:text-stone-500 pb-2"
-                onclick="copyName('card-instance-{{$variant->id}}')">{{$variant->cardInstance->card_set_code}} {{$variant->cardInstance->shortRarity}}</h3>
+                onclick="copyName('card-instance-{{$variant->id}}')">{{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->rarity_verbose}})</h3>
         </div>
         <div class="flex flex-col items-center align-center py-4 w-[100%]">
-                <div class="js-tooltip bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
+                <div class="bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">
                     <div class="flex flex-col">
                         <div class="p-2 flex flex-row">
                             @foreach(Lang::cases() as $index => $lang)
@@ -100,8 +102,7 @@ use App\Models\Variant;
                         </div>
                         @endif
                     </div>
-                    <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded"
-                            wire:click="updateOwn()">
+                    <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" wire:click="updateOwn()">
                         Update Own
                     </button>
                 </div>

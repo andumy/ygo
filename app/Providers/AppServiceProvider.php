@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Synths\CatalogMatchSynth;
 use Illuminate\Support\ServiceProvider;
 use Generator;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\LazyCollection;
 use JsonMachine\Items;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -41,6 +43,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Livewire::propertySynthesizer(CatalogMatchSynth::class);
     }
 }

@@ -3,7 +3,11 @@
     <p class="bg-green-300 text-stone-700">
         {{$message}}
     </p>
-    <div class="py-10 flex flex-col xl:flex-row justify-center xl:justify-between">
+    <div class="py-10 flex flex-col xl:flex-row justify-end">
+        <select wire:model.boolean="onlyMissing" wire:change="changeAvailableSets" class="my-4 xl:mx-4 xl:my-0">
+            <option value="1">Only Missing</option>
+            <option value="0">All sets</option>
+        </select>
         <select wire:model="set" wire:change="refresh" class="my-4 xl:mx-4 xl:my-0">
             <option value="">All sets</option>
             @foreach($sets as $s)
@@ -24,6 +28,7 @@
                 <th class="text-center px-4">Not Set</th>
                 <th class="text-center px-4">Collectable</th>
                 <th class="text-center px-4">Tradable</th>
+                <th class="text-center px-4">Listed</th>
                 <th class="text-center px-4">Language</th>
                 <th class="text-center px-4">Condition</th>
                 <th class="text-center px-4">1st Edition</th>
@@ -33,6 +38,7 @@
             <tbody>
             @php $bgLight = true; $prevCard = null; @endphp
             @foreach($variants ?? [] as $variantId => $variantArray)
+                @php $newVariant = true; @endphp
                 @foreach($variantArray as $lang => $langArray)
                     @foreach($langArray as $cond => $condArray)
                         @foreach($condArray as $isFirstEd => $ownedCard)
@@ -42,7 +48,7 @@
                                     $prevCard = $ownedCard['card_set_code'];
                                 }
                             @endphp
-                            <tr class="py-2 {{!$isMissing[$ownedCard['card_set_code']] ? 'bg-red-200' : ($bgLight ? 'bg-gray-100' : 'bg-gray-200')}} {{$ownedCard['not_set'] == 0 ? 'opacity-40' : ''}}"
+                            <tr class="{{$newVariant ? 'border-t-2 border-cyan-400' : ''}} py-2 {{$ownedCard['is_missing'] ? 'bg-red-200' : ($bgLight ? 'bg-gray-100' : 'bg-gray-200')}} {{$ownedCard['not_set'] == 0 ? 'opacity-40' : ''}}"
                                 wire:key="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}">
                                 <td class="px-2 text-center">{{$ownedCard['ygo_id']}}</td>
                                 <td class="px-2 text-center">{{$ownedCard['card_name']}}</td>
@@ -51,13 +57,16 @@
                                 <td class="px-2 text-center
                                     {{$ownedCard['not_set'] == 0 ? 'text-green-400' : 'text-white'}}
                                     {{$ownedCard['not_set'] == 0 ? '' : ($ownedCard['not_set'] < 0 ? 'bg-red-900' : 'bg-black')}}
-                                ">{{ $ownedCard['not_set'] }}</td>
+                                ">{!! $ownedCard['was_changed'] ? '<span>❗</span>' : '' !!} {{ $ownedCard['not_set'] }}</td>
                                 <td class="px-2 text-center"><input type="number" class="w-[100px]"
                                                                     wire:model="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_collectable"
-                                                                    wire:blur="revalidate"></td>
+                                                                    wire:blur="revalidate({{$variantId}},'{{$lang}}','{{$cond}}',{{$isFirstEd}})"></td>
                                 <td class="px-2 text-center"><input type="number" class="w-[100px]"
                                                                     wire:model="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_tradable"
-                                                                    wire:blur="revalidate"></td>
+                                                                    wire:blur="revalidate({{$variantId}},'{{$lang}}','{{$cond}}',{{$isFirstEd}})"></td>
+                                <td class="px-2 text-center
+                                    {{$ownedCard['listed'] == 0 ? '' : 'bg-black'}}
+                                ">{{ $ownedCard['listed'] }}</td>
                                 <td class="px-2 text-center"><img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}"
                                                                   class="h-full w-auto pe-2"></td>
                                 <td class="px-2 text-center">{!! Condition::from($cond)->getShortHandRender() !!}</td>
@@ -71,6 +80,7 @@
                                     </button>
                                 </td>
                             </tr>
+                            @php $newVariant = false; @endphp
                         @endforeach
                     @endforeach
                 @endforeach
@@ -85,6 +95,18 @@
         </button>
         <p>Total Collectable: {{$totalCollectable}}</p>
         <p>Total Tradable: {{$totalTradable}}</p>
+        <p>Total Listed: {{$totalListed}}</p>
         <p>Total Not Set: {{$totalNotSet}}</p>
     </div>
 </div>
+@script
+<script>
+    Livewire.on('$refresh', () => {
+        window.scrollTo({
+            top: 15,
+            left: 15,
+            behaviour: 'smooth'
+        })
+    })
+</script>
+@endscript

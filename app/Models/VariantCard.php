@@ -16,6 +16,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string ygo_id
  * @property bool is_original
  * @property Collection<Variant> variants
+ * @property Collection<Variant> variantsOrderedByCode
  * @property Collection<CardInstance> cardInstances
  * @property boolean isOwned
  * @property boolean isOrdered
@@ -64,5 +65,14 @@ class VariantCard extends Model
     public function getIsMissingAttribute(): bool
     {
         return !$this->isOwned && !$this->isOrdered;
+    }
+
+    /** @return Collection<Variant> */
+    public function getVariantsOrderedByCodeAttribute(): Collection
+    {
+        return $this->variants()->join('card_instances', 'card_instances.id', '=', 'variants.card_instance_id')
+            ->select('variants.*')
+            ->orderBy('card_instances.card_set_code')
+            ->get();
     }
 }

@@ -26,4 +26,21 @@ enum Lang: string
     {
         return asset('storage/lang/'. $this->value . '.jpg');
     }
+
+    public function getLongName(): string{
+        return match ($this) {
+            self::ENGLISH => 'English',
+            self::FRENCH => 'French',
+            self::GERMAN => 'German',
+            self::ITALIAN => 'Italian',
+            self::PORTUGUESE => 'Portuguese',
+            self::SPANISH => 'Spanish',
+            self::JAPANESE => 'Japanese',
+            self::JAPANESE_ASIAN => 'Japanese (Asian)',
+            self::ASIAN_ENGLISH => 'Asian English',
+            self::KOREAN => 'Korean',
+            self::TRADITIONAL_CHINESE => 'Traditional Chinese',
+            self::SIMPLIFIED_CHINESE => 'Simplified Chinese'
+        };
+    }
 }

@@ -9,7 +9,7 @@ use App\Models\VariantCard;
 ?>
 
 <div class="p-10 text-stone-700">
-    <div class="pb-10 flex">
+    <div class="flex">
         <a href="/all-variants-for-card/{{$variantCard->cardInstances->first()->card_id}}" class="hover:text-stone-400">
             <h1 class="text-2xl font-bold">
                 {{$variantCard->cardInstances->first()->card->name}}
@@ -19,7 +19,7 @@ use App\Models\VariantCard;
             &nbsp;- {{$variantCard->ygo_id}}
         </h1>
     </div>
-    <div class="flex text-stone-400 relative items-start flex-col p-4 my-5">
+    <div class="flex text-stone-400 relative items-start flex-col p-4">
         <div class="flex flex-col items-center w-[100%]">
             <img
                 @if($variantCard->isMissing)
@@ -50,10 +50,10 @@ use App\Models\VariantCard;
         <div class="flex flex-col ps-5 w-[100%]">
             <table>
                 <tbody>
-                    @foreach($variantCard->variants as $variant)
+                    @foreach($variantCard->variantsOrderedByCode as $variant)
                         <tr class="py-2 border-b-2">
                             <td>
-                                <a href="/single-variant/{{$variant->id}}" class="flex flex-row justify-start items-start relative py-1
+                                <a href="/single-variant/{{$variant->id}}" class="flex flex-row justify-start items-center relative py-1
                             @if(!$variant->isMissing)
                                  font-bold
                                  @if($variant->isOwned)
@@ -86,8 +86,7 @@ use App\Models\VariantCard;
                                         <p class="text-md text-cyan-500 px-1"> x </p>
                                     @endif
 
-                                    <p data-tooltip-target="{{$variant->id}}"
-                                       class="text-md m-0"> {{$variant->cardInstance->card_set_code}} {{$variant->cardInstance->shortRarity}}
+                                    <p class="text-md m-0"> {{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->rarity_verbose}})
                                         : {{$variant->cardInstance->price?->price ?? '-'}} €</p>
                                 </a>
                             </td>

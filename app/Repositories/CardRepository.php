@@ -14,12 +14,6 @@ class CardRepository
         return Card::firstOrCreate($find, $data);
     }
 
-    public function setYgoId(Card $card, string $ygoId): void
-    {
-        $card->ygo_id = $ygoId;
-        $card->save();
-    }
-
     public function markHasImage(Card $card): void
     {
         $card->has_image = true;
@@ -82,7 +76,9 @@ class CardRepository
     public function findByYgoId(string $id): ?Card
     {
         return Card::whereHas('cardInstances', function ($q) use($id){
-            $q->whereHas('variants', fn ($qq) => $qq->where('ygo_id', $id));
+            $q->whereHas('variants', function ($qq) use ($id) {
+                $qq->whereHas('variantCard', fn ($qqq) => $qqq->where('ygo_id', $id));
+            });
         })->first();
     }
 

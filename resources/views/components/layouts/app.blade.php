@@ -15,6 +15,9 @@
         <a href="/tradable" class="text-blue-500 hover:text-blue-800 ps-5">Tradable</a>
         <a href="/purchase-recommendation" class="text-blue-500 hover:text-blue-800 ps-5">Purchase Recommendation</a>
         <a href="/bulk" class="text-blue-500 hover:text-blue-800 ps-5">Bulk upload</a>
+        <a href="/sell" class="text-blue-500 hover:text-blue-800 ps-5">Sell cards</a>
+        <a href="/alerts" class="text-blue-500 hover:text-blue-800 ps-5">Alerts</a>
+        <a href="/catalog" class="text-blue-500 hover:text-blue-800 ps-5">Catalog</a>
     </div>
         {{ $slot }}
     <script>

@@ -119,7 +119,7 @@ class CardService
 
         }
 
-        $ownedCards->take($ownChangeAmount * -1)->each(fn($ownedCard) => $ownedCard->delete());
+        $ownedCards->take($ownChangeAmount)->each(fn($ownedCard) => $ownedCard->delete());
 
         return new AddCardResponse(
             status: AddCardStatuses::DELETE,

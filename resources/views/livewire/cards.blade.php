@@ -14,7 +14,7 @@
                         {{$metrics['total_cards']['total']}} Total
                     </h3>
                     <h3 class="text-lg font-bold ps-10 text-stone-300">
-                        ({{$metrics['total_cards']['percentage']}} %)
+                        ({{$metrics['total_cards']['percentage']}} % / {{$metrics['total_cards']['total'] - $metrics['total_cards']['owned']}} Missing)
                     </h3>
                 </div>
                 <div class="flex">
@@ -26,7 +26,7 @@
                         {{$metrics['total_instances']['total']}} Total Instances
                     </h3>
                     <h3 class="text-lg font-bold ps-10 text-stone-300">
-                        ({{$metrics['total_instances']['percentage']}} %)
+                        ({{$metrics['total_instances']['percentage']}} % / {{$metrics['total_instances']['total'] - $metrics['total_instances']['owned']}} Missing)
                     </h3>
                 </div>
             </div>
@@ -70,32 +70,3 @@
     </div>
     {{$cards->links()}}
 </div>
-
-<script>
-    function registerTooltips() {
-        document.body.addEventListener('click', function (event) {
-            const tooltip = event.target.getAttribute('data-tooltip-target');
-            const hideTooltip = event.target.getAttribute('data-hide-tooltip');
-
-            if (hideTooltip) {
-                hideAllTooltips();
-            }
-
-            if (!tooltip) {
-                return;
-            }
-            hideAllTooltips();
-            document.getElementById('tooltip-' + tooltip)?.classList.remove('hidden');
-        });
-    }
-
-    function hideAllTooltips() {
-        document.querySelectorAll('.js-tooltip').forEach((element) => {
-            element.classList.add('hidden');
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        registerTooltips();
-    });
-</script>

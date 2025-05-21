@@ -9,11 +9,9 @@
 ?>
 
 <div class="w-screen p-10 text-stone-700">
-    <div class="pb-10">
-        <h1 class="text-2xl font-bold">
-            {{$card->name}}
-        </h1>
-    </div>
+    <h1 class="text-2xl font-bold">
+        {{$card->name}}
+    </h1>
     <div class="py-5 grid gap-3 grid-cols-1 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-7 grid-rows-1">
         @foreach($card->variantCards as $variantCard)
             <div class="flex text-stone-400 relative items-start p-4 my-5">
