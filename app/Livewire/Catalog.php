@@ -76,7 +76,7 @@ class Catalog extends Component
         $this->catalogMatches = $this->listService->generateList();
 
         foreach ($this->catalogMatches as $catalogMatch) {
-            $this->total += $catalogMatch->ownedCard->amount;
+            $this->total += $catalogMatch->ownedCardWithAmount->amount;
         }
     }
 
@@ -98,12 +98,12 @@ class Catalog extends Component
 
             fputcsv($handle, [
                 $catalog->cardmarket_id,
-                $catalogMatch->ownedCard->amount,
+                $catalogMatch->ownedCardWithAmount->amount,
                 $catalog->name,
                 $catalog->expansion,
-                $catalogMatch->ownedCard->is_first_edition ? '1' : '0',
-                $catalogMatch->ownedCard->cond->getShortHand(),
-                $catalogMatch->ownedCard->lang->getLongName()
+                $catalogMatch->ownedCardWithAmount->is_first_edition ? '1' : '0',
+                $catalogMatch->ownedCardWithAmount->cond->getShortHand(),
+                $catalogMatch->ownedCardWithAmount->lang->getLongName()
             ]);
         }
 

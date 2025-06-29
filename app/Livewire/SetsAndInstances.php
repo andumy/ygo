@@ -7,6 +7,8 @@ use App\Models\Set;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;
 use App\Repositories\SetRepository;
+use App\Repositories\VariantCardRepository;
+use App\Repositories\VariantRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -36,17 +38,23 @@ class SetsAndInstances extends Component
     private SetRepository $setRepository;
     private CardRepository $cardRepository;
     private CardInstanceRepository $cardInstanceRepository;
+    private VariantCardRepository $variantCardRepository;
+    private VariantRepository $variantRepository;
 
 
     public function boot(
         SetRepository $setRepository,
         CardRepository $cardRepository,
-        CardInstanceRepository $cardInstanceRepository
+        CardInstanceRepository $cardInstanceRepository,
+        VariantCardRepository $variantCardRepository,
+        VariantRepository $variantRepository
     )
     {
         $this->setRepository = $setRepository;
         $this->cardRepository = $cardRepository;
         $this->cardInstanceRepository = $cardInstanceRepository;
+        $this->variantCardRepository = $variantCardRepository;
+        $this->variantRepository = $variantRepository;
     }
 
     public function mount() {
@@ -96,11 +104,17 @@ class SetsAndInstances extends Component
 
     public function confirmSave()
     {
-        $this->cardInstanceRepository->firstOrCreate([
+        $ci = $this->cardInstanceRepository->firstOrCreate([
             'card_id' => $this->card->id,
             'set_id' => $this->set->id,
             'card_set_code' => $this->card_set_code,
             'rarity_verbose' => $this->rarities[$this->rarity],
+        ],[]);
+
+        $variantCard = $this->variantCardRepository->findById($this->card_id);
+        $this->variantRepository->firstOrCreate([
+            'card_instance_id' => $ci->id,
+            'variant_card_id' => $variantCard->id,
         ],[]);
 
         $this->message = $this->card->name . ' added to ' . $this->set->name .

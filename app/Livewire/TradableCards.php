@@ -152,8 +152,8 @@ class TradableCards extends Component
         foreach ($this->variantRepository->search(set: $this->set, onlyOwned: 1, excludeOrdered: true) as $variant) {
             /** @var Variant $variant */
 
-            $ownedCards = $this->ownedCardRepository->fetchByVariantGroupByAllOverAmount($variant->id);
-            foreach ($ownedCards as $ownedCard) {
+            $ownedCardsWithAmount = $this->ownedCardRepository->fetchByVariantGroupByAllOverAmount($variant->id);
+            foreach ($ownedCardsWithAmount as $ownedCard) {
                 $currentElement = $this->variants
                 [$variant->id]
                 [$ownedCard->lang->value]

@@ -51,14 +51,14 @@ class Orders extends Component
     public function render()
     {
         $this->orders = $this->orderRepository->all();
-        $orderedCards = [];
+        $orderedCardsWithAmount = [];
 
         if($this->orderId) {
-            $orderedCards = $this->ownedCardRepository->fetchByOrderWithAmount($this->orderId);
+            $orderedCardsWithAmount = $this->ownedCardRepository->fetchByOrderWithAmount($this->orderId);
         }
 
         return view('livewire.orders', [
-            'orderedCards' => $orderedCards
+            'orderedCardsWithAmount' => $orderedCardsWithAmount
         ]);
     }
 }

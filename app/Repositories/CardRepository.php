@@ -44,9 +44,9 @@ class CardRepository
     }
 
     public function paginate(
-        string $search,
-        string $set,
-        int $pagination,
+        string $search = '',
+        string $set = '',
+        int $pagination = 100,
         ?bool $onlyOwned = null,
     )
     {

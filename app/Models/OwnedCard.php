@@ -8,11 +8,9 @@ use App\Enums\Sale;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int id
- * @property int amount
  * @property Lang $lang
  * @property Sale $sale
  * @property Condition $cond

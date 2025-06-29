@@ -137,9 +137,43 @@ const handleShoppingCart = () => {
     })
 }
 
+const showImportCsv = () => {
+    let output = ''
+    document.querySelectorAll('tbody>tr').forEach(node => {
+        const nr = node.querySelector('.row .col-auto div').querySelector('span').innerHTML.substring(1);
+        const set = node.querySelector('.row .col-auto div').querySelector('a span').innerHTML;
+        const cond = node.querySelectorAll('.row .col-auto')[1].querySelector('a span').innerHTML;
+        const language = node.querySelectorAll('.row .col-auto')[2].querySelector('span span').getAttribute('aria-label');
+        let lang = language;
+        switch(language){
+            case 'Italian':
+                lang = 'it';
+                break;
+            case 'German':
+                lang = 'de';
+                break;
+            case 'Spanish':
+                lang = 'sp';
+                break;
+            case 'English':
+                lang = 'en';
+                break;
+            case 'French':
+                lang = 'fr';
+                break;
+        }
+        const isFirstEd = node.querySelectorAll('.row .col-auto')[4].querySelector('span span') ? 1 : '';
+        output += `\n${set},,${lang},${nr},1,${isFirstEd},,${cond}`;
+    });
+    console.log(output)
+
+}
+
 
 if(document.querySelector('h1')?.innerText === "Shopping Cart"){
     handleShoppingCart();
 } else {
     handleProductPage();
 }
+
+showImportCsv();

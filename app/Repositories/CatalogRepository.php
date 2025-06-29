@@ -33,6 +33,7 @@ class CatalogRepository
         ]);
     }
 
+    /** @return Collection<Catalog> */
     public function search(
         ?string $expansionCode = null,
         ?string $number = null,

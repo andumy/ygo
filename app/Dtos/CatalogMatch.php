@@ -3,7 +3,7 @@
 namespace App\Dtos;
 
 use App\Models\Catalog;
-use App\Models\OwnedCard;
+use App\Models\OwnedCardWithAmount;
 use Illuminate\Support\Collection;
 
 class CatalogMatch
@@ -11,13 +11,13 @@ class CatalogMatch
 
     /**
      * @param Collection<Catalog> $catalogs
-     * @param OwnedCard $ownedCard
+     * @param OwnedCardWithAmount $ownedCardWithAmount
      * @param Catalog|null $selectedCatalog
      */
     public function __construct(
-        public Collection         $catalogs,
-        public OwnedCard        $ownedCard,
-        public ?Catalog $selectedCatalog = null
+        public Collection          $catalogs,
+        public OwnedCardWithAmount $ownedCardWithAmount,
+        public ?Catalog            $selectedCatalog = null
     )
     {
     }

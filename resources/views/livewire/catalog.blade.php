@@ -52,14 +52,14 @@
                 <tbody>
                 @foreach($catalogMatches as $index => $catalogMatch)
                     <tr class="py-2 border-b-2 {{$catalogMatch->selectedCatalog ? 'bg-green-200' : 'bg-red-200'}}">
-                        <td class="text-center px-2">{{$catalogMatch->ownedCard->variant->cardInstance->card->name}}</td>
-                        <td class="text-center px-2">{{$catalogMatch->ownedCard->variant->cardInstance->card_set_code}}</td>
-                        <td class="text-center px-2">{{$catalogMatch->ownedCard->variant->cardInstance->set->name}}</td>
-                        <td class="text-center px-2">{{$catalogMatch->ownedCard->variant->cardInstance->rarity_verbose->value}}</td>
-                        <td class="text-center px-2">{{$catalogMatch->ownedCard->lang->value}}</td>
-                        <td class="text-center px-2">{{$catalogMatch->ownedCard->cond->value}}</td>
-                        <td class="text-center px-2">{!! $catalogMatch->ownedCard->is_first_edition ? '<span>✔️</span>' : '' !!}</td>
-                        <td class="text-center px-2">{{$catalogMatch->ownedCard->amount}}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->card->name}}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->card_set_code}}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->set->name}}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->rarity_verbose->value}}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->lang->value}}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->cond->value}}</td>
+                        <td class="text-center px-2">{!! $catalogMatch->ownedCardWithAmount->is_first_edition ? '<span>✔️</span>' : '' !!}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->amount}}</td>
                         <td class="text-center px-2">||</td>
 
                         @if($catalogMatch->selectedCatalog)

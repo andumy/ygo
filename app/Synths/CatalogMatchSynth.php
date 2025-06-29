@@ -7,6 +7,7 @@ use App\Models\Card;
 use App\Models\CardInstance;
 use App\Models\Catalog;
 use App\Models\OwnedCard;
+use App\Models\OwnedCardWithAmount;
 use App\Models\Set;
 use App\Models\Variant;
 use Illuminate\Support\Collection;
@@ -25,7 +26,7 @@ class CatalogMatchSynth extends Synth
     {
         return [[
             'catalogs' => $target->catalogs,
-            'ownedCard' => $target->ownedCard,
+            'ownedCard' => $target->ownedCardWithAmount,
             'selectedCatalog' => $target->selectedCatalog,
         ], []];
     }
@@ -39,8 +40,8 @@ class CatalogMatchSynth extends Synth
             );
         }
 
-        $ownedCard = new OwnedCard();
-        $ownedCard->fill($array['ownedCard']);
+        $ownedCardWithAmount = new OwnedCardWithAmount();
+        $ownedCardWithAmount->fill($array['ownedCard']);
 
         if (isset($array['ownedCard']['variant'])) {
             $variant = new Variant();
@@ -70,13 +71,13 @@ class CatalogMatchSynth extends Synth
                 $variant->setRelation('cardInstance', $cardInstance);
             }
 
-            unset($ownedCard->variant);
-            $ownedCard->setRelation('variant', $variant);
+            unset($ownedCardWithAmount->variant);
+            $ownedCardWithAmount->setRelation('variant', $variant);
         }
 
         return new CatalogMatch(
             catalogs: $catalogs,
-            ownedCard: $ownedCard,
+            ownedCardWithAmount: $ownedCardWithAmount,
             selectedCatalog: $array['selectedCatalog'] ? (new Catalog())->fill($array['selectedCatalog']) : null
         );
     }

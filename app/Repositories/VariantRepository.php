@@ -7,6 +7,7 @@ use App\Enums\Sale;
 use App\Models\Variant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class VariantRepository
 {
@@ -102,5 +103,53 @@ class VariantRepository
                     $q->whereHas('ownedCards');
                 }
             });
+    }
+
+    public function getPurchasableVariants(int $setId): Collection
+    {
+        // Get rarities in order for comparison
+        $rarityCases = Rarities::cases();
+        $rarityOrder = array_flip(array_map(fn($r) => $r->value, $rarityCases));
+
+        // Convert rarity order to a CASE statement for MySQL ordering
+        $rarityOrderSql = "CASE ci.rarity_verbose ";
+        foreach ($rarityOrder as $rarityValue => $position) {
+            $rarityOrderSql .= "WHEN ".DB::connection()->getPdo()->quote($rarityValue)." THEN $position ";
+        }
+        $rarityOrderSql .= "ELSE " . count($rarityOrder) . " END";
+
+        return Variant::query()
+            ->select('variants.*')
+            ->join('variant_cards as vc', 'variants.variant_card_id', '=', 'vc.id')
+            ->join('card_instances as ci', 'variants.card_instance_id', '=', 'ci.id')
+            ->leftJoin('owned_cards as oc', 'variants.id', '=', 'oc.variant_id')
+            ->whereNull('oc.id') // No owned cards
+            ->where('vc.is_original', true) // Only original variant cards
+            ->where('ci.set_id', $setId) // Only variants from the specified set
+            ->whereNotExists(function($query) {
+                // Exclude cards where ANY variant of the same card (regardless of rarity) is owned
+                $query->select(DB::raw(1))
+                    ->from('variants as v_owned')
+                    ->join('card_instances as ci_owned', 'v_owned.card_instance_id', '=', 'ci_owned.id')
+                    ->join('owned_cards as oc_owned', 'v_owned.id', '=', 'oc_owned.variant_id')
+                    ->whereRaw('ci_owned.card_id = ci.card_id')
+                    ->whereRaw('ci_owned.set_id = ci.set_id')
+                    ->whereRaw('ci_owned.card_set_code = ci.card_set_code');
+            })
+            ->whereIn('variants.id', function($query) use ($rarityOrderSql, $setId) {
+                $query->selectRaw('MIN(v2.id)')
+                    ->from('variants as v2')
+                    ->join('card_instances as ci2', 'v2.card_instance_id', '=', 'ci2.id')
+                    ->leftJoin('owned_cards as oc2', 'v2.id', '=', 'oc2.variant_id')
+                    ->join('variant_cards as vc2', 'v2.variant_card_id', '=', 'vc2.id')
+                    ->whereNull('oc2.id')
+                    ->where('vc2.is_original', true)
+                    ->where('ci2.set_id', $setId)
+                    ->groupBy('ci2.card_id', 'ci2.set_id', 'ci2.card_set_code')
+                    ->havingRaw("MIN($rarityOrderSql)");
+            })
+            ->with(['cardInstance.card', 'cardInstance.set', 'variantCard'])
+            ->orderBy('ci.card_set_code')
+            ->get();
     }
 }

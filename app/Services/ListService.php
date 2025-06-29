@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Dtos\CatalogMatch;
-use App\Models\OwnedCard;
+use App\Models\Catalog;
+use App\Models\OwnedCardWithAmount;
+use App\Models\Variant;
 use App\Repositories\CatalogRepository;
 use App\Repositories\OwnedCardRepository;
 use Illuminate\Support\Collection;
@@ -23,11 +25,11 @@ class ListService
      */
     public function generateList(): Collection{
         $catalogMatches = new Collection();
-        $ownedCards = $this->ownedCardRepository->getTradable();
+        $ownedCardsWithAmount = $this->ownedCardRepository->getTradable();
 
-        foreach ($ownedCards as $ownedCard) {
+        foreach ($ownedCardsWithAmount as $ownedCardWithAmount) {
             $catalogMatches->push(
-                $this->extractCatalogEntry($ownedCard)
+                $this->extractCatalogEntry($ownedCardWithAmount)
             );
         }
         return $catalogMatches;
@@ -37,45 +39,54 @@ class ListService
     public function markOwnedCardsAsListed(Collection $catalogMatches): void
     {
         foreach ($catalogMatches as $catalogMatch) {
-            $this->ownedCardRepository->markListed($catalogMatch->ownedCard);
+            $this->ownedCardRepository->markListed($catalogMatch->ownedCardWithAmount);
         }
     }
 
-    private function extractCatalogEntry(OwnedCard $ownedCard): CatalogMatch{
-        $catalogs = $this->catalogRepository->search(
-            expansionCode: $ownedCard->variant->cardInstance->card_set_code_base,
-            number: $ownedCard->variant->cardInstance->card_set_code_nr,
-            rarity: $ownedCard->variant->cardInstance->rarity_verbose,
-            name: $ownedCard->variant->cardInstance->card->name,
-        );
+    private function extractCatalogEntry(OwnedCardWithAmount $ownedCardWithAmount): CatalogMatch{
 
-        if($catalogs->isEmpty()){
-            $catalogs = $this->catalogRepository->search(
-                expansionCode: $ownedCard->variant->cardInstance->card_set_code_base,
-                number: $ownedCard->variant->cardInstance->card_set_code_nr,
-                rarity: $ownedCard->variant->cardInstance->rarity_verbose,
-            );
-        }
-
-        if($catalogs->isEmpty()){
-            $catalogs = $this->catalogRepository->search(
-                expansionCode: $ownedCard->variant->cardInstance->card_set_code_base,
-                number: $ownedCard->variant->cardInstance->card_set_code_nr,
-            );
-        }
-
-        if($catalogs->isEmpty()){
-            $catalogs = $this->catalogRepository->search(
-                number: $ownedCard->variant->cardInstance->card_set_code_nr,
-                rarity: $ownedCard->variant->cardInstance->rarity_verbose,
-                name: $ownedCard->variant->cardInstance->card->name,
-            );
-        }
-
+        $catalogs = $this->getCatalogsMatch($ownedCardWithAmount->variant);
         return new CatalogMatch(
             catalogs: $catalogs,
-            ownedCard: $ownedCard,
+            ownedCardWithAmount: $ownedCardWithAmount,
             selectedCatalog: $catalogs->count() > 1 ? null : $catalogs->first()
+        );
+    }
+
+    /** @return Collection<Catalog> */
+    public function getCatalogsMatch(Variant $variant): Collection{
+        $catalogs = $this->catalogRepository->search(
+            expansionCode: $variant->cardInstance->card_set_code_base,
+            number: $variant->cardInstance->card_set_code_nr,
+            rarity: $variant->cardInstance->rarity_verbose,
+            name: $variant->cardInstance->card->name,
+        );
+
+        if(!$catalogs->isEmpty()){
+            return $catalogs;
+        }
+
+        $catalogs = $this->catalogRepository->search(
+            expansionCode: $variant->cardInstance->card_set_code_base,
+            number: $variant->cardInstance->card_set_code_nr,
+            rarity: $variant->cardInstance->rarity_verbose,
+        );
+        if(!$catalogs->isEmpty()){
+            return $catalogs;
+        }
+
+        $catalogs = $this->catalogRepository->search(
+            expansionCode: $variant->cardInstance->card_set_code_base,
+            number: $variant->cardInstance->card_set_code_nr,
+        );
+        if(!$catalogs->isEmpty()){
+            return $catalogs;
+        }
+
+        return $this->catalogRepository->search(
+            number: $variant->cardInstance->card_set_code_nr,
+            rarity: $variant->cardInstance->rarity_verbose,
+            name: $variant->cardInstance->card->name,
         );
     }
 }

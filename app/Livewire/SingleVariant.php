@@ -63,22 +63,22 @@ class SingleVariant extends Component
     {
         $this->ownedCards = [];
 
-        foreach ($this->ownedCardRepository->fetchByVariantGroupByAllOverAmount($this->variant->id) as $ownedCard){
+        foreach ($this->ownedCardRepository->fetchByVariantGroupByAllOverAmount($this->variant->id) as $ownedCardWithAmount){
             if(
                 $this->ownedCards
-                [$ownedCard->lang->value]
-                [$ownedCard->cond->value]
-                [(int)$ownedCard->is_first_edition] ?? null
+                [$ownedCardWithAmount->lang->value]
+                [$ownedCardWithAmount->cond->value]
+                [(int)$ownedCardWithAmount->is_first_edition] ?? null
             ) {
                 $this->ownedCards
-                [$ownedCard->lang->value]
-                [$ownedCard->cond->value]
-                [(int)$ownedCard->is_first_edition] += $ownedCard->amount;
+                [$ownedCardWithAmount->lang->value]
+                [$ownedCardWithAmount->cond->value]
+                [(int)$ownedCardWithAmount->is_first_edition] += $ownedCardWithAmount->amount;
             } else {
                 $this->ownedCards
-                [$ownedCard->lang->value]
-                [$ownedCard->cond->value]
-                [(int)$ownedCard->is_first_edition] = $ownedCard->amount ?? 0;
+                [$ownedCardWithAmount->lang->value]
+                [$ownedCardWithAmount->cond->value]
+                [(int)$ownedCardWithAmount->is_first_edition] = $ownedCardWithAmount->amount ?? 0;
             }
         }
 

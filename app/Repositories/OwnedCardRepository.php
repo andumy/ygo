@@ -6,6 +6,7 @@ use App\Enums\Condition;
 use App\Enums\Lang;
 use App\Enums\Sale;
 use App\Models\OwnedCard;
+use App\Models\OwnedCardWithAmount;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use function collect;
@@ -116,9 +117,9 @@ class OwnedCardRepository
         $ownedCard->save();
         return true;
     }
-    /** @return Collection<OwnedCard> */
+    /** @return Collection<OwnedCardWithAmount> */
     public function fetchByVariantGroupByAllOverAmount(int $variantId): Collection {
-        return OwnedCard::where('variant_id', $variantId)
+        return OwnedCardWithAmount::where('variant_id', $variantId)
             ->where('sale', '!=', Sale::SOLD)
             ->groupBy('variant_id', 'lang', 'cond', 'sale', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, sale, is_first_edition, count(*) as amount')
@@ -126,9 +127,9 @@ class OwnedCardRepository
             ->get();
     }
 
-    /** @return Collection<OwnedCard> */
+    /** @return Collection<OwnedCardWithAmount> */
     public function fetchByOrderWithAmount(int $orderId): Collection {
-        return OwnedCard::where('order_id', $orderId)
+        return OwnedCardWithAmount::where('order_id', $orderId)
             ->where('sale', '!=', Sale::SOLD)
             ->groupBy('variant_id','lang', 'cond', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, is_first_edition, count(*) as amount')
@@ -187,9 +188,9 @@ class OwnedCardRepository
         OwnedCard::where('id',$ownCardId)->delete();
     }
 
-    /** @return Collection<OwnedCard> */
+    /** @return Collection<OwnedCardWithAmount> */
     public function getTradable(): Collection{
-        return OwnedCard::where('sale', Sale::TRADE)
+        return OwnedCardWithAmount::where('sale', Sale::TRADE)
             ->where('order_id', null)
             ->groupBy('variant_id','lang', 'cond', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, is_first_edition, count(*) as amount')

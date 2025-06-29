@@ -1,9 +1,9 @@
 @php
     use App\Models\Order;
-    use App\Models\OwnedCard;
+    use App\Models\OwnedCard;use App\Models\OwnedCardWithAmount;
     /**
-    * @var OwnedCard $oc
-    * @var Order $o
+    * @var OwnedCardWithAmount[] $orderedCardsWithAmount
+    * @var Order[] $orders
     * */
 @endphp
 <div class="w-screen p-10 text-stone-700">
@@ -21,10 +21,10 @@
     <div class="py-10 flex justify-between">
         <div class="flex">
             <input
-                    class="appearance-none border rounded text-black"
-                    type="text"
-                    wire:model="orderName"
-                    placeholder="Order name"
+                class="appearance-none border rounded text-black"
+                type="text"
+                wire:model="orderName"
+                placeholder="Order name"
             >
             <button class="dark:bg-gray-800 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded"
                     wire:click="addOrder">
@@ -50,7 +50,7 @@
             </button>
         </div>
     </div>
-    @if($orderedCards)
+    @if($orderedCardsWithAmount)
         <table>
             <thead>
             <tr>
@@ -64,7 +64,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($orderedCards as $oc)
+            @foreach($orderedCardsWithAmount as $oc)
                 <tr class="py-2">
                     <td class="text-center px-2">{{$oc->variant->cardInstance->ownedCards->where('lang', $oc->lang)->where('cond', $oc->cond)->where('order_id', $orderId)->pluck('id')->reduce(fn($carry, $id) => "$carry $id",'')}}</td>
                     <td class="text-center px-2
