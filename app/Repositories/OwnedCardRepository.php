@@ -3,42 +3,58 @@
 namespace App\Repositories;
 
 use App\Enums\Condition;
+use App\Enums\Games;
 use App\Enums\Lang;
 use App\Enums\Sale;
 use App\Models\OwnedCard;
 use App\Models\OwnedCardWithAmount;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use function collect;
 
 class OwnedCardRepository
 {
 
-    public function count(): int {
-        return OwnedCard::where('sale','!=', Sale::SOLD)->count();
-    }
-
-    public function countTradable(): int {
-        return OwnedCard::where('sale', Sale::TRADE)->count();
+    public function count(): int
+    {
+        /** @var GameRepository $gameRepository */
+        $gameRepository = App::make(GameRepository::class);
+        return OwnedCard::where('sale', '!=', Sale::SOLD)
+            ->join('variants', 'owned_cards.variant_id', '=', 'variants.id')
+            ->join('card_instances', 'variants.card_instance_id', '=', 'card_instances.id')
+            ->where(
+                'card_instances.game_id',
+                Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id
+            )->count();
     }
 
     public function purgeSell(): void
     {
-        OwnedCard::where('sale', Sale::SOLD)->delete();
+        /** @var GameRepository $gameRepository */
+        $gameRepository = App::make(GameRepository::class);
+        OwnedCard::where('sale', Sale::SOLD)->join('variants', 'owned_cards.variant_id', '=', 'variants.id')
+            ->join('card_instances', 'variants.card_instance_id', '=', 'card_instances.id')
+            ->where(
+                'card_instances.game_id',
+                Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id
+            )->delete();
     }
 
     public function createAmount(
-        int $variantId,
-        int $batch,
-        int $amount,
-        Lang $lang = Lang::ENGLISH,
+        int       $variantId,
+        int       $batch,
+        int       $amount,
+        Lang      $lang = Lang::ENGLISH,
         Condition $condition = Condition::NEAR_MINT,
-        int $orderId = null,
-        ?bool $isFirstEdition = null,
-        Sale $sale = Sale::NOT_SET
-    ): Collection {
+        int       $orderId = null,
+        ?bool     $isFirstEdition = null,
+        Sale      $sale = Sale::NOT_SET
+    ): Collection
+    {
         $ownedCards = collect();
-        for($i = 0; $i < $amount; $i++){
+        for ($i = 0; $i < $amount; $i++) {
             $ownedCards->push($this->create(
                 variantId: $variantId,
                 batch: $batch,
@@ -53,21 +69,22 @@ class OwnedCardRepository
     }
 
     public function sellAmount(
-        int $variantId,
-        int $amount,
-        Lang $lang = Lang::ENGLISH,
+        int       $variantId,
+        int       $amount,
+        Lang      $lang = Lang::ENGLISH,
         Condition $condition = Condition::NEAR_MINT,
-        ?bool $isFirstEdition = null,
-    ): int {
+        ?bool     $isFirstEdition = null,
+    ): int
+    {
         $totalDeleted = 0;
-        for($i = 0; $i < $amount; $i++){
+        for ($i = 0; $i < $amount; $i++) {
             $wasUpdated = $this->sell(
                 variantId: $variantId,
                 lang: $lang,
                 condition: $condition,
                 isFirstEdition: $isFirstEdition,
             );
-            if($wasUpdated){
+            if ($wasUpdated) {
                 $totalDeleted++;
             }
         }
@@ -75,14 +92,15 @@ class OwnedCardRepository
     }
 
     public function create(
-        int $variantId,
-        int $batch,
-        Lang $lang = Lang::ENGLISH,
+        int       $variantId,
+        int       $batch,
+        Lang      $lang = Lang::ENGLISH,
         Condition $condition = Condition::NEAR_MINT,
-        int $orderId = null,
-        ?bool $isFirstEdition = null,
-        Sale $sale = Sale::NOT_SET
-    ): OwnedCard {
+        int       $orderId = null,
+        ?bool     $isFirstEdition = null,
+        Sale      $sale = Sale::NOT_SET
+    ): OwnedCard
+    {
         return OwnedCard::create([
             'variant_id' => $variantId,
             'lang' => $lang,
@@ -95,11 +113,12 @@ class OwnedCardRepository
     }
 
     public function sell(
-        int $variantId,
-        Lang $lang = Lang::ENGLISH,
+        int       $variantId,
+        Lang      $lang = Lang::ENGLISH,
         Condition $condition = Condition::NEAR_MINT,
-        ?bool $isFirstEdition = null,
-    ): bool {
+        ?bool     $isFirstEdition = null,
+    ): bool
+    {
         /** @var OwnedCard|null $ownedCard */
         $ownedCard = OwnedCard::where([
             'variant_id' => $variantId,
@@ -109,7 +128,7 @@ class OwnedCardRepository
             'is_first_edition' => $isFirstEdition === null ? false : $isFirstEdition
         ])->first();
 
-        if(!$ownedCard){
+        if (!$ownedCard) {
             return false;
         }
 
@@ -117,25 +136,28 @@ class OwnedCardRepository
         $ownedCard->save();
         return true;
     }
+
     /** @return Collection<OwnedCardWithAmount> */
-    public function fetchByVariantGroupByAllOverAmount(int $variantId): Collection {
+    public function fetchByVariantGroupByAllOverAmount(int $variantId): Collection
+    {
         return OwnedCardWithAmount::where('variant_id', $variantId)
             ->where('sale', '!=', Sale::SOLD)
             ->groupBy('variant_id', 'lang', 'cond', 'sale', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, sale, is_first_edition, count(*) as amount')
-            ->orderBy('amount','DESC')
+            ->orderBy('amount', 'DESC')
             ->get();
     }
 
     /** @return Collection<OwnedCardWithAmount> */
-    public function fetchByOrderWithAmount(int $orderId): Collection {
+    public function fetchByOrderWithAmount(int $orderId): Collection
+    {
         return OwnedCardWithAmount::where('order_id', $orderId)
             ->where('sale', '!=', Sale::SOLD)
-            ->groupBy('variant_id','lang', 'cond', 'is_first_edition')
+            ->groupBy('variant_id', 'lang', 'cond', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, is_first_edition, count(*) as amount')
             ->join('variants', 'variants.id', '=', 'owned_cards.variant_id')
             ->join('card_instances', 'card_instances.id', '=', 'variants.card_instance_id')
-            ->orderBy('card_instances.card_set_code','DESC')
+            ->orderBy('card_instances.card_set_code', 'DESC')
             ->get();
     }
 
@@ -146,12 +168,13 @@ class OwnedCardRepository
 
     /** @return Collection<OwnedCard> */
     public function cardsForUpdate(
-        int $variantId,
-        Lang $lang = Lang::ENGLISH,
+        int        $variantId,
+        Lang       $lang = Lang::ENGLISH,
         ?Condition $condition = null,
-        ?int $orderId = null,
-        ?bool $isFirstEdition = null
-    ): Collection{
+        ?int       $orderId = null,
+        ?bool      $isFirstEdition = null
+    ): Collection
+    {
         return OwnedCard::where('variant_id', $variantId)
             ->where('sale', '!=', Sale::SOLD)
             ->where('lang', $lang)
@@ -165,14 +188,14 @@ class OwnedCardRepository
 
     public function shipOrder(int $orderId): void
     {
-        OwnedCard::where('order_id',$orderId)->update(['order_id' => null]);
+        OwnedCard::where('order_id', $orderId)->update(['order_id' => null]);
     }
 
     public function resetSale(
-        int $variantId,
-        Lang $lang,
+        int       $variantId,
+        Lang      $lang,
         Condition $condition,
-        bool $isFirstEdition
+        bool      $isFirstEdition
     ): void
     {
         OwnedCard::where('variant_id', $variantId)
@@ -185,20 +208,21 @@ class OwnedCardRepository
 
     public function delete(int $ownCardId): void
     {
-        OwnedCard::where('id',$ownCardId)->delete();
+        OwnedCard::where('id', $ownCardId)->delete();
     }
 
     /** @return Collection<OwnedCardWithAmount> */
-    public function getTradable(): Collection{
+    public function getTradable(): Collection
+    {
         return OwnedCardWithAmount::where('sale', Sale::TRADE)
             ->where('order_id', null)
-            ->groupBy('variant_id','lang', 'cond', 'is_first_edition')
+            ->groupBy('variant_id', 'lang', 'cond', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, is_first_edition, count(*) as amount')
             ->join('variants', 'variants.id', '=', 'owned_cards.variant_id')
             ->join('card_instances', 'card_instances.id', '=', 'variants.card_instance_id')
             ->join('sets', 'sets.id', '=', 'card_instances.set_id')
-            ->orderBy('sets.code','DESC')
-            ->orderBy('card_instances.card_set_code','ASC')
+            ->orderBy('sets.code', 'DESC')
+            ->orderBy('card_instances.card_set_code', 'ASC')
             ->limit(100)
             ->get();
     }

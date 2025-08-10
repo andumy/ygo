@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int card_instance_id
  * @property CardInstance $cardInstance
  */
-
 class Price extends Model
 {
     use HasFactory;

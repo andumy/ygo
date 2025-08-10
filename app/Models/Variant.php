@@ -123,4 +123,5 @@ class Variant extends Model
             $this->ownedCards->whereNotNull('order_id')->reduce([$this, 'buildAmountByLangAndCond'], [])
         );
     }
+
 }

@@ -49,12 +49,6 @@ class FetchImagesCommand extends Command
                     }
 
                     try {
-//                        if(Storage::exists('public/' . $card->ygoId . '.jpg')){
-//                            $cardRepository->markHasImage($card);
-//                            $this->info("Image already exists for {$card->name}");
-//                            continue;
-//                        }
-
                         $contents = file_get_contents(config('ygo.image_url') . $card->ygoId . '.jpg');
                         Storage::put('public/' . $card->ygoId . '.jpg', $contents);
                         $cardRepository->markHasImage($card);

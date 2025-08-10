@@ -29,4 +29,5 @@ class Order extends Model
     {
         return $this->hasManyThrough(Card::class, OwnedCard::class);
     }
+
 }

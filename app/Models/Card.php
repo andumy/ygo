@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Enums\Games;
+use App\Repositories\GameRepository;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
@@ -23,6 +26,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string alias
  * @property string type
  * @property bool has_image
+ * @property int game_id
+ * @property Game game
  * @property Collection<Variant> variants
  * @property Collection<VariantCard> variantCards
  * @property Collection<CardInstance> cardInstances
@@ -58,6 +63,11 @@ class Card extends Model
             'card_id',
             'set_id'
         );
+    }
+
+    public function game(): BelongsTo
+    {
+        return $this->belongsTo(Game::class);
     }
 
     public function codeForSet(string $set): string {
@@ -103,5 +113,18 @@ class Card extends Model
         /** @var VariantCard $variantCard */
         $variantCard = $this->variantCards()->where('is_original', 1)->first();
         return $variantCard->ygo_id;
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('game', function (Builder $builder) {
+            /** @var GameRepository $gameRepository */
+            $gameRepository = App::make(GameRepository::class);
+
+            $builder->where(
+                'cards.game_id',
+        Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id
+            );
+        });
     }
 }

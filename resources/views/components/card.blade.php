@@ -28,6 +28,8 @@
                     {{asset('storage/'. $card->ygoId . '.jpg')}}
                 @elseif (file_exists(public_path('storage/'. $card->ygoId . '.png')))
                     {{asset('storage/'. $card->ygoId . '.png')}}
+                @else
+                    {{asset('storage/back.jpg')}}
                 @endif
             "
             >

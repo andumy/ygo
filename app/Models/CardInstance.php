@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\Games;
 use App\Enums\Lang;
 use App\Enums\Rarities;
 use App\Enums\Sale;
+use App\Repositories\GameRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,11 +15,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use function array_key_exists;
 use function collect;
 use function current;
 use function explode;
-use function strtoupper;
 
 /**
  * @property int id
@@ -27,6 +31,8 @@ use function strtoupper;
  * @property int set_id
  * @property Collection<OwnedCard> ownedCards
  * @property Collection<Variant> variants
+ * @property int game_id
+ * @property Game game
  * @property Price price
  * @property string card_set_code
  * @property string card_set_code_base
@@ -41,6 +47,7 @@ use function strtoupper;
  * @property boolean isOrdered
  * @property boolean isMissing
  */
+
 class CardInstance extends Model
 {
     use HasFactory;
@@ -60,6 +67,11 @@ class CardInstance extends Model
     public function set(): BelongsTo
     {
         return $this->belongsTo(Set::class);
+    }
+
+    public function game(): BelongsTo
+    {
+        return $this->belongsTo(Game::class);
     }
 
     public function ownedCards(): HasManyThrough
@@ -156,6 +168,19 @@ class CardInstance extends Model
     public function isOwnedForLang(Lang $lang): bool
     {
         return $this->ownedCards()->whereNull('order_id')->where('lang', $lang)->exists() > 0;
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('game', function (Builder $builder) {
+            /** @var GameRepository $gameRepository */
+            $gameRepository = App::make(GameRepository::class);
+
+            $builder->where(
+                'card_instances.game_id',
+        Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id
+            );
+        });
     }
 
 }

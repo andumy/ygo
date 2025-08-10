@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\Rarities;
 use App\Models\Card;
+use App\Models\Set;
 use App\Models\VariantCard;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;
@@ -66,6 +67,14 @@ class FetchCardsCommand extends Command
             }
         }
 
+        $setRepository->firstOrCreate([
+            'name' => 'Setless Cards',
+        ], [
+            'card_amount' => 0,
+            'date' => Carbon::now(),
+            'code' => 'SETLESS',
+        ]);
+
         $response = Http::get(config('ygo.cards'));
 
         $response->lazy('/data')->each(function ($data, $key) use (
@@ -80,7 +89,6 @@ class FetchCardsCommand extends Command
 
             if(!array_key_exists('card_sets', $data)){
                 $this->warn("Card {$data['name']} has no instances. Skipped.");
-                return;
             }
 
             if (!$variantCardRepository->findById($data['id'], true)) {
@@ -189,8 +197,14 @@ class FetchCardsCommand extends Command
         Card                   $card
     ): void
     {
-
-        foreach ($data['card_sets'] ?? [] as $dataSet) {
+        $fallbackSet = [
+            "set_name" => 'Setless Cards',
+            "set_code" => "",
+            "set_rarity" => "",
+            "set_rarity_code" => "",
+            "set_price" => "0"
+        ];
+        foreach ($data['card_sets'] ?? [$fallbackSet] as $dataSet) {
             $set = $setRepository->findByName($dataSet['set_name']);
             if (!$set) {
                 $this->error("Set {$dataSet['set_name']} not found.");

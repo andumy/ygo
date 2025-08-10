@@ -32,7 +32,7 @@ const showBoxes = (card,code,order,el,addToCart,isFirstEdition,lang,condition,ra
     div.style = 'position:absolute; top:0; left:-10px; background-color:white; padding:2px;margin:2px;border-radius:4px; z-index:1000;display:flex;justify-content:center;align-items:center;font-size:10px;';
 
     // Fix fetch to use HTTP if your local server isn't using HTTPS
-    fetch(`http://localhost/card-info?card=${encodeURIComponent(realCard)}`)
+    fetch(`http://localhost:8080/card-info?card=${encodeURIComponent(realCard)}`)
         .then((response) => response.json())
         .then((data) => {
             // Safely update the div content with the received data
@@ -52,7 +52,7 @@ const showBoxes = (card,code,order,el,addToCart,isFirstEdition,lang,condition,ra
 
     div.addEventListener('click', () => {
         fetch(
-            `http://localhost/order-card?
+            `http://localhost:8080/order-card?
             card=${encodeURIComponent(realCard)}
             &code=${encodeURIComponent(`${code}`)}
             &order=${encodeURIComponent(order)}

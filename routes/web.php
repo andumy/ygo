@@ -1,19 +1,19 @@
 <?php
 
 use App\Http\Controllers\CardController;
-use App\Livewire\Alerts;
-use App\Livewire\Bulk;
-use App\Livewire\Cards;
-use App\Livewire\Catalog;
-use App\Livewire\Orders;
-use App\Livewire\PurchaseRecommendation;
-use App\Livewire\Sell;
-use App\Livewire\SetsAndInstances;
-use App\Livewire\AllVariantsForCard;
-use App\Livewire\SingleVariant;
-use App\Livewire\SingleVariantCard;
-use App\Livewire\TradableCards;
-use App\Livewire\Wizzard;
+use App\Livewire\Pages\Alerts;
+use App\Livewire\Pages\AllVariantsForCard;
+use App\Livewire\Pages\Bulk;
+use App\Livewire\Pages\Cards;
+use App\Livewire\Pages\Catalog;
+use App\Livewire\Pages\Orders;
+use App\Livewire\Pages\PurchaseRecommendation;
+use App\Livewire\Pages\Sell;
+use App\Livewire\Pages\SetsAndInstances;
+use App\Livewire\Pages\SingleVariant;
+use App\Livewire\Pages\SingleVariantCard;
+use App\Livewire\Pages\TradableCards;
+use App\Livewire\Pages\Wizzard;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Cards::class);

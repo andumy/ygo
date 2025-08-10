@@ -32,7 +32,7 @@
             </div>
             <div class="flex flex-col">
                 <h3 class="text-lg font-bold text-cyan-700">
-                    {{$metrics['total_owned_physical_cards']['owned']}} Physical Cards ({{$metrics['total_owned_physical_cards']['tradable']}} tradable)
+                    {{$metrics['total_owned_physical_cards']['owned']}} Physical Cards
                 </h3>
                 <div class="pt-2">
                     <p class="text-lg font-bold text-cyan-700">Estimated value: {{$metrics['total_owned_physical_cards']['estimated_cost']}} €</p>

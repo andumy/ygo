@@ -25,7 +25,6 @@ class CardInstanceRepository
         return CardInstance::where('card_set_code', $code)->get();
     }
 
-
     public function rarities(): Collection
     {
         return CardInstance::select('rarity_verbose')
@@ -36,29 +35,23 @@ class CardInstanceRepository
 
     public function priceForOwnOrOrder(): float
     {
-        $result = DB::select(
-    'select sum(p.price) as total from card_instances as ci, owned_cards as oc, prices as p, variants as v where
-            ci.id = v.card_instance_id and
-            oc.variant_id = v.id and
-            ci.id = p.card_instance_id and
-            oc.batch is not null'
-        );
 
-        return round(current($result)->total, 2);
+        $result = CardInstance::join('variants', 'card_instances.id', '=', 'variants.card_instance_id')
+            ->join('owned_cards', 'variants.id', '=', 'owned_cards.variant_id')
+            ->join('prices', 'card_instances.id', '=', 'prices.card_instance_id')
+            ->whereNotNull('owned_cards.batch')
+            ->sum('prices.price');
+
+        return round($result, 2);
     }
 
     public function count(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): int{
-        $sub = $this->searchQuery(
+        return $this->searchQuery(
             search: $search,
             set: $set,
             onlyOwned: $onlyOwned,
             excludeOrdered: $excludeOrdered,
-        )->groupBy('card_set_code')->select('card_set_code');
-
-        return DB::table( DB::raw("({$sub->toSql()}) as sub") )
-            ->mergeBindings($sub->getQuery())
-            ->count();
-
+        )->distinct('card_set_code')->count();
     }
 
     private function searchQuery(string $search = '', string $set = '', ?bool $onlyOwned = null, bool $excludeOrdered = false): Builder {

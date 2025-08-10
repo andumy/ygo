@@ -3,11 +3,16 @@
 namespace App\Models;
 
 use App\Enums\Condition;
+use App\Enums\Games;
 use App\Enums\Lang;
 use App\Enums\Sale;
+use App\Repositories\GameRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 
 /**
  * @property int id

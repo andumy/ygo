@@ -20,11 +20,10 @@ class CardRepository
         $card->save();
     }
 
-    public function create(string $name, ?int $ygoId, string $type): Card
+    public function create(string $name, string $type): Card
     {
         return Card::create([
             'name' => $name,
-            'ygo_id' => $ygoId,
             'type' => $type
         ]);
     }

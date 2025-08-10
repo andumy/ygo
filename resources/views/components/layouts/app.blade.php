@@ -19,6 +19,7 @@
         <a href="/alerts" class="text-blue-500 hover:text-blue-800 ps-5">Alerts</a>
         <a href="/catalog" class="text-blue-500 hover:text-blue-800 ps-5">Catalog</a>
         <a href="/wizzard" class="text-blue-500 hover:text-blue-800 ps-5">Wizzard</a>
+        <livewire:game-selector/>
     </div>
         {{ $slot }}
     <script>
