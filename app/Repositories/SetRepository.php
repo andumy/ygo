@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Enums\Sale;
 use App\Models\Set;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class SetRepository
@@ -21,6 +22,17 @@ class SetRepository
     public function findByName(string $name): ?Set
     {
         return Set::where('name',$name)->orWhere('alias',$name)->first();
+    }
+
+    public function findByNameAndGameId(string $name, int $gameId): ?Set
+    {
+        return Set::withoutGlobalScope('game')
+            ->where(function (Builder $q) use($name) {
+                $q->where('name', $name)
+                    ->orWhere('alias', $name);
+            })
+            ->where('game_id', $gameId)
+            ->first();
     }
 
     /** @return Collection<Set> */

@@ -21,11 +21,11 @@ use App\Models\Variant;
         </h1>
         <a href="/single-variant-card/{{$variant->variant_card_id}}" class="hover:text-stone-400">
             <h1 class="text-2xl font-bold">
-                {{$variant->variantCard->ygo_id}}
+                {{$variant->variantCard->passcode}}
             </h1>
         </a>
         <h1 class="text-2xl font-bold">
-            &nbsp;- {{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->rarity_verbose}})
+            &nbsp;- {{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->shortRarity}})
         </h1>
     </div>
     <p class="bg-green-300 text-stone-700">
@@ -44,10 +44,10 @@ use App\Models\Variant;
                     class="w-60"
                 @endif
                 src="
-        @if (file_exists(public_path('storage/'. $variant->variantCard->ygo_id . '.jpg')))
-            {{asset('storage/'. $variant->variantCard->ygo_id . '.jpg')}}
-        @elseif (file_exists(public_path('storage/'. $variant->variantCard->ygo_id . '.png')))
-            {{asset('storage/'. $variant->variantCard->ygo_id . '.png')}}
+        @if (file_exists(public_path('storage/'. $variant->variantCard->passcode . '.jpg')))
+            {{asset('storage/'. $variant->variantCard->passcode . '.jpg')}}
+        @elseif (file_exists(public_path('storage/'. $variant->variantCard->passcode . '.png')))
+            {{asset('storage/'. $variant->variantCard->passcode . '.png')}}
         @endif
     "
             >
@@ -57,10 +57,10 @@ use App\Models\Variant;
                 onclick="copyName('card-{{$variant->id}}')">{{ $variant->cardInstance->card->name }}</h2>
             <p id="id-{{$variant->id}}"
                class="text-md text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400"
-               onclick="copyName('id-{{$variant->id}}')">{{ $variant->variantCard->ygo_id }}</p>
+               onclick="copyName('id-{{$variant->id}}')">{{ $variant->variantCard->passcode }}</p>
             <h3 id="card-instance-{{$variant->id}}"
                 class="text-md text-center text-stone-800 cursor-pointer hover:text-stone-500 pb-2"
-                onclick="copyName('card-instance-{{$variant->id}}')">{{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->rarity_verbose}})</h3>
+                onclick="copyName('card-instance-{{$variant->id}}')">{{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->shortRarity}})</h3>
         </div>
         <div class="flex flex-col items-center align-center py-4 w-[100%]">
                 <div class="bg-white rounded-xl z-50 flex p-2 top-5 right-0 text-stone-800 font-normal">

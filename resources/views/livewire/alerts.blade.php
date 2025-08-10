@@ -28,7 +28,7 @@
                             <td>{{ $variant->id }}</td>
                             <td>{{ $variant->cardInstance->card->name }}</td>
                             <td>{{ $variant->cardInstance->card_set_code }}</td>
-                            <td>{{ $variant->cardInstance->rarity_verbose->value }}</td>
+                            <td>{{ $variant->cardInstance->shortRarity }}</td>
                         </tr>
                     @endforeach
                 </tbody>

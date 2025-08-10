@@ -7,17 +7,17 @@ use Illuminate\Database\Eloquent\Builder;
 
 class VariantCardRepository
 {
-    public function findById(string $ygoId, ?bool $isOriginal = null): ?VariantCard
+    public function findById(string $passcode, ?bool $isOriginal = null): ?VariantCard
     {
-        return VariantCard::where('ygo_id', $ygoId)
+        return VariantCard::where('passcode', $passcode)
             ->when($isOriginal !== null, fn(Builder $q) => $q->where('is_original', $isOriginal))
             ->first();
     }
 
-    public function create(string $ygoId, bool $isOriginal): VariantCard
+    public function create(string $passcode, bool $isOriginal): VariantCard
     {
         return VariantCard::create([
-            'ygo_id' => $ygoId,
+            'passcode' => $passcode,
             'is_original' => $isOriginal,
         ]);
     }

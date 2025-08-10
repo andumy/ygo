@@ -55,7 +55,7 @@
                         <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->card->name}}</td>
                         <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->card_set_code}}</td>
                         <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->set->name}}</td>
-                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->rarity_verbose->value}}</td>
+                        <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->variant->cardInstance->shortRarity}}</td>
                         <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->lang->value}}</td>
                         <td class="text-center px-2">{{$catalogMatch->ownedCardWithAmount->cond->value}}</td>
                         <td class="text-center px-2">{!! $catalogMatch->ownedCardWithAmount->is_first_edition ? '<span>✔️</span>' : '' !!}</td>

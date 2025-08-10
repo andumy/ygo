@@ -90,7 +90,7 @@ class SetsAndInstances extends Component
     }
 
     public function addInstance(){
-        $this->card = $this->cardRepository->findByYgoId($this->card_id);
+        $this->card = $this->cardRepository->findByPasscode($this->card_id);
 
         if(!$this->card){
             $this->message = 'Card not found';

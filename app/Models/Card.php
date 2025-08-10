@@ -20,7 +20,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @property int id
- * @property int ygoId
+ * @property int passcode
  * @property int card_id
  * @property string name
  * @property string alias
@@ -108,11 +108,11 @@ class Card extends Model
         return !$this->isOwned && !$this->isOrdered;
     }
 
-    public function getYgoIdAttribute(): string
+    public function getPasscodeAttribute(): string
     {
         /** @var VariantCard $variantCard */
         $variantCard = $this->variantCards()->where('is_original', 1)->first();
-        return $variantCard->ygo_id;
+        return $variantCard->passcode;
     }
 
     protected static function booted(): void

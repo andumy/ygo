@@ -16,7 +16,7 @@ use App\Models\VariantCard;
             </h1>
         </a>
         <h1 class="text-2xl font-bold">
-            &nbsp;- {{$variantCard->ygo_id}}
+            &nbsp;- {{$variantCard->passcode}}
         </h1>
     </div>
     <div class="flex text-stone-400 relative items-start flex-col p-4">
@@ -32,10 +32,10 @@ use App\Models\VariantCard;
                     class="w-60"
                 @endif
                 src="
-        @if (file_exists(public_path('storage/'. $variantCard->ygo_id . '.jpg')))
-            {{asset('storage/'. $variantCard->ygo_id . '.jpg')}}
-        @elseif (file_exists(public_path('storage/'. $variantCard->ygo_id . '.png')))
-            {{asset('storage/'. $variantCard->ygo_id . '.png')}}
+        @if (file_exists(public_path('storage/'. $variantCard->passcode . '.jpg')))
+            {{asset('storage/'. $variantCard->passcode . '.jpg')}}
+        @elseif (file_exists(public_path('storage/'. $variantCard->passcode . '.png')))
+            {{asset('storage/'. $variantCard->passcode . '.png')}}
         @endif
     "
             >
@@ -44,7 +44,7 @@ use App\Models\VariantCard;
                 onclick="copyName('card-{{$variantCard->id}}')">{{ $variantCard->cardInstances->first()->card->name }}</h2>
             <p id="id-{{$variantCard->id}}"
                class="text-md text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400"
-               onclick="copyName('id-{{$variantCard->id}}')">{{ $variantCard->ygo_id }}</p>
+               onclick="copyName('id-{{$variantCard->id}}')">{{ $variantCard->passcode }}</p>
 
         </div>
         <div class="flex flex-col ps-5 w-[100%]">
@@ -86,7 +86,7 @@ use App\Models\VariantCard;
                                         <p class="text-md text-cyan-500 px-1"> x </p>
                                     @endif
 
-                                    <p class="text-md m-0"> {{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->rarity_verbose}})
+                                    <p class="text-md m-0"> {{$variant->cardInstance->card_set_code}} ({{$variant->cardInstance->shortRarity}})
                                         : {{$variant->cardInstance->price?->price ?? '-'}} €</p>
                                 </a>
                             </td>

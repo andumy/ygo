@@ -2,12 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Strategies\Cards\CardStrategyResolver;
+use App\Enums\Games;
 use App\Enums\Rarities;
 use App\Models\Card;
-use App\Models\Set;
+use App\Models\Game;
 use App\Models\VariantCard;
 use App\Repositories\CardInstanceRepository;
 use App\Repositories\CardRepository;
+use App\Repositories\GameRepository;
 use App\Repositories\PriceRepository;
 use App\Repositories\SetRepository;
 use App\Repositories\VariantCardRepository;
@@ -15,9 +18,7 @@ use App\Repositories\VariantRepository;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Http;
 use function array_key_exists;
-use function config;
 
 class FetchCardsCommand extends Command
 {
@@ -40,141 +41,154 @@ class FetchCardsCommand extends Command
      */
     public function handle(
         CardRepository         $cardRepository,
+        GameRepository         $gameRepository,
         SetRepository          $setRepository,
         CardInstanceRepository $cardInstanceRepository,
         VariantCardRepository  $variantCardRepository,
         VariantRepository      $variantRepository,
         PriceRepository        $priceRepository,
+        CardStrategyResolver   $cardStrategyResolver,
     ): void
     {
-        $sets = Http::get(config('ygo.sets'))->json();
+        foreach ([Games::RIFTBOUND] as $gameEnum){
+            $game = $gameRepository->findForGame($gameEnum);
 
-        foreach ($sets as $setData) {
-            $date = Carbon::parse($setData['tcg_date']);
-            $set = $setRepository->findByName($setData['set_name']);
+            $strategy = $cardStrategyResolver->resolve($gameEnum);
 
-            if (!$set) {
-                $setRepository->updateOrCreate(
-                    [
-                        'name' => $setData['set_name'],
-                    ],
-                    [
-                        'code' => $setData['set_code'],
-                        'card_amount' => $setData['num_of_cards'],
-                        'date' => $date->year > 0 ? $date->format('Y-m-d') : null
-                    ]
-                );
-            }
-        }
+            $sets = $strategy->fetchSets();
 
-        $setRepository->firstOrCreate([
-            'name' => 'Setless Cards',
-        ], [
-            'card_amount' => 0,
-            'date' => Carbon::now(),
-            'code' => 'SETLESS',
-        ]);
+            foreach ($sets as $setData) {
+                $date = Carbon::parse($setData['tcg_date']);
+                $set = $setRepository->findByNameAndGameId($setData['set_name'], $game->id);
 
-        $response = Http::get(config('ygo.cards'));
-
-        $response->lazy('/data')->each(function ($data, $key) use (
-            $cardRepository,
-            $setRepository,
-            $cardInstanceRepository,
-            $variantCardRepository,
-            $variantRepository,
-            $priceRepository,
-        ) {
-            $this->info("Processing card {$data['name']}.");
-
-            if(!array_key_exists('card_sets', $data)){
-                $this->warn("Card {$data['name']} has no instances. Skipped.");
-            }
-
-            if (!$variantCardRepository->findById($data['id'], true)) {
-                $nonOgVariantCard = $variantCardRepository->findById($data['id'], false);
-                if ($nonOgVariantCard) {
-                    //check if there is other variant for that card that is Og.
-                    $cards = new Collection();
-                    foreach ($nonOgVariantCard->variants as $variant) {
-                        $cards->push($variant->cardInstance->card);
-                    }
-
-                    $cards = $cards->unique('id');
-
-                    if ($cards->count() > 1) {
-                        $this->error("Ygo Id {$data['id']} has a variant card non-og associated that goes up to multiple cards");
-                        return;
-                    }
-
-                    /** @var Card $card */
-                    $card = $cards->first();
-
-                    $isThereAnOg = false;
-                    foreach ($card->variantCards as $variantCard) {
-                        if ($variantCard->is_original) {
-                            $isThereAnOg = true;
-                            $variantCard->is_original = false;
-                            $variantCard->save();
-                            $this->info("Variant card {$variantCard->ygo_id} is no longer original.");
-                        }
-                    }
-
-                    if($isThereAnOg){
-                        $this->info("No original variant card found for $card->name.");
-                    }
-
-                    $nonOgVariantCard->is_original = true;
-                    $nonOgVariantCard->save();
-
-                    $this->info("Variant card {$data['id']} is now original for $card->name.");
-
-                } else {
-                    $variantCardRepository->create($data['id'], true);
-                    $this->info("Original variant card {$data['id']} was created");
+                if (!$set) {
+                    $setRepository->updateOrCreate(
+                        [
+                            'name' => $setData['set_name'],
+                            'game_id' => $game->id,
+                        ],
+                        [
+                            'code' => $setData['set_code'],
+                            'card_amount' => $setData['num_of_cards'],
+                            'date' => $date->year > 0 ? $date->format('Y-m-d') : null
+                        ]
+                    );
                 }
             }
 
-            $allVariantCards = new Collection();
-            foreach ($data['card_images'] ?? [] as $variant) {
-                $variantCard = $variantCardRepository->findById($variant['id']);
-                if (!$variantCard) {
-                    $variantCard = $variantCardRepository->create($variant['id'], $variant['id'] === $data['id']);
-                    $this->info("Non-Original variant card {$data['id']} was created");
-                }
-                $allVariantCards->push($variantCard);
-            }
+            $setRepository->firstOrCreate([
+                'name' => 'Setless Cards',
+                'game_id' => $game->id,
+            ], [
+                'card_amount' => 0,
+                'date' => Carbon::now(),
+                'code' => 'SETLESS',
+            ]);
 
-            /** @var Card $card */
-            $card = $allVariantCards->first()?->cardInstances?->first()?->card;
+            $response = $strategy->fetchCards();
 
-            if(!$card) {
-                $card = $cardRepository->findByName($data['name']);
-                if(!$card){
-                    $card = $cardRepository->firstOrCreate([
-                        'name' => $data['name'],
-                        'type' => $data['type'],
-                    ],[]);
-                }
-            }
-
-            if($card->name !== $data['name']){
-                $this->alert("Card $card->name renamed to {$data['name']}.");
-                $card->name = $data['name'];
-                $card->has_image = false;
-                $card->save();
-            }
-
-            $this->createCardInstances(
+            $response->lazy('/data')->each(function ($data, $key) use (
+                $cardRepository,
                 $setRepository,
                 $cardInstanceRepository,
+                $variantCardRepository,
                 $variantRepository,
                 $priceRepository,
-                $data,
-                $allVariantCards,
-                $card
-            );
-        });
+                $game
+            ) {
+                $this->info("Processing card {$data['name']}.");
+
+                if(!array_key_exists('card_sets', $data)){
+                    $this->warn("Card {$data['name']} has no instances. Skipped.");
+                }
+
+                if (!$variantCardRepository->findById($data['id'], true)) {
+                    $nonOgVariantCard = $variantCardRepository->findById($data['id'], false);
+                    if ($nonOgVariantCard) {
+                        //check if there is other variant for that card that is Og.
+                        $cards = new Collection();
+                        foreach ($nonOgVariantCard->variants as $variant) {
+                            $cards->push($variant->cardInstance->card);
+                        }
+
+                        $cards = $cards->unique('id');
+
+                        if ($cards->count() > 1) {
+                            $this->error("Ygo Id {$data['id']} has a variant card non-og associated that goes up to multiple cards");
+                            return;
+                        }
+
+                        /** @var Card $card */
+                        $card = $cards->first();
+
+                        $isThereAnOg = false;
+                        foreach ($card->variantCards as $variantCard) {
+                            if ($variantCard->is_original) {
+                                $isThereAnOg = true;
+                                $variantCard->is_original = false;
+                                $variantCard->save();
+                                $this->info("Variant card {$variantCard->passcode} is no longer original.");
+                            }
+                        }
+
+                        if($isThereAnOg){
+                            $this->info("No original variant card found for $card->name.");
+                        }
+
+                        $nonOgVariantCard->is_original = true;
+                        $nonOgVariantCard->save();
+
+                        $this->info("Variant card {$data['id']} is now original for $card->name.");
+
+                    } else {
+                        $variantCardRepository->create($data['id'], true);
+                        $this->info("Original variant card {$data['id']} was created");
+                    }
+                }
+
+                $allVariantCards = new Collection();
+                foreach ($data['card_images'] ?? [] as $variant) {
+                    $variantCard = $variantCardRepository->findById($variant['id']);
+                    if (!$variantCard) {
+                        $variantCard = $variantCardRepository->create($variant['id'], $variant['id'] === $data['id']);
+                        $this->info("Non-Original variant card {$data['id']} was created");
+                    }
+                    $allVariantCards->push($variantCard);
+                }
+
+                /** @var Card $card */
+                $card = $allVariantCards->first()?->cardInstances?->first()?->card;
+
+                if(!$card) {
+                    $card = $cardRepository->findByNameAndGameId($data['name'], $game->id);
+                    if(!$card){
+                        $card = $cardRepository->firstOrCreate([
+                            'name' => $data['name'],
+                            'type' => $data['type'],
+                            'game_id' => $game->id,
+                        ],[]);
+                    }
+                }
+
+                if($card->name !== $data['name']){
+                    $this->alert("Card $card->name renamed to {$data['name']}.");
+                    $card->name = $data['name'];
+                    $card->has_image = false;
+                    $card->save();
+                }
+
+                $this->createCardInstances(
+                    $setRepository,
+                    $cardInstanceRepository,
+                    $variantRepository,
+                    $priceRepository,
+                    $data,
+                    $allVariantCards,
+                    $card,
+                    $game
+                );
+            });
+        }
     }
 
     /**
@@ -194,7 +208,8 @@ class FetchCardsCommand extends Command
         PriceRepository        $priceRepository,
         array                  $data,
         Collection             $allVariantCards,
-        Card                   $card
+        Card                   $card,
+        Game                   $game
     ): void
     {
         $fallbackSet = [
@@ -205,7 +220,7 @@ class FetchCardsCommand extends Command
             "set_price" => "0"
         ];
         foreach ($data['card_sets'] ?? [$fallbackSet] as $dataSet) {
-            $set = $setRepository->findByName($dataSet['set_name']);
+            $set = $setRepository->findByNameAndGameId($dataSet['set_name'], $game->id);
             if (!$set) {
                 $this->error("Set {$dataSet['set_name']} not found.");
                 continue;
@@ -217,6 +232,7 @@ class FetchCardsCommand extends Command
                     'set_id' => $set->id,
                     'card_set_code' => $dataSet['set_code'],
                     'rarity_verbose' => Rarities::tryFrom($dataSet['set_rarity'])?->value ?? Rarities::MISSING->value,
+                    'game_id' => $game->id,
                 ],
                 []
             );
@@ -232,7 +248,7 @@ class FetchCardsCommand extends Command
                 ],[]);
 
                 if ($variant->wasRecentlyCreated) {
-                    $this->info("Variant for {$ci->card_set_code} over ygo id {$variantCard->ygo_id} was added.");
+                    $this->info("Variant for {$ci->card_set_code} over ygo id {$variantCard->passcode} was added.");
                 }
             }
 

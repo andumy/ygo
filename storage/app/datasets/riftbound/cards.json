@@ -1,0 +1,580 @@
+{
+    "data": [
+        {
+            "id": "OGS-001",
+            "name": "Annie Fiery",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-001",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-001",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-001/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-002",
+            "name": "Firestorm",
+            "type": "Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-002",
+                    "set_rarity": "Riftbound Rare",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-002",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-002/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-003",
+            "name": "Incinerate",
+            "type": "Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-003",
+                    "set_rarity": "Riftbound Common",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-003",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-003/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-004",
+            "name": "Master Yi Meditative",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-004",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-004",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-004/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-005",
+            "name": "Zephyr Sage",
+            "type": "Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-005",
+                    "set_rarity": "Riftbound Rare",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-005",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-005/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-006",
+            "name": "Lux Illuminated",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-006",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-006",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-006/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-007",
+            "name": "Garen Rugged",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-007",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-007",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-007/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-008",
+            "name": "Gentlemen's Duel",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-008",
+                    "set_rarity": "Riftbound Common",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-008",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-008/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-009",
+            "name": "Master Yi Honed",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-009",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-009",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-009/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-010",
+            "name": "Annie Stubborn",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-010",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-010",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-010/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-011",
+            "name": "Flash",
+            "type": "Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-011",
+                    "set_rarity": "Riftbound Common",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-011",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-011/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-012",
+            "name": "Blast of Power",
+            "type": "Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-012",
+                    "set_rarity": "Riftbound Common",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-012",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-012/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-013",
+            "name": "Garen Commander",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-013",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-013",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-013/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-014",
+            "name": "Lux Crownguard",
+            "type": "Champion Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-014",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-014",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-014/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-015",
+            "name": "Recruit the Vanguard",
+            "type": "Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-015",
+                    "set_rarity": "Riftbound Rare",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-015",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-015/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-016",
+            "name": "Vanguard Attendant",
+            "type": "Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-016",
+                    "set_rarity": "Riftbound Common",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-016",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-016/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-017",
+            "name": "Dark Child Starter",
+            "type": "Legend",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-017",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-017",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-017/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-018",
+            "name": "Tibbers",
+            "type": "Signature Unit",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-018",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-018",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-018/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-019",
+            "name": "Wuju Bladesman Starter",
+            "type": "Legend",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-019",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-019",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-019/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-020",
+            "name": "Highlander",
+            "type": "Signature Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-020",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-020",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-020/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-021",
+            "name": "Lady of Luminosity",
+            "type": "Legend",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-021",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-021",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-021/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-022",
+            "name": "Final Spark",
+            "type": "Signature Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-022",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-022",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-022/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-023",
+            "name": "Might of Demacia",
+            "type": "Legend",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-023",
+                    "set_rarity": "Riftbound Epic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-023",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-023/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        },
+        {
+            "id": "OGS-024",
+            "name": "Decisive Strike",
+            "type": "Signature Spell",
+            "card_sets": [
+                {
+                    "set_name": "Origins - Proving Grounds",
+                    "set_code": "OGS-024",
+                    "set_rarity": "Riftbound Mythic",
+                    "set_price": "0"
+                }
+            ],
+            "card_images": [
+                {
+                    "id": "OGS-024",
+                    "image_url": "https://cdn.rgpub.io/public/live/map/riftbound/latest/OGS/cards/OGS-024/full-desktop.jpg"
+                }
+            ],
+            "card_prices": [
+                {
+                    "cardmarket_price": "0.00"
+                }
+            ]
+        }
+    ]
+}

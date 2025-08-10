@@ -28,10 +28,10 @@
                                 class="w-60"
                             @endif
                             src="
-                @if (file_exists(public_path('storage/'. $variantCard->ygo_id . '.jpg')))
-                    {{asset('storage/'. $variantCard->ygo_id . '.jpg')}}
-                @elseif (file_exists(public_path('storage/'. $variantCard->ygo_id . '.png')))
-                    {{asset('storage/'. $variantCard->ygo_id . '.png')}}
+                @if (file_exists(public_path('storage/'. $variantCard->passcode . '.jpg')))
+                    {{asset('storage/'. $variantCard->passcode . '.jpg')}}
+                @elseif (file_exists(public_path('storage/'. $variantCard->passcode . '.png')))
+                    {{asset('storage/'. $variantCard->passcode . '.png')}}
                 @endif
             "
                         >
@@ -44,7 +44,7 @@
                         onclick="copyName('card-{{$variantCard->id}}')">{{ $card->name }}</h2>
                     <p id="id-{{$variantCard->id}}"
                        class="text-md text-center font-bold text-stone-500 cursor-pointer hover:text-stone-400"
-                       onclick="copyName('id-{{$variantCard->id}}')">{{ $variantCard->ygo_id }}</p>
+                       onclick="copyName('id-{{$variantCard->id}}')">{{ $variantCard->passcode }}</p>
                 </div>
             </div>
         @endforeach

@@ -50,7 +50,7 @@
                             @endphp
                             <tr class="{{$newVariant ? 'border-t-2 border-cyan-400' : ''}} py-2 {{$ownedCard['is_missing'] ? 'bg-red-200' : ($bgLight ? 'bg-gray-100' : 'bg-gray-200')}} {{$ownedCard['not_set'] == 0 ? 'opacity-40' : ''}}"
                                 wire:key="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}">
-                                <td class="px-2 text-center">{{$ownedCard['ygo_id']}}</td>
+                                <td class="px-2 text-center">{{$ownedCard['passcode']}}</td>
                                 <td class="px-2 text-center">{{$ownedCard['card_name']}}</td>
                                 <td class="px-2 text-center">{{$ownedCard['rarity']}}</td>
                                 <td class="px-2 text-center">{{$ownedCard['card_set_code']}}</td>

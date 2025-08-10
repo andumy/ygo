@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Strategies\Images\ImageStrategyResolver;
 use App\Models\Card;
 use App\Repositories\CardRepository;
 use Illuminate\Console\Command;
@@ -38,19 +39,22 @@ class FetchImagesCommand extends Command
      */
     public function handle(
         CardRepository $cardRepository,
+        ImageStrategyResolver $imageStrategyResolver
     ): void
     {
         $cardRepository->chunk(
         /** @var Collection<Card> $cards */
-            function (Collection $cards) use ($cardRepository) {
+            function (Collection $cards) use ($cardRepository, $imageStrategyResolver) {
                 foreach ($cards as $card) {
                     if ($card->has_image) {
                         continue;
                     }
 
+                    $strategy = $imageStrategyResolver->resolve($card->game->name);
+
                     try {
-                        $contents = file_get_contents(config('ygo.image_url') . $card->ygoId . '.jpg');
-                        Storage::put('public/' . $card->ygoId . '.jpg', $contents);
+                        $contents = $strategy->fetchImage($card);
+                        Storage::put('public/' . $card->passcode . '.jpg', $contents);
                         $cardRepository->markHasImage($card);
                         $this->info("Fetched image for {$card->name}");
                     } catch (\Exception) {

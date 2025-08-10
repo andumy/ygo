@@ -11,7 +11,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @property int id
- * @property string ygo_id
+ * @property string passcode
  * @property bool is_original
  * @property Collection<Variant> variants
  * @property Collection<Variant> variantsOrderedByCode

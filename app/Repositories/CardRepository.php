@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Card;
 use App\Models\CardInstance;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class CardRepository
@@ -42,6 +43,17 @@ class CardRepository
         return Card::where('name', $name)->orWhere('alias', $name)->first();
     }
 
+    public function findByNameAndGameId(string $name, int $gameId): ?Card
+    {
+        return Card::withoutGlobalScope('game')
+            ->where(function (Builder $q) use($name) {
+                $q->where('name', $name)
+                    ->orWhere('alias', $name);
+            })
+            ->where('game_id', $gameId)
+            ->first();
+    }
+
     public function paginate(
         string $search = '',
         string $set = '',
@@ -69,14 +81,14 @@ class CardRepository
 
     public function chunk(callable $callback): void
     {
-        Card::chunk(100, $callback);
+        Card::withoutGlobalScope('game')->chunk(100, $callback);
     }
 
-    public function findByYgoId(string $id): ?Card
+    public function findByPasscode(string $id): ?Card
     {
         return Card::whereHas('cardInstances', function ($q) use($id){
             $q->whereHas('variants', function ($qq) use ($id) {
-                $qq->whereHas('variantCard', fn ($qqq) => $qqq->where('ygo_id', $id));
+                $qq->whereHas('variantCard', fn ($qqq) => $qqq->where('passcode', $id));
             });
         })->first();
     }
@@ -113,7 +125,7 @@ class CardRepository
                             $qqq->where('card_set_code', 'like', '%' . $search . '%')
                                 ->orWhereHas('variants', function ($qqqq) use ($search) {
                                     $qqqq->whereHas('variantCard',
-                                        fn($qqqqq) => $qqqqq->where('ygo_id', 'like', '%' . $search . '%')
+                                        fn($qqqqq) => $qqqqq->where('passcode', 'like', '%' . $search . '%')
                                     );
                                 });
                         });

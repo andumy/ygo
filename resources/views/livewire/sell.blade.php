@@ -45,12 +45,12 @@
                                     <td class="text-center px-2">{!! Condition::from($cond)->getShortHandRender() !!}</td>
                                     <td class="text-center px-2">{!! $isFirstEd ? '<span>✔️</span>' : '' !!}</td>
                                     @if($cardObject['variants']->count() == 1)
-                                        <td class="text-center px-2">{{$cardObject['variants']->first()->cardInstance->rarity_verbose->value}}</td>
+                                        <td class="text-center px-2">{{$cardObject['variants']->first()->cardInstance->shortRarity}}</td>
                                     @else
                                         <td class="text-center px-2">
                                             <div class="flex flex-col">
                                                 @foreach($cardObject['variants'] as $variant)
-                                                    <p>{{$variant->cardInstance->rarity_verbose->value}}({{$variant->variantCard->ygo_id}})</p>
+                                                    <p>{{$variant->cardInstance->shortRarity}}({{$variant->variantCard->passcode}})</p>
                                                 @endforeach
                                             </div>
                                         </td>

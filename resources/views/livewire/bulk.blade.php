@@ -51,7 +51,7 @@
                                                     )
                                                 )
                                         }}
-                                        ">{{$cardObject['variants']->first()->cardInstance->rarity_verbose->value}}</td>
+                                        ">{{$cardObject['variants']->first()->cardInstance->shortRarity}}</td>
                                     @else
                                         <td class="text-center px-2">
                                             <div class="flex flex-col">
@@ -64,7 +64,7 @@
                                                                 )
                                                             )
                                                         }}
-                                                    ">{{$variant->cardInstance->rarity_verbose->value}}({{$variant->variantCard->ygo_id}})</p>
+                                                    ">{{$variant->cardInstance->shortRarity}}({{$variant->variantCard->passcode}})</p>
                                                 @endforeach
                                             </div>
                                         </td>

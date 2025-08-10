@@ -160,7 +160,7 @@ class TradableCards extends Component
                 [(int)$ownedCard->is_first_edition] ?? [];
 
                 $currentElement = [
-                    'ygo_id' => $variant->variantCard->ygo_id,
+                    'passcode' => $variant->variantCard->passcode,
                     'card_set_code' => $variant->cardInstance->card_set_code,
                     'card_name' => $variant->cardInstance->card->name,
                     'rarity' => $variant->cardInstance->rarity_verbose->value,

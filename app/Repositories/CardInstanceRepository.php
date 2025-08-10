@@ -60,7 +60,7 @@ class CardInstanceRepository
                 $qq->where('card_set_code', 'like', '%' . $search . '%')
                     ->orWhereHas('card', fn ($qqq) => $qqq->where('name', 'like', '%' . $search . '%'))
                     ->orWhereHas('variants', fn ($qqq) => $qqq->whereHas('variantCard',
-                        fn($qqqq) => $qqqq->where('ygo_id', 'like', '%' . $search . '%')
+                        fn($qqqq) => $qqqq->where('passcode', 'like', '%' . $search . '%')
                     ));
             });
         })

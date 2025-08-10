@@ -38,7 +38,7 @@ use function explode;
  * @property string card_set_code_base
  * @property string card_set_code_nr
  * @property Rarities rarity_verbose
- * @property string shortRarity
+ * @property ?string shortRarity
  * @property array orderAmountByLangAndCond
  * @property array ownAmountByLangAndCond
  * @property array orderAmountByLang
@@ -91,7 +91,7 @@ class CardInstance extends Model
 
     public function getShortRarityAttribute(): string
     {
-        return '(' .Rarities::tryFrom($this->rarity_verbose->value)->getShortHand(). ')';
+        return Rarities::tryFrom($this->rarity_verbose->value)->getShortHand() ?? $this->rarity_verbose->value;
     }
 
     public function buildAmountByLang(array $carry, OwnedCard $ownedCard): array {

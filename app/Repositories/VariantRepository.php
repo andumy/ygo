@@ -82,7 +82,7 @@ class VariantRepository
                         ->orWhereHas('card', fn($qqqq) => $qqqq->where('name', 'like', '%' . $search . '%'));
                 })
                     ->orWhereHas('variantCard', function ($qqq) use ($search) {
-                        $qqq->where('ygo_id', 'like', '%' . $search . '%');
+                        $qqq->where('passcode', 'like', '%' . $search . '%');
                     });
             });
         })

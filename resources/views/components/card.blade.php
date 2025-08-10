@@ -24,10 +24,10 @@
                 @endif
                 @endif
                 src="
-                @if (file_exists(public_path('storage/'. $card->ygoId . '.jpg')))
-                    {{asset('storage/'. $card->ygoId . '.jpg')}}
-                @elseif (file_exists(public_path('storage/'. $card->ygoId . '.png')))
-                    {{asset('storage/'. $card->ygoId . '.png')}}
+                @if (file_exists(public_path('storage/'. $card->passcode . '.jpg')))
+                    {{asset('storage/'. $card->passcode . '.jpg')}}
+                @elseif (file_exists(public_path('storage/'. $card->passcode . '.png')))
+                    {{asset('storage/'. $card->passcode . '.png')}}
                 @else
                     {{asset('storage/back.jpg')}}
                 @endif

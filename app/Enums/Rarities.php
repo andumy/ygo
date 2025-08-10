@@ -2,8 +2,6 @@
 
 namespace App\Enums;
 
-use function Laravel\Prompts\search;
-
 enum Rarities: string
 {
     case PROMO = "Promo";
@@ -54,59 +52,22 @@ enum Rarities: string
     case QUARTER_CENTURY_SECRET_RARE = "Quarter Century Secret Rare";
     case TEN_THOUSANDS_SECRET_RARE = "10000 Secret Rare";
     case GHOST_RARE = "Ghost Rare";
+    case RIFTBOUND_COMMON = "Riftbound Common";
+    case RIFTBOUND_RARE = "Riftbound Rare";
+    case RIFTBOUND_EPIC = "Riftbound Epic";
+    case RIFTBOUND_MYTHIC = "Riftbound Mythic";
+    case RIFTBOUND_LEGENDARY = "Riftbound Legendary";
 
 
-    public function getShortHand(): string
+    public function getShortHand(): ?string
     {
         return match ($this) {
-            self::COMMON => "C",
-            self::QUARTER_CENTURY_SECRET_RARE => "QCSR",
-            self::ULTRA_RARE => "UR",
-            self::SUPER_RARE => "SR",
-            self::RARE => "R",
-            self::SHORT_PRINT => "SP",
-            self::SHATTERFOIL_RARE => "SHR",
-            self::DUEL_TERMINAL_NORMAL_PARALLEL_RARE => "DTNPR",
-            self::ULTIMATE_RARE => "ULTR",
-            self::SECRET_RARE => "SCR",
-            self::MOSAIC_RARE => "MSR",
-            self::GOLD_SECRET_RARE => "GSR",
-            self::GOLD_RARE => "GR",
-            self::STARFOIL_RARE => "SFR",
-            self::COLLECTORS_RARE => "CR",
-            self::STARLIGHT_RARE => "SLR",
-            self::PREMIUM_GOLD_RARE => "PGR",
-            self::PRISMATIC_SECRET_RARE => "PSR",
-            self::STARFOIL => "SF",
-            self::DUEL_TERMINAL_RARE_PARALLEL_RARE => "DTRPR",
-            self::DUEL_TERMINAL_SUPER_PARALLEL_RARE => "DTSPR",
-            self::DUEL_TERMINAL_ULTRA_PARALLEL_RARE => "DTUPR",
-            self::EXTRA_SECRET_RARE => "ESCR",
-            self::GHOST_RARE => "GHR",
-            self::REPRINT => "RP",
-            self::NORMAL_PARALLEL_RARE => "NPR",
-            self::PLATINUM_RARE => "PLR",
-            self::ULTRA_PARALLEL_RARE => "ULPR",
-            self::NEW => "N",
-            self::ULTRA_RARE_PHARAOHS_RARE => "URPR",
-            self::GHOST_GOLD_RARE => "GHGR",
-            self::PLATINUM_SECRET_RARE => "PLSR",
-            self::EUROPEAN_OCEANIAN_DEBUT => "EOD",
-            self::SUPER_SHORT_PRINT => "SSP",
-            self::SUPER_PARALLEL_RARE => "SPR",
-            self::ULTRA_SECRET_RARE => "USR",
-            self::EXTRA_SECRET => "ES",
-            self::EUROPEAN_DEBUT => "ED",
-            self::TEN_THOUSANDS_SECRET_RARE => "10KSR",
-            self::OCEANIAN_DEBUT => "OD",
-            self::PRISMATIC_COLLECTORS_RARE => "PCR",
-            self::PRISMATIC_ULTIMATE_RARE => "PUR",
-            self::PROMO => "P",
-            self::PARALLEL_RARE => "PR",
-            self::ULTRA_PHARAOHS_RARE => "UPR",
-            self::SECRET_PHARAOHS_RARE => "SPHR",
-            self::DUEL_TERMINAL_NORMAL_RARE_PARALLEL_RARE => "DTNRPR",
-            default => "N/A",
+            self::RIFTBOUND_COMMON => "⚪",
+            self::RIFTBOUND_RARE => "🔵",
+            self::RIFTBOUND_EPIC => "🟣",
+            self::RIFTBOUND_MYTHIC => "🟠",
+            self::RIFTBOUND_LEGENDARY => "🟡",
+            default => null,
         };
     }
 
