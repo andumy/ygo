@@ -3,20 +3,18 @@
 namespace App\Livewire;
 
 use App\Enums\Games;
-use App\Repositories\GameRepository;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 class GameSelector extends Component
 {
     public int $selectedGame;
-    public Collection $availableGames;
+    public array $availableGames;
 
-    public function mount(GameRepository $gameRepository)
+    public function mount()
     {
-        $this->availableGames = $gameRepository->getAllGames();
-        $this->selectedGame = Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id;
+        $this->availableGames = Games::cases();
+        $this->selectedGame = Session::get('game_id') ?? Games::YGO->id();
     }
 
     public function updatedSelectedGame($gameId)

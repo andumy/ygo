@@ -50,7 +50,7 @@ class FetchCardsCommand extends Command
         CardStrategyResolver   $cardStrategyResolver,
     ): void
     {
-        foreach ([Games::RIFTBOUND] as $gameEnum){
+        foreach ([Games::RIFTBOUND, Games::YGO] as $gameEnum){
             $game = $gameRepository->findForGame($gameEnum);
 
             $strategy = $cardStrategyResolver->resolve($gameEnum);
@@ -62,7 +62,7 @@ class FetchCardsCommand extends Command
                 $set = $setRepository->findByNameAndGameId($setData['set_name'], $game->id);
 
                 if (!$set) {
-                    $setRepository->updateOrCreate(
+                    $setRepository->updateOrCreateByGame(
                         [
                             'name' => $setData['set_name'],
                             'game_id' => $game->id,
@@ -76,13 +76,13 @@ class FetchCardsCommand extends Command
                 }
             }
 
-            $setRepository->firstOrCreate([
+            $setRepository->firstOrCreateWithGame([
                 'name' => 'Setless Cards',
                 'game_id' => $game->id,
             ], [
+                'code' => 'SETLESS',
                 'card_amount' => 0,
                 'date' => Carbon::now(),
-                'code' => 'SETLESS',
             ]);
 
             $response = $strategy->fetchCards();
@@ -162,7 +162,7 @@ class FetchCardsCommand extends Command
                 if(!$card) {
                     $card = $cardRepository->findByNameAndGameId($data['name'], $game->id);
                     if(!$card){
-                        $card = $cardRepository->firstOrCreate([
+                        $card = $cardRepository->firstOrCreateWithGame([
                             'name' => $data['name'],
                             'type' => $data['type'],
                             'game_id' => $game->id,
@@ -226,7 +226,7 @@ class FetchCardsCommand extends Command
                 continue;
             }
 
-            $ci = $cardInstanceRepository->firstOrCreate(
+            $ci = $cardInstanceRepository->firstOrCreateWithGame(
                 [
                     'card_id' => $card->id,
                     'set_id' => $set->id,

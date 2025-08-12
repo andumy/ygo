@@ -19,26 +19,22 @@ class OwnedCardRepository
 
     public function count(): int
     {
-        /** @var GameRepository $gameRepository */
-        $gameRepository = App::make(GameRepository::class);
         return OwnedCard::where('sale', '!=', Sale::SOLD)
             ->join('variants', 'owned_cards.variant_id', '=', 'variants.id')
             ->join('card_instances', 'variants.card_instance_id', '=', 'card_instances.id')
             ->where(
                 'card_instances.game_id',
-                Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id
+                Session::get('game_id') ?? Games::YGO->id()
             )->count();
     }
 
     public function purgeSell(): void
     {
-        /** @var GameRepository $gameRepository */
-        $gameRepository = App::make(GameRepository::class);
         OwnedCard::where('sale', Sale::SOLD)->join('variants', 'owned_cards.variant_id', '=', 'variants.id')
             ->join('card_instances', 'variants.card_instance_id', '=', 'card_instances.id')
             ->where(
                 'card_instances.game_id',
-                Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id
+                Session::get('game_id') ?? Games::YGO->id()
             )->delete();
     }
 

@@ -9,20 +9,14 @@ use Illuminate\Support\Facades\DB;
 
 class CardInstanceRepository
 {
-    public function create(array $data): CardInstance
-    {
-        return CardInstance::create($data);
-    }
-
     public function firstOrCreate(array $find, array $data): CardInstance
     {
         return CardInstance::firstOrCreate($find, $data);
     }
 
-    /** @return Collection<CardInstance> */
-    public function getBySetCode(string $code): Collection
+    public function firstOrCreateWithGame(array $find, array $data): CardInstance
     {
-        return CardInstance::where('card_set_code', $code)->get();
+        return CardInstance::withoutGlobalScope('game')->firstOrCreate($find, $data);
     }
 
     public function rarities(): Collection

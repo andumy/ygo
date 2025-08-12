@@ -1,5 +1,5 @@
 @php
-    use App\Models\Card;
+    use App\Enums\Games;use App\Models\Card;
     use App\Models\CardInstance;
     /**
     * @var Card $card
@@ -29,7 +29,20 @@
                 @elseif (file_exists(public_path('storage/'. $card->passcode . '.png')))
                     {{asset('storage/'. $card->passcode . '.png')}}
                 @else
-                    {{asset('storage/back.jpg')}}
+                    @switch($card->game_id)
+                        @case(Games::YGO->id())
+                            {{asset('storage/ygo-back.jpg')}}
+                        @break
+                        @case(Games::MTG->id())
+                            {{asset('storage/mtg-back.png')}}
+                        @break
+                        @case(Games::POKEMON->id())
+                            {{asset('storage/pokemon-back.png')}}
+                        @break
+                        @case(Games::RIFTBOUND->id())
+                            {{asset('storage/riftbound-back.png')}}
+                        @break
+                    @endswitch
                 @endif
             "
             >

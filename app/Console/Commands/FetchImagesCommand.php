@@ -42,11 +42,13 @@ class FetchImagesCommand extends Command
         ImageStrategyResolver $imageStrategyResolver
     ): void
     {
-        $cardRepository->chunk(
+        $cardRepository->chunkWithoutImagesAndGame(
         /** @var Collection<Card> $cards */
             function (Collection $cards) use ($cardRepository, $imageStrategyResolver) {
                 foreach ($cards as $card) {
+                    $this->info("Processing {$card->name}");
                     if ($card->has_image) {
+                        $this->warn("Skipped image for {$card->name}");
                         continue;
                     }
 
@@ -54,10 +56,13 @@ class FetchImagesCommand extends Command
 
                     try {
                         $contents = $strategy->fetchImage($card);
-                        Storage::put('public/' . $card->passcode . '.jpg', $contents);
+                        foreach ($contents as $passcode => $content) {
+                            Storage::put('public/' . $passcode . '.jpg', $content);
+                            $this->info("Fetched image for {$card->name} on passcode $passcode");
+                        }
                         $cardRepository->markHasImage($card);
-                        $this->info("Fetched image for {$card->name}");
-                    } catch (\Exception) {
+                    } catch (\Exception $e) {
+                        $this->error("Failed to fetch image for $card->name with passcode $passcode.". $e->getMessage());
                     }
                 }
             }

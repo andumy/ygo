@@ -10,32 +10,15 @@ use Illuminate\Support\Collection;
 
 class CardRepository
 {
-    public function firstOrCreate(array $find, array $data): Card
+    public function firstOrCreateWithGame(array $find, array $data): Card
     {
-        return Card::firstOrCreate($find, $data);
+        return Card::withoutGlobalScope('game')->firstOrCreate($find, $data);
     }
 
     public function markHasImage(Card $card): void
     {
         $card->has_image = true;
         $card->save();
-    }
-
-    public function create(string $name, string $type): Card
-    {
-        return Card::create([
-            'name' => $name,
-            'type' => $type
-        ]);
-    }
-
-    /** @return string[] */
-    public function types(): array{
-        return Card::select('type')
-            ->distinct()
-            ->get()
-            ->pluck('type')
-            ->toArray();
     }
 
     public function findByName(string $name): ?Card
@@ -68,20 +51,9 @@ class CardRepository
         )->paginate($pagination);
     }
 
-    public function getForOrder(int $orderId): Collection
+    public function chunkWithoutImagesAndGame(callable $callback): void
     {
-        return Card::whereHas('cardInstances', function ($q) use ($orderId) {
-            $q->whereHas('variants', function ($qq) use ($orderId){
-                $qq->whereHas('ownedCards', function ($qqq) use ($orderId) {
-                    $qqq->where('order_id', $orderId);
-                });
-            });
-        })->get();
-    }
-
-    public function chunk(callable $callback): void
-    {
-        Card::withoutGlobalScope('game')->chunk(100, $callback);
+        Card::withoutGlobalScope('game')->where('has_image', false)->chunk(100, $callback);
     }
 
     public function findByPasscode(string $id): ?Card

@@ -53,20 +53,20 @@ enum Rarities: string
     case TEN_THOUSANDS_SECRET_RARE = "10000 Secret Rare";
     case GHOST_RARE = "Ghost Rare";
     case RIFTBOUND_COMMON = "Riftbound Common";
+    case RIFTBOUND_UNCOMMON = "Riftbound Uncommon";
     case RIFTBOUND_RARE = "Riftbound Rare";
     case RIFTBOUND_EPIC = "Riftbound Epic";
-    case RIFTBOUND_MYTHIC = "Riftbound Mythic";
-    case RIFTBOUND_LEGENDARY = "Riftbound Legendary";
+    case RIFTBOUND_OVERNUMBERED = "Riftbound Overnumbered";
 
 
     public function getShortHand(): ?string
     {
         return match ($this) {
             self::RIFTBOUND_COMMON => "⚪",
-            self::RIFTBOUND_RARE => "🔵",
-            self::RIFTBOUND_EPIC => "🟣",
-            self::RIFTBOUND_MYTHIC => "🟠",
-            self::RIFTBOUND_LEGENDARY => "🟡",
+            self::RIFTBOUND_UNCOMMON => "🔵",
+            self::RIFTBOUND_RARE => "🟣",
+            self::RIFTBOUND_EPIC => "🟠",
+            self::RIFTBOUND_OVERNUMBERED => "🟡",
             default => null,
         };
     }

@@ -6,5 +6,5 @@ use App\Models\Card;
 
 interface ImageStrategyInterface
 {
-    public function fetchImage(Card $card): string;
+    public function fetchImage(Card $card): array;
 }

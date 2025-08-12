@@ -13,6 +13,10 @@ class SetRepository
     {
         return Set::firstOrCreate($find, $data);
     }
+    public function firstOrCreateWithGame(array $find, array $data): Set
+    {
+        return Set::withoutGlobalScope('game')->firstOrCreate($find, $data);
+    }
 
     public function findById(int $id): ?Set
     {
@@ -35,15 +39,9 @@ class SetRepository
             ->first();
     }
 
-    /** @return Collection<Set> */
-    public function getByCode(string $code): Collection
+    public function updateOrCreateByGame(array $find, array $data): Set
     {
-        return Set::where('code',$code)->get();
-    }
-
-    public function updateOrCreate(array $find, array $data): Set
-    {
-        return Set::updateOrCreate($find, $data);
+        return Set::withoutGlobalScope('game')->updateOrCreate($find, $data);
     }
 
     public function all(): Collection

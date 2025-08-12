@@ -118,12 +118,10 @@ class Card extends Model
     protected static function booted(): void
     {
         static::addGlobalScope('game', function (Builder $builder) {
-            /** @var GameRepository $gameRepository */
-            $gameRepository = App::make(GameRepository::class);
 
             $builder->where(
                 'cards.game_id',
-        Session::get('game_id') ?? $gameRepository->findForGame(Games::YGO)?->id
+        Session::get('game_id') ?? Games::YGO->id()
             );
         });
     }

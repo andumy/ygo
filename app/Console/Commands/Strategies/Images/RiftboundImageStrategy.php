@@ -8,9 +8,13 @@ use function file_get_contents;
 
 class RiftboundImageStrategy implements ImageStrategyInterface
 {
-    public function fetchImage(Card $card): string
+    public function fetchImage(Card $card): array
     {
-        $set = current(explode('-', $card->passcode));
-        return file_get_contents("https://cdn.rgpub.io/public/live/map/riftbound/latest/$set/cards/$card->passcode/full-desktop.jpg");
+        $images = [];
+        foreach ($card->variantCards as $variantCard) {
+            $set = current(explode('-', $variantCard->passcode));
+            $images[$variantCard->passcode] = file_get_contents("https://cdn.rgpub.io/public/live/map/riftbound/latest/$set/cards/$variantCard->passcode/full-desktop.jpg");
+        }
+        return $images;
     }
 }
