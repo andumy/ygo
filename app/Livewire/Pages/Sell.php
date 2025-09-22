@@ -139,7 +139,7 @@ class Sell extends Component
     }
 
     public function purgeSell(){
-        $this->ownedCardRepository->purgeSell();
+        $this->ownedCardRepository->purgeListed();
         $this->message = 'Sold cards purged';
     }
 

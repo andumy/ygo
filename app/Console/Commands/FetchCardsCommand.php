@@ -58,7 +58,7 @@ class FetchCardsCommand extends Command
             $sets = $strategy->fetchSets();
 
             foreach ($sets as $setData) {
-                $date = Carbon::parse($setData['tcg_date']);
+                $date = ($setData['tcg_date'] ?? false) ? Carbon::parse($setData['tcg_date']) : Carbon::now();
                 $set = $setRepository->findByNameAndGameId($setData['set_name'], $game->id);
 
                 if (!$set) {

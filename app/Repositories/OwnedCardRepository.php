@@ -19,7 +19,7 @@ class OwnedCardRepository
 
     public function count(): int
     {
-        return OwnedCard::where('sale', '!=', Sale::SOLD)
+        return OwnedCard::where('sale', '!=', Sale::LISTED)
             ->join('variants', 'owned_cards.variant_id', '=', 'variants.id')
             ->join('card_instances', 'variants.card_instance_id', '=', 'card_instances.id')
             ->where(
@@ -28,9 +28,9 @@ class OwnedCardRepository
             )->count();
     }
 
-    public function purgeSell(): void
+    public function purgeListed(): void
     {
-        OwnedCard::where('sale', Sale::SOLD)->join('variants', 'owned_cards.variant_id', '=', 'variants.id')
+        OwnedCard::where('sale', Sale::LISTED)->join('variants', 'owned_cards.variant_id', '=', 'variants.id')
             ->join('card_instances', 'variants.card_instance_id', '=', 'card_instances.id')
             ->where(
                 'card_instances.game_id',
@@ -128,8 +128,7 @@ class OwnedCardRepository
             return false;
         }
 
-        $ownedCard->sale = Sale::SOLD;
-        $ownedCard->save();
+        $ownedCard->delete();
         return true;
     }
 
@@ -137,7 +136,7 @@ class OwnedCardRepository
     public function fetchByVariantGroupByAllOverAmount(int $variantId): Collection
     {
         return OwnedCardWithAmount::where('variant_id', $variantId)
-            ->where('sale', '!=', Sale::SOLD)
+            ->where('sale', '!=', Sale::LISTED)
             ->groupBy('variant_id', 'lang', 'cond', 'sale', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, sale, is_first_edition, count(*) as amount')
             ->orderBy('amount', 'DESC')
@@ -148,7 +147,7 @@ class OwnedCardRepository
     public function fetchByOrderWithAmount(int $orderId): Collection
     {
         return OwnedCardWithAmount::where('order_id', $orderId)
-            ->where('sale', '!=', Sale::SOLD)
+            ->where('sale', '!=', Sale::LISTED)
             ->groupBy('variant_id', 'lang', 'cond', 'is_first_edition')
             ->selectRaw('variant_id, lang, cond, is_first_edition, count(*) as amount')
             ->join('variants', 'variants.id', '=', 'owned_cards.variant_id')
@@ -172,13 +171,13 @@ class OwnedCardRepository
     ): Collection
     {
         return OwnedCard::where('variant_id', $variantId)
-            ->where('sale', '!=', Sale::SOLD)
+            ->where('sale', '!=', Sale::LISTED)
             ->where('lang', $lang)
             ->when($condition, fn($query) => $query->where('cond', $condition))
             ->when($orderId, fn($query) => $query->where('order_id', $orderId))
             ->when($orderId === null, fn($query) => $query->whereNull('order_id'))
             ->when($isFirstEdition !== null, fn($query) => $query->where('is_first_edition', $isFirstEdition))
-            ->orderBy(DB::raw('FIELD(sale, "IN COLLECTION", "LISTED", "TRADE", "NOT SET")'))
+            ->orderBy(DB::raw('FIELD(sale, "IN COLLECTION", "TRADE", "NOT SET")'))
             ->get();
     }
 
@@ -195,7 +194,7 @@ class OwnedCardRepository
     ): void
     {
         OwnedCard::where('variant_id', $variantId)
-            ->where('sale', '!=', Sale::SOLD)
+            ->where('sale', '!=', Sale::LISTED)
             ->where('lang', $lang)
             ->where('cond', $condition)
             ->where('is_first_edition', $isFirstEdition)

@@ -105,12 +105,12 @@ class CardInstance extends Model
 
     public function getOwnAmountByLangAttribute(): Collection
     {
-        return collect($this->ownedCards->whereNull('order_id')->where('sale', '!=', Sale::SOLD)->reduce([$this, 'buildAmountByLang'], []));
+        return collect($this->ownedCards->whereNull('order_id')->where('sale', '!=', Sale::LISTED)->reduce([$this, 'buildAmountByLang'], []));
     }
 
     public function getOrderAmountByLangAttribute(): Collection
     {
-        return collect($this->ownedCards->whereNotNull('order_id')->where('sale', '!=', Sale::SOLD)->reduce([$this, 'buildAmountByLang'], []));
+        return collect($this->ownedCards->whereNotNull('order_id')->where('sale', '!=', Sale::LISTED)->reduce([$this, 'buildAmountByLang'], []));
     }
 
     public function buildAmountByLangAndCond(array $carry, OwnedCard $ownedCard): array {

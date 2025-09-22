@@ -140,9 +140,13 @@ const handleShoppingCart = () => {
 const showImportCsv = () => {
     let output = ''
     document.querySelectorAll('tbody>tr').forEach(node => {
-        const nr = node.querySelector('.row .col-auto div').querySelector('span').innerHTML.substring(1);
-        const set = node.querySelector('.row .col-auto div').querySelector('a span').innerHTML;
-        const cond = node.querySelectorAll('.row .col-auto')[1].querySelector('a span').innerHTML;
+        const amount = node.querySelector('.amount').dataset.amount;
+        const nr = node.querySelector('.row .col-auto div').querySelector('span')?.innerHTML.substring(1);
+        const set = node.querySelector('.row .col-auto div').querySelector('a span')?.innerHTML;
+        const cond = node.querySelectorAll('.row .col-auto')[1].querySelector('a span')?.innerHTML;
+        if(!nr || !set || !cond) {
+            return;
+        }
         const language = node.querySelectorAll('.row .col-auto')[2].querySelector('span span').getAttribute('aria-label');
         let lang = language;
         switch(language){
@@ -163,7 +167,7 @@ const showImportCsv = () => {
                 break;
         }
         const isFirstEd = node.querySelectorAll('.row .col-auto')[4].querySelector('span span') ? 1 : '';
-        output += `\n${set},,${lang},${nr},1,${isFirstEd},,${cond}`;
+        output += `\n${set},,${lang},${nr},${amount},${isFirstEd},,${cond}`;
     });
     console.log(output)
 

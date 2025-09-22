@@ -2,8 +2,6 @@
 
 namespace App\Enums;
 
-use function asset;
-
 enum Sale: string
 {
     case NOT_SET = 'NOT SET';
@@ -11,5 +9,4 @@ enum Sale: string
     case IN_COLLECTION = 'IN COLLECTION';
 
     case LISTED = 'LISTED';
-    case SOLD = 'SOLD';
 }

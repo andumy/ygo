@@ -26,7 +26,6 @@ class TradableCards extends Component
     public int $totalCollectable = 0;
     public int $totalTradable = 0;
     public int $totalNotSet = 0;
-    public int $totalListed = 0;
 
     public Collection $sets;
 
@@ -127,9 +126,6 @@ class TradableCards extends Component
             $this->changed[$variantId][$lang][$cond][$isFirstEd]['tradable'] !=
             $this->variants[$variantId][$lang][$cond][$isFirstEd]['new_tradable']
             ||
-            $this->changed[$variantId][$lang][$cond][$isFirstEd]['listed'] !=
-            $this->variants[$variantId][$lang][$cond][$isFirstEd]['listed']
-            ||
             $this->changed[$variantId][$lang][$cond][$isFirstEd]['not_set'] !=
             $this->variants[$variantId][$lang][$cond][$isFirstEd]['not_set'];
     }
@@ -141,7 +137,6 @@ class TradableCards extends Component
         $this->totalTradable = 0;
         $this->totalCollectable = 0;
         $this->totalNotSet = 0;
-        $this->totalListed = 0;
 
         if($this->set === ''){
             $this->dispatch('$refresh');
@@ -166,7 +161,6 @@ class TradableCards extends Component
                     'rarity' => $variant->cardInstance->rarity_verbose->value,
                     'collectable' => ($ownedCard->sale === Sale::IN_COLLECTION ? $ownedCard->amount : 0) + ($currentElement['collectable'] ?? 0),
                     'tradable' => ($ownedCard->sale === Sale::TRADE ? $ownedCard->amount : 0) + ($currentElement['tradable'] ?? 0),
-                    'listed' => ($ownedCard->sale === Sale::LISTED ? $ownedCard->amount : 0) + ($currentElement['listed'] ?? 0),
                     'not_set' => ($ownedCard->sale === Sale::NOT_SET ? $ownedCard->amount : 0) + ($currentElement['not_set'] ?? 0),
                     'is_missing' => !$variant->isCollected,
                     'was_changed' => false
@@ -187,10 +181,6 @@ class TradableCards extends Component
                     $this->totalNotSet += $ownedCard->amount;
                 }
 
-                if ($ownedCard->sale === Sale::LISTED) {
-                    $this->totalListed += $ownedCard->amount;
-                }
-
                 $this->variants
                 [$variant->id]
                 [$ownedCard->lang->value]
@@ -204,7 +194,6 @@ class TradableCards extends Component
                 [(int)$ownedCard->is_first_edition] = [
                     'collectable' => $currentElement['collectable'],
                     'tradable' => $currentElement['tradable'],
-                    'listed' => $currentElement['listed'],
                     'not_set' => $currentElement['not_set'],
                 ];
             }
@@ -272,7 +261,6 @@ class TradableCards extends Component
 
                         $newStructure = [
                             ...array_fill(0, max((int)$ownedCard['new_tradable'], 0), Sale::TRADE),
-                            ...array_fill(0, max((int)$ownedCard['listed'], 0), Sale::LISTED),
                             ...array_fill(0, max((int)$ownedCard['new_collectable'], 0), Sale::IN_COLLECTION),
                             ...array_fill(0, max((int)$ownedCard['not_set'], 0), Sale::NOT_SET),
                         ];

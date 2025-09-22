@@ -54,8 +54,6 @@ class CardController extends Controller
         $lang = Lang::from($request->get('lang') ?? 'EN');
         $condition = Condition::from($request->get('condition') ?? 'NM');
 
-
-
         $batch = $ownedCardRepository->fetchNextBatch();
 
         $order = $orderRepository->firstOrCreate($orderName);

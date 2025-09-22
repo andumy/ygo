@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "YGO Set Sync",
+    "description": "Set synchronizer between yugipedia and YGO Library",
+    "author": {
+        "email": "andrei_dumitrescu_96@yahoo.com",
+        "name": "Andrei Dumitrescu",
+        "url": "https://github.com/andumy"
+    },
+    "version": "1.0",
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["https://*.yugipedia.com/*"],
+            "js": ["contentScript.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "host_permissions": [
+        "https://*.yugipedia.com/*",
+        "http://localhost/*"
+    ],
+    "icons": {
+        "128": "ygo.png"
+    }
+}

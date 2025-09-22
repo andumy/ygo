@@ -18,7 +18,6 @@ return new class extends Migration
                     '".Sale::TRADE->value."',
                     '".Sale::IN_COLLECTION->value."',
                     '".Sale::LISTED->value."',
-                    '".Sale::SOLD->value."'
                 ) DEFAULT '".Sale::NOT_SET->value."'"
         );
     }

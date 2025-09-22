@@ -48,11 +48,13 @@ class PurchaseRecommendation extends Component
             ['missing', 'desc']
         ])->toArray();
 
-        $this->completionSets = $sets->filter(fn($s) => $s['total'] > 10)
-        ->sortBy([
-            ['setMissing', 'asc'],
-            ['total', 'desc'],
-        ])->toArray();
+        $this->completionSets = $sets->filter(fn($s) => $s['total'] > 10 && $s['owned'] > 0)
+        ->map(fn($s) => [
+            ...$s,
+            'weight' => ($s['owned'] / $s['total']) * log($s['total'] + 1) * (1 - ($s['setMissing'] / $s['total']))
+        ])
+        ->sortByDesc('weight')
+        ->toArray();
 
         $notOwnedCards = $this->cardRepository->searchQuery(onlyOwned: false)->get();
         $this->cis = [];

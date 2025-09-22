@@ -28,7 +28,6 @@
                 <th class="text-center px-4">Not Set</th>
                 <th class="text-center px-4">Collectable</th>
                 <th class="text-center px-4">Tradable</th>
-                <th class="text-center px-4">Listed</th>
                 <th class="text-center px-4">Language</th>
                 <th class="text-center px-4">Condition</th>
                 <th class="text-center px-4">1st Edition</th>
@@ -64,9 +63,6 @@
                                 <td class="px-2 text-center"><input type="number" class="w-[100px]"
                                                                     wire:model="variants.{{$variantId}}.{{$lang}}.{{$cond}}.{{$isFirstEd}}.new_tradable"
                                                                     wire:blur="revalidate({{$variantId}},'{{$lang}}','{{$cond}}',{{$isFirstEd}})"></td>
-                                <td class="px-2 text-center
-                                    {{$ownedCard['listed'] == 0 ? '' : 'bg-black'}}
-                                ">{{ $ownedCard['listed'] }}</td>
                                 <td class="px-2 text-center"><img src="{{Lang::from($lang)->getFlag()}}" alt="{{$lang}}"
                                                                   class="h-full w-auto pe-2"></td>
                                 <td class="px-2 text-center">{!! Condition::from($cond)->getShortHandRender() !!}</td>
@@ -95,7 +91,6 @@
         </button>
         <p>Total Collectable: {{$totalCollectable}}</p>
         <p>Total Tradable: {{$totalTradable}}</p>
-        <p>Total Listed: {{$totalListed}}</p>
         <p>Total Not Set: {{$totalNotSet}}</p>
     </div>
 </div>

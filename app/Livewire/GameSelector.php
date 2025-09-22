@@ -14,7 +14,10 @@ class GameSelector extends Component
     public function mount()
     {
         $this->availableGames = Games::cases();
-        $this->selectedGame = Session::get('game_id') ?? Games::YGO->id();
+        if(!Session::get('game_id')) {
+            Session::put('game_id', Games::YGO->id());
+        }
+        $this->selectedGame = Session::get('game_id');
     }
 
     public function updatedSelectedGame($gameId)

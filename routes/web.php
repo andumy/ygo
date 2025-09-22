@@ -12,6 +12,7 @@ use App\Livewire\Pages\Sell;
 use App\Livewire\Pages\SetsAndInstances;
 use App\Livewire\Pages\SingleVariant;
 use App\Livewire\Pages\SingleVariantCard;
+use App\Livewire\Pages\SyncSet;
 use App\Livewire\Pages\TradableCards;
 use App\Livewire\Pages\Wizzard;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,7 @@ Route::get('/sell', Sell::class);
 Route::get('/alerts', Alerts::class);
 Route::get('/catalog', Catalog::class);
 Route::get('/wizzard', Wizzard::class);
+Route::get('/sync', SyncSet::class);
 
 Route::get('/all-variants-for-card/{card}', AllVariantsForCard::class);
 Route::get('/single-variant-card/{variantCard}', SingleVariantCard::class);
